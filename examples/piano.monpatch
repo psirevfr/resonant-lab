@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "name": "4 modes amortis",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1 · 438.7 Hz",
+      "parameters": {
+        "frequency": 438.74659942688606,
+        "amplitude": 0.035247701250192116,
+        "phase": 2.462534051586425,
+        "tau": 1.611427865422253,
+        "attack": 0.010555555555555556,
+        "onset": 0.006145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 438.747 Hz. Décroissance estimée τ=1.704 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : 0.524798522581447."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2 · 877.8 Hz",
+      "parameters": {
+        "frequency": 877.7840360860454,
+        "amplitude": 0.017140186819993537,
+        "phase": -2.987623979874863,
+        "tau": 0.780722748555526,
+        "attack": 0.010555555555555556,
+        "onset": 0.006145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 877.784 Hz. Décroissance estimée τ=1.156 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : 0.777241396102873."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3 · 1319.5 Hz",
+      "parameters": {
+        "frequency": 1319.4868778637056,
+        "amplitude": 0.013984863967054168,
+        "phase": 2.6325278435313195,
+        "tau": 0.6507838231835148,
+        "attack": 0.010555555555555556,
+        "onset": 0.006145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Pic spectral mesuré à 1319.487 Hz. Décroissance estimée τ=1.016 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : 0.7554926610251278."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4 · 1766.4 Hz",
+      "parameters": {
+        "frequency": 1766.3839456105452,
+        "amplitude": 0.020047400039194224,
+        "phase": -1.355583204587363,
+        "tau": 0.552093671265472,
+        "attack": 0.010555555555555556,
+        "onset": 0.006145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Pic spectral mesuré à 1766.384 Hz. Décroissance estimée τ=0.552 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : 0.8323282560764097."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 330.0,
+        "y": 201.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "gain",
+      "type": "gain",
+      "label": "Gain de sortie",
+      "parameters": {
+        "gain": 1.0
+      },
+      "position": {
+        "x": 570.0,
+        "y": 201.0
+      },
+      "reason": "Gain unité explicite ; aucun changement de niveau caché."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 810.0,
+        "y": 201.0
+      },
+      "reason": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "sum-gain",
+      "source": "sum",
+      "target": "gain"
+    },
+    {
+      "id": "gain-out",
+      "source": "gain",
+      "target": "out"
+    }
+  ]
+}

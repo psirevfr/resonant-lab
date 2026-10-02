@@ -1,0 +1,97 @@
+[
+  {
+    "file": "piano.wav",
+    "selection_start": 0,
+    "duration": 3,
+    "f0": 438.74659942688606,
+    "inharmonicity": null,
+    "model": "4 modes amortis",
+    "candidates": [
+      {
+        "name": "4 modes amortis",
+        "error": 0.5990698460154193,
+        "score": 0.6255698460154193
+      },
+      {
+        "name": "12 modes amortis",
+        "error": 0.5704986645374721,
+        "score": 0.6369986645374721
+      },
+      {
+        "name": "12 modes amortis + LPF 6000 Hz",
+        "error": 0.5715001467390575,
+        "score": 0.6410001467390575
+      },
+      {
+        "name": "12 modes amortis + LPF 2000 Hz",
+        "error": 0.5843943654753002,
+        "score": 0.6538943654753002
+      },
+      {
+        "name": "1 modes amortis",
+        "error": 0.7204645532986235,
+        "score": 0.7319645532986234
+      },
+      {
+        "name": "Bruit filtr\u00e9 amorti",
+        "error": 0.9312441812682941,
+        "score": 0.9422441812682941
+      }
+    ],
+    "before": 0.5990698460154193,
+    "after": 0.5419748160264312,
+    "evaluations": 61,
+    "seconds": 1.03
+  },
+  {
+    "file": "piano2.wav",
+    "selection_start": 0,
+    "duration": 3,
+    "f0": 438.8029167724123,
+    "inharmonicity": {
+      "B": 0.0008492295129597084,
+      "f0_ideal": 438.5907566768581,
+      "rmse_hz": 0.4019360538481171,
+      "harmonic_rmse_hz": 19.253018787303926,
+      "count": 6,
+      "method": "Moindres carr\u00e9s born\u00e9s : f\u2099=n f\u2080 \u221a(1+B n\u00b2). Indice descriptif, pas intervalle de confiance."
+    },
+    "model": "4 modes amortis",
+    "candidates": [
+      {
+        "name": "4 modes amortis",
+        "error": 0.6385390971208226,
+        "score": 0.6650390971208225
+      },
+      {
+        "name": "1 modes amortis",
+        "error": 0.6834245386995305,
+        "score": 0.6949245386995304
+      },
+      {
+        "name": "12 modes amortis",
+        "error": 0.6320634054363097,
+        "score": 0.6985634054363097
+      },
+      {
+        "name": "12 modes amortis + LPF 6000 Hz",
+        "error": 0.6326589861050254,
+        "score": 0.7021589861050254
+      },
+      {
+        "name": "12 modes amortis + LPF 2000 Hz",
+        "error": 0.6385381963886079,
+        "score": 0.7080381963886079
+      },
+      {
+        "name": "Bruit filtr\u00e9 amorti",
+        "error": 0.948722745007911,
+        "score": 0.959722745007911
+      }
+    ],
+    "before": 0.6385390971208226,
+    "after": 0.5966269845172293,
+    "evaluations": 61,
+    "seconds": 0.99
+  }
+]

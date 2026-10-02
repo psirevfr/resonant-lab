@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "name": "Compact · 8 modes",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 437.98345773179653,
+        "amplitude": 0.015993089337518165,
+        "phase": -0.4288549107683277,
+        "tau": 0.5132093907152864,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 438.94065620055653,
+        "amplitude": 0.05502195800526309,
+        "phase": 1.3542529741171911,
+        "tau": 1.1523986436645282,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 439.30684048748384,
+        "amplitude": 0.07813198432548919,
+        "phase": -2.89578355084198,
+        "tau": 0.6628890656749229,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4",
+      "parameters": {
+        "frequency": 877.945695163491,
+        "amplitude": 0.01050123530424905,
+        "phase": 2.9014295173336144,
+        "tau": 0.9905860902795613,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-5",
+      "type": "modal",
+      "label": "Mode 5",
+      "parameters": {
+        "frequency": 878.7022972072579,
+        "amplitude": 0.03502830497619267,
+        "phase": 3.0865628766457505,
+        "tau": 0.4081050839892869,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 30.0,
+        "y": 490.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-6",
+      "type": "modal",
+      "label": "Mode 6",
+      "parameters": {
+        "frequency": 879.4850610011185,
+        "amplitude": 0.05513444760858598,
+        "phase": -1.2544118519449121,
+        "tau": 0.12659936193034962,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 30.0,
+        "y": 605.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-7",
+      "type": "modal",
+      "label": "Mode 7",
+      "parameters": {
+        "frequency": 1320.7859681623477,
+        "amplitude": 0.043947480002006795,
+        "phase": -2.6242904151227755,
+        "tau": 0.12340138250701334,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 270.0,
+        "y": 30.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-8",
+      "type": "modal",
+      "label": "Mode 8",
+      "parameters": {
+        "frequency": 1766.3647097117073,
+        "amplitude": 0.03269190069868117,
+        "phase": 0.9501078524264379,
+        "tau": 0.20402523120025967,
+        "attack": 0.0005,
+        "onset": 0.013145833333333332
+      },
+      "position": {
+        "x": 270.0,
+        "y": 145.0
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 540.0,
+        "y": 230.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 760.0,
+        "y": 230.0
+      },
+      "reason": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "mode-5-sum",
+      "source": "mode-5",
+      "target": "sum"
+    },
+    {
+      "id": "mode-6-sum",
+      "source": "mode-6",
+      "target": "sum"
+    },
+    {
+      "id": "mode-7-sum",
+      "source": "mode-7",
+      "target": "sum"
+    },
+    {
+      "id": "mode-8-sum",
+      "source": "mode-8",
+      "target": "sum"
+    },
+    {
+      "id": "sum-out",
+      "source": "sum",
+      "target": "out"
+    }
+  ]
+}

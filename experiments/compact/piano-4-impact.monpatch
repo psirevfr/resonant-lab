@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "name": "4 modes amortis + impact",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 438.9324318820326,
+        "amplitude": 0.04853237509125477,
+        "phase": 0.24898560900366498,
+        "tau": 1.1909783095400368,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 438.932 Hz. Décroissance estimée τ=1.191 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 439.308355028881,
+        "amplitude": 0.07124323280064027,
+        "phase": 2.2479178189426747,
+        "tau": 0.6952649179012261,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 439.308 Hz. Décroissance estimée τ=0.695 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 878.6973609251588,
+        "amplitude": 0.025451936573041744,
+        "phase": 0.9959878879060645,
+        "tau": 0.3482642893698541,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Pic spectral mesuré à 878.697 Hz. Décroissance estimée τ=0.348 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4",
+      "parameters": {
+        "frequency": 1321.0704481090281,
+        "amplitude": 0.02589996064458812,
+        "phase": -0.2734191198818761,
+        "tau": 0.31624913354902573,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Pic spectral mesuré à 1321.070 Hz. Décroissance estimée τ=0.316 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 330.0,
+        "y": 201.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "gain",
+      "type": "gain",
+      "label": "Gain de sortie",
+      "parameters": {
+        "gain": 1.0
+      },
+      "position": {
+        "x": 570.0,
+        "y": 201.0
+      },
+      "reason": "Gain unité explicite ; aucun changement de niveau caché."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1300.0,
+        "y": 375.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "impact-noise",
+      "type": "noise",
+      "label": "Impact · bruit blanc",
+      "parameters": {
+        "amplitude": 0.034164859171404244,
+        "seed": 42.0
+      },
+      "position": {
+        "x": 30.0,
+        "y": 535.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.443900."
+    },
+    {
+      "id": "impact-hp",
+      "type": "highpass",
+      "label": "Impact · coupe-bas",
+      "parameters": {
+        "fc": 80.0,
+        "q": 0.7071067811865476
+      },
+      "position": {
+        "x": 280.0,
+        "y": 535.0
+      },
+      "reason": "Coupe-bas à 80 Hz dans cette famille de candidats : retire la composante très basse fréquence du bruit. Hypothèse de modèle explicite."
+    },
+    {
+      "id": "impact-lp",
+      "type": "lowpass",
+      "label": "Impact · couleur",
+      "parameters": {
+        "fc": 2500.0,
+        "q": 0.7071067811865476
+      },
+      "position": {
+        "x": 520.0,
+        "y": 535.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.443900."
+    },
+    {
+      "id": "impact-env",
+      "type": "envelope",
+      "label": "Impact · enveloppe",
+      "parameters": {
+        "attack": 0.0007,
+        "tau": 0.15,
+        "onset": 0.006145833333333333
+      },
+      "position": {
+        "x": 760.0,
+        "y": 535.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.443900."
+    },
+    {
+      "id": "impact-sum",
+      "type": "sum",
+      "label": "Modes + impact",
+      "parameters": {},
+      "position": {
+        "x": 1050.0,
+        "y": 375.0
+      },
+      "reason": "Somme explicite des modes déterministes et du bruit transitoire. Aucune copie du WAV dans le graphe."
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "sum-gain",
+      "source": "sum",
+      "target": "gain"
+    },
+    {
+      "id": "impact-noise-impact-hp",
+      "source": "impact-noise",
+      "target": "impact-hp"
+    },
+    {
+      "id": "impact-hp-impact-lp",
+      "source": "impact-hp",
+      "target": "impact-lp"
+    },
+    {
+      "id": "impact-lp-impact-env",
+      "source": "impact-lp",
+      "target": "impact-env"
+    },
+    {
+      "id": "gain-impact-sum",
+      "source": "gain",
+      "target": "impact-sum"
+    },
+    {
+      "id": "impact-env-impact-sum",
+      "source": "impact-env",
+      "target": "impact-sum"
+    },
+    {
+      "id": "impact-sum-out",
+      "source": "impact-sum",
+      "target": "out"
+    }
+  ]
+}

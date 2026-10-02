@@ -1,0 +1,1068 @@
+{
+  "version": 1,
+  "name": "40 modes / résonances isolées · attaque ajustée + impact",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 21.361538994956906,
+        "amplitude": 0.004071390957393056,
+        "phase": -0.6883146096659121,
+        "tau": 0.6491559510793834,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 22.053491261377765,
+        "amplitude": 0.004888343190615645,
+        "phase": -2.9828003098907807,
+        "tau": 0.2243237131253858,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 185.18112690066005,
+        "amplitude": 0.0007854563786925487,
+        "phase": 0.5253542445948076,
+        "tau": 1.2564156634154924,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4",
+      "parameters": {
+        "frequency": 185.25396373611605,
+        "amplitude": 0.005778749637745876,
+        "phase": 3.014536218954545,
+        "tau": 0.14834120984012916,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-5",
+      "type": "modal",
+      "label": "Mode 5",
+      "parameters": {
+        "frequency": 204.38498304215494,
+        "amplitude": 0.012596288282618733,
+        "phase": -0.7607468340599688,
+        "tau": 0.05077756134278439,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-6",
+      "type": "modal",
+      "label": "Mode 6",
+      "parameters": {
+        "frequency": 206.8839580712346,
+        "amplitude": 0.0014336930359408872,
+        "phase": 0.187262379066631,
+        "tau": 0.7277245191089349,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-7",
+      "type": "modal",
+      "label": "Mode 7",
+      "parameters": {
+        "frequency": 209.34980044398858,
+        "amplitude": 0.009638254997209359,
+        "phase": 0.7247773811541789,
+        "tau": 0.08219821184667027,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 720.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-8",
+      "type": "modal",
+      "label": "Mode 8",
+      "parameters": {
+        "frequency": 329.37168138887733,
+        "amplitude": 0.014033144380823547,
+        "phase": -1.6494083292517816,
+        "tau": 0.06276264411200227,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 835.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-9",
+      "type": "modal",
+      "label": "Mode 9",
+      "parameters": {
+        "frequency": 333.04989184757994,
+        "amplitude": 0.0013878509779622072,
+        "phase": -0.13752624888043385,
+        "tau": 0.6276093182266049,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-10",
+      "type": "modal",
+      "label": "Mode 10",
+      "parameters": {
+        "frequency": 337.37261292059094,
+        "amplitude": 0.006280489052715772,
+        "phase": -3.0793321935233475,
+        "tau": 0.035602781986717846,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-11",
+      "type": "modal",
+      "label": "Mode 11",
+      "parameters": {
+        "frequency": 347.72447966340326,
+        "amplitude": 0.028191510822335456,
+        "phase": 0.17133818108373688,
+        "tau": 0.04290040449342065,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-12",
+      "type": "modal",
+      "label": "Mode 12",
+      "parameters": {
+        "frequency": 349.83349672035445,
+        "amplitude": 0.0031915205842792567,
+        "phase": -1.6808138126504089,
+        "tau": 0.36842664551889537,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-13",
+      "type": "modal",
+      "label": "Mode 13",
+      "parameters": {
+        "frequency": 353.7019183709916,
+        "amplitude": 0.06182609568796912,
+        "phase": 1.9741361008193437,
+        "tau": 0.01500000000000001,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-14",
+      "type": "modal",
+      "label": "Mode 14",
+      "parameters": {
+        "frequency": 365.6918516796976,
+        "amplitude": 0.050122961784873764,
+        "phase": 0.14653186329597645,
+        "tau": 0.01500000000000001,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-15",
+      "type": "modal",
+      "label": "Mode 15",
+      "parameters": {
+        "frequency": 369.83087421002676,
+        "amplitude": 0.004853027911983168,
+        "phase": -1.2782520233187427,
+        "tau": 0.7868955774810394,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 720.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-16",
+      "type": "modal",
+      "label": "Mode 16",
+      "parameters": {
+        "frequency": 369.88101741351653,
+        "amplitude": 0.010524351382297946,
+        "phase": 1.8678831155156717,
+        "tau": 0.5048964719483582,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 835.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-17",
+      "type": "modal",
+      "label": "Mode 17",
+      "parameters": {
+        "frequency": 404.8816490436102,
+        "amplitude": 0.02402357980996155,
+        "phase": -2.089321893477468,
+        "tau": 0.03218343567054248,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-18",
+      "type": "modal",
+      "label": "Mode 18",
+      "parameters": {
+        "frequency": 410.6015606575677,
+        "amplitude": 0.002409735833183676,
+        "phase": 0.10475163837444512,
+        "tau": 0.2440535108424827,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-19",
+      "type": "modal",
+      "label": "Mode 19",
+      "parameters": {
+        "frequency": 414.71683080175455,
+        "amplitude": 0.008646056177146177,
+        "phase": -0.8715725472162674,
+        "tau": 0.17557893298870916,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-20",
+      "type": "modal",
+      "label": "Mode 20",
+      "parameters": {
+        "frequency": 437.98435923477433,
+        "amplitude": 0.012312759962458482,
+        "phase": -1.6598391818706766,
+        "tau": 0.6790045606648848,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-21",
+      "type": "modal",
+      "label": "Mode 21",
+      "parameters": {
+        "frequency": 438.9324318820326,
+        "amplitude": 0.05185846262002679,
+        "phase": 0.20288801975294035,
+        "tau": 1.1909783095400368,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-22",
+      "type": "modal",
+      "label": "Mode 22",
+      "parameters": {
+        "frequency": 439.308355028881,
+        "amplitude": 0.07323450762619947,
+        "phase": 2.186069855227764,
+        "tau": 0.6952649179012261,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-23",
+      "type": "modal",
+      "label": "Mode 23",
+      "parameters": {
+        "frequency": 462.724515749752,
+        "amplitude": 0.009094654724070596,
+        "phase": -2.6450820244635604,
+        "tau": 0.0734248916261628,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 720.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-24",
+      "type": "modal",
+      "label": "Mode 24",
+      "parameters": {
+        "frequency": 465.5876405268422,
+        "amplitude": 0.0014872497651164996,
+        "phase": -2.602928186374692,
+        "tau": 0.9836352058022632,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 530.0,
+        "y": 835.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-25",
+      "type": "modal",
+      "label": "Mode 25",
+      "parameters": {
+        "frequency": 466.1508084999868,
+        "amplitude": 0.0018208548117215374,
+        "phase": -1.7849799986639079,
+        "tau": 0.8113215816359586,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-26",
+      "type": "modal",
+      "label": "Mode 26",
+      "parameters": {
+        "frequency": 877.9588017650286,
+        "amplitude": 0.011209220593198756,
+        "phase": 0.33379109057586476,
+        "tau": 0.9628027938940746,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-27",
+      "type": "modal",
+      "label": "Mode 27",
+      "parameters": {
+        "frequency": 878.6973609251588,
+        "amplitude": 0.04965860867652328,
+        "phase": 0.670865701613522,
+        "tau": 0.3482642893698541,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-28",
+      "type": "modal",
+      "label": "Mode 28",
+      "parameters": {
+        "frequency": 879.3328231457662,
+        "amplitude": 0.06385771369574737,
+        "phase": 2.81463909473268,
+        "tau": 0.15154135021056578,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-29",
+      "type": "modal",
+      "label": "Mode 29",
+      "parameters": {
+        "frequency": 1319.404042550445,
+        "amplitude": 0.01621666367369231,
+        "phase": 0.7196423338002376,
+        "tau": 0.17399123981572326,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-30",
+      "type": "modal",
+      "label": "Mode 30",
+      "parameters": {
+        "frequency": 1319.708922113808,
+        "amplitude": 0.0066539166106800085,
+        "phase": -1.0712971380778598,
+        "tau": 0.9479417017257575,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-31",
+      "type": "modal",
+      "label": "Mode 31",
+      "parameters": {
+        "frequency": 1321.0704481090281,
+        "amplitude": 0.020607516654396793,
+        "phase": -0.0711097905000102,
+        "tau": 0.31624913354902573,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 720.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-32",
+      "type": "modal",
+      "label": "Mode 32",
+      "parameters": {
+        "frequency": 1764.5788797932776,
+        "amplitude": 0.00717979284597014,
+        "phase": 2.6092443738278313,
+        "tau": 0.41784469135790114,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 780.0,
+        "y": 835.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-33",
+      "type": "modal",
+      "label": "Mode 33",
+      "parameters": {
+        "frequency": 1766.4022698625708,
+        "amplitude": 0.022869326446127283,
+        "phase": 1.9662502165522895,
+        "tau": 0.3285185819182504,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-34",
+      "type": "modal",
+      "label": "Mode 34",
+      "parameters": {
+        "frequency": 1766.9070785491197,
+        "amplitude": 0.001733338712949004,
+        "phase": 3.0231739835027227,
+        "tau": 1.3022790158539481,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-35",
+      "type": "modal",
+      "label": "Mode 35",
+      "parameters": {
+        "frequency": 2213.8644651639465,
+        "amplitude": 0.00192627844667275,
+        "phase": -2.5888608829667703,
+        "tau": 0.26047399522014325,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-36",
+      "type": "modal",
+      "label": "Mode 36",
+      "parameters": {
+        "frequency": 2216.3048343873347,
+        "amplitude": 0.00099330554712259,
+        "phase": -0.684273781231699,
+        "tau": 0.6581495317015911,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-37",
+      "type": "modal",
+      "label": "Mode 37",
+      "parameters": {
+        "frequency": 2220.940903544416,
+        "amplitude": 0.002288555714400402,
+        "phase": 0.8347503097318381,
+        "tau": 0.08219777263022428,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-38",
+      "type": "modal",
+      "label": "Mode 38",
+      "parameters": {
+        "frequency": 3600.207363319296,
+        "amplitude": 0.005355032418697738,
+        "phase": -0.5229247215845056,
+        "tau": 0.10340930691334482,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-39",
+      "type": "modal",
+      "label": "Mode 39",
+      "parameters": {
+        "frequency": 3602.8832550110637,
+        "amplitude": 0.003539496804284896,
+        "phase": -1.492767336939668,
+        "tau": 0.3823610845247844,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 720.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-40",
+      "type": "modal",
+      "label": "Mode 40",
+      "parameters": {
+        "frequency": 3605.0545064786656,
+        "amplitude": 0.0006702409489247377,
+        "phase": -0.34498315235413557,
+        "tau": 0.46076017621132137,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 1030.0,
+        "y": 835.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 3 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.006 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : 12 Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.008146 s, constante 0.006000 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 1330.0,
+        "y": 429.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "gain",
+      "type": "gain",
+      "label": "Gain de sortie",
+      "parameters": {
+        "gain": 1.0121081190499046
+      },
+      "position": {
+        "x": 1570.0,
+        "y": 429.0
+      },
+      "reason": "Gain unité explicite ; aucun changement de niveau caché."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 2300.0,
+        "y": 835.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "impact-noise",
+      "type": "noise",
+      "label": "Impact · bruit blanc",
+      "parameters": {
+        "amplitude": 0.0521005708210142,
+        "seed": 42.0
+      },
+      "position": {
+        "x": 30.0,
+        "y": 995.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.297070."
+    },
+    {
+      "id": "impact-hp",
+      "type": "highpass",
+      "label": "Impact · coupe-bas",
+      "parameters": {
+        "fc": 40.007932835362226,
+        "q": 0.7071067811865476
+      },
+      "position": {
+        "x": 280.0,
+        "y": 995.0
+      },
+      "reason": "Coupe-bas à 80 Hz dans cette famille de candidats : retire la composante très basse fréquence du bruit. Hypothèse de modèle explicite."
+    },
+    {
+      "id": "impact-lp",
+      "type": "lowpass",
+      "label": "Impact · couleur",
+      "parameters": {
+        "fc": 400.07932835362226,
+        "q": 0.7071067811865476
+      },
+      "position": {
+        "x": 520.0,
+        "y": 995.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.297070."
+    },
+    {
+      "id": "impact-env",
+      "type": "envelope",
+      "label": "Impact · enveloppe",
+      "parameters": {
+        "attack": 0.0007,
+        "tau": 0.2999851259336958,
+        "onset": 0.004145833333333333
+      },
+      "position": {
+        "x": 760.0,
+        "y": 995.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.297070."
+    },
+    {
+      "id": "impact-sum",
+      "type": "sum",
+      "label": "Modes + impact",
+      "parameters": {},
+      "position": {
+        "x": 2050.0,
+        "y": 835.0
+      },
+      "reason": "Somme explicite des modes déterministes et du bruit transitoire. Aucune copie du WAV dans le graphe."
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "mode-5-sum",
+      "source": "mode-5",
+      "target": "sum"
+    },
+    {
+      "id": "mode-6-sum",
+      "source": "mode-6",
+      "target": "sum"
+    },
+    {
+      "id": "mode-7-sum",
+      "source": "mode-7",
+      "target": "sum"
+    },
+    {
+      "id": "mode-8-sum",
+      "source": "mode-8",
+      "target": "sum"
+    },
+    {
+      "id": "mode-9-sum",
+      "source": "mode-9",
+      "target": "sum"
+    },
+    {
+      "id": "mode-10-sum",
+      "source": "mode-10",
+      "target": "sum"
+    },
+    {
+      "id": "mode-11-sum",
+      "source": "mode-11",
+      "target": "sum"
+    },
+    {
+      "id": "mode-12-sum",
+      "source": "mode-12",
+      "target": "sum"
+    },
+    {
+      "id": "mode-13-sum",
+      "source": "mode-13",
+      "target": "sum"
+    },
+    {
+      "id": "mode-14-sum",
+      "source": "mode-14",
+      "target": "sum"
+    },
+    {
+      "id": "mode-15-sum",
+      "source": "mode-15",
+      "target": "sum"
+    },
+    {
+      "id": "mode-16-sum",
+      "source": "mode-16",
+      "target": "sum"
+    },
+    {
+      "id": "mode-17-sum",
+      "source": "mode-17",
+      "target": "sum"
+    },
+    {
+      "id": "mode-18-sum",
+      "source": "mode-18",
+      "target": "sum"
+    },
+    {
+      "id": "mode-19-sum",
+      "source": "mode-19",
+      "target": "sum"
+    },
+    {
+      "id": "mode-20-sum",
+      "source": "mode-20",
+      "target": "sum"
+    },
+    {
+      "id": "mode-21-sum",
+      "source": "mode-21",
+      "target": "sum"
+    },
+    {
+      "id": "mode-22-sum",
+      "source": "mode-22",
+      "target": "sum"
+    },
+    {
+      "id": "mode-23-sum",
+      "source": "mode-23",
+      "target": "sum"
+    },
+    {
+      "id": "mode-24-sum",
+      "source": "mode-24",
+      "target": "sum"
+    },
+    {
+      "id": "mode-25-sum",
+      "source": "mode-25",
+      "target": "sum"
+    },
+    {
+      "id": "mode-26-sum",
+      "source": "mode-26",
+      "target": "sum"
+    },
+    {
+      "id": "mode-27-sum",
+      "source": "mode-27",
+      "target": "sum"
+    },
+    {
+      "id": "mode-28-sum",
+      "source": "mode-28",
+      "target": "sum"
+    },
+    {
+      "id": "mode-29-sum",
+      "source": "mode-29",
+      "target": "sum"
+    },
+    {
+      "id": "mode-30-sum",
+      "source": "mode-30",
+      "target": "sum"
+    },
+    {
+      "id": "mode-31-sum",
+      "source": "mode-31",
+      "target": "sum"
+    },
+    {
+      "id": "mode-32-sum",
+      "source": "mode-32",
+      "target": "sum"
+    },
+    {
+      "id": "mode-33-sum",
+      "source": "mode-33",
+      "target": "sum"
+    },
+    {
+      "id": "mode-34-sum",
+      "source": "mode-34",
+      "target": "sum"
+    },
+    {
+      "id": "mode-35-sum",
+      "source": "mode-35",
+      "target": "sum"
+    },
+    {
+      "id": "mode-36-sum",
+      "source": "mode-36",
+      "target": "sum"
+    },
+    {
+      "id": "mode-37-sum",
+      "source": "mode-37",
+      "target": "sum"
+    },
+    {
+      "id": "mode-38-sum",
+      "source": "mode-38",
+      "target": "sum"
+    },
+    {
+      "id": "mode-39-sum",
+      "source": "mode-39",
+      "target": "sum"
+    },
+    {
+      "id": "mode-40-sum",
+      "source": "mode-40",
+      "target": "sum"
+    },
+    {
+      "id": "sum-gain",
+      "source": "sum",
+      "target": "gain"
+    },
+    {
+      "id": "impact-noise-impact-hp",
+      "source": "impact-noise",
+      "target": "impact-hp"
+    },
+    {
+      "id": "impact-hp-impact-lp",
+      "source": "impact-hp",
+      "target": "impact-lp"
+    },
+    {
+      "id": "impact-lp-impact-env",
+      "source": "impact-lp",
+      "target": "impact-env"
+    },
+    {
+      "id": "gain-impact-sum",
+      "source": "gain",
+      "target": "impact-sum"
+    },
+    {
+      "id": "impact-env-impact-sum",
+      "source": "impact-env",
+      "target": "impact-sum"
+    },
+    {
+      "id": "impact-sum-out",
+      "source": "impact-sum",
+      "target": "out"
+    }
+  ]
+}

@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "name": "12 modes amortis",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 437.98435923477433,
+        "amplitude": 0.012712893277896249,
+        "phase": -1.6426833169755815,
+        "tau": 0.6790045606648848,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 437.984 Hz. Décroissance estimée τ=0.679 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 438.9324318820326,
+        "amplitude": 0.05190159041753315,
+        "phase": 0.19687908715453195,
+        "tau": 1.1909783095400368,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 438.932 Hz. Décroissance estimée τ=1.191 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 439.308355028881,
+        "amplitude": 0.07298510376688142,
+        "phase": 2.179202184164056,
+        "tau": 0.6952649179012261,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Pic spectral mesuré à 439.308 Hz. Décroissance estimée τ=0.695 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4",
+      "parameters": {
+        "frequency": 877.9588017650286,
+        "amplitude": 0.01113852345863377,
+        "phase": 0.32002475983227374,
+        "tau": 0.9628027938940746,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Pic spectral mesuré à 877.959 Hz. Décroissance estimée τ=0.963 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-5",
+      "type": "modal",
+      "label": "Mode 5",
+      "parameters": {
+        "frequency": 878.6973609251588,
+        "amplitude": 0.049650764113651456,
+        "phase": 0.6567376655611998,
+        "tau": 0.3482642893698541,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 490.0
+      },
+      "reason": "Pic spectral mesuré à 878.697 Hz. Décroissance estimée τ=0.348 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-6",
+      "type": "modal",
+      "label": "Mode 6",
+      "parameters": {
+        "frequency": 879.3328231457662,
+        "amplitude": 0.06379648945155478,
+        "phase": 2.7947912950148552,
+        "tau": 0.15154135021056578,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 605.0
+      },
+      "reason": "Pic spectral mesuré à 879.333 Hz. Décroissance estimée τ=0.152 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-7",
+      "type": "modal",
+      "label": "Mode 7",
+      "parameters": {
+        "frequency": 1319.404042550445,
+        "amplitude": 0.015100648117294363,
+        "phase": 0.6345930003465777,
+        "tau": 0.17399123981572326,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 720.0
+      },
+      "reason": "Pic spectral mesuré à 1319.404 Hz. Décroissance estimée τ=0.174 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-8",
+      "type": "modal",
+      "label": "Mode 8",
+      "parameters": {
+        "frequency": 1319.708922113808,
+        "amplitude": 0.0065732939735278495,
+        "phase": -1.0329807913442908,
+        "tau": 0.9479417017257575,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 835.0
+      },
+      "reason": "Pic spectral mesuré à 1319.709 Hz. Décroissance estimée τ=0.948 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-9",
+      "type": "modal",
+      "label": "Mode 9",
+      "parameters": {
+        "frequency": 1321.0704481090281,
+        "amplitude": 0.02123292624361409,
+        "phase": -0.06244424737994337,
+        "tau": 0.31624913354902573,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 1321.070 Hz. Décroissance estimée τ=0.316 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-10",
+      "type": "modal",
+      "label": "Mode 10",
+      "parameters": {
+        "frequency": 1764.5788797932776,
+        "amplitude": 0.007709120352290716,
+        "phase": 2.5927298718035465,
+        "tau": 0.41784469135790114,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 1764.579 Hz. Décroissance estimée τ=0.418 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-11",
+      "type": "modal",
+      "label": "Mode 11",
+      "parameters": {
+        "frequency": 1766.4022698625708,
+        "amplitude": 0.022412805996157425,
+        "phase": 2.072647507325654,
+        "tau": 0.3285185819182504,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 260.0
+      },
+      "reason": "Pic spectral mesuré à 1766.402 Hz. Décroissance estimée τ=0.329 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-12",
+      "type": "modal",
+      "label": "Mode 12",
+      "parameters": {
+        "frequency": 3602.8832550110637,
+        "amplitude": 0.004579700708137898,
+        "phase": -1.49462942755079,
+        "tau": 0.3823610845247844,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 280.0,
+        "y": 375.0
+      },
+      "reason": "Pic spectral mesuré à 3602.883 Hz. Décroissance estimée τ=0.382 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 580.0,
+        "y": 429.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "gain",
+      "type": "gain",
+      "label": "Gain de sortie",
+      "parameters": {
+        "gain": 1.0
+      },
+      "position": {
+        "x": 820.0,
+        "y": 429.0
+      },
+      "reason": "Gain unité explicite ; aucun changement de niveau caché."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1060.0,
+        "y": 429.0
+      },
+      "reason": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "mode-5-sum",
+      "source": "mode-5",
+      "target": "sum"
+    },
+    {
+      "id": "mode-6-sum",
+      "source": "mode-6",
+      "target": "sum"
+    },
+    {
+      "id": "mode-7-sum",
+      "source": "mode-7",
+      "target": "sum"
+    },
+    {
+      "id": "mode-8-sum",
+      "source": "mode-8",
+      "target": "sum"
+    },
+    {
+      "id": "mode-9-sum",
+      "source": "mode-9",
+      "target": "sum"
+    },
+    {
+      "id": "mode-10-sum",
+      "source": "mode-10",
+      "target": "sum"
+    },
+    {
+      "id": "mode-11-sum",
+      "source": "mode-11",
+      "target": "sum"
+    },
+    {
+      "id": "mode-12-sum",
+      "source": "mode-12",
+      "target": "sum"
+    },
+    {
+      "id": "sum-gain",
+      "source": "sum",
+      "target": "gain"
+    },
+    {
+      "id": "gain-out",
+      "source": "gain",
+      "target": "out"
+    }
+  ]
+}

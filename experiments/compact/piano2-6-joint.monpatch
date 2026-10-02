@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "name": "6 modes amortis",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 438.4141014784028,
+        "amplitude": 0.011303982754923664,
+        "phase": 2.7611380773203997,
+        "tau": 29.999999999999016,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 438.399 Hz. Décroissance estimée τ=29.999 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 438.97834593082206,
+        "amplitude": 0.3272084809164163,
+        "phase": -2.6513027929317183,
+        "tau": 0.4518424686162644,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 439.013 Hz. Décroissance estimée τ=0.521 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 439.1595927204121,
+        "amplitude": 0.12024406273280265,
+        "phase": -0.2468677199129834,
+        "tau": 1.0812547063698956,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Pic spectral mesuré à 439.151 Hz. Décroissance estimée τ=0.866 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4",
+      "parameters": {
+        "frequency": 878.3801958746669,
+        "amplitude": 0.09201680209104622,
+        "phase": 0.8077507946682987,
+        "tau": 0.1638061417460588,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Pic spectral mesuré à 878.519 Hz. Décroissance estimée τ=0.211 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-5",
+      "type": "modal",
+      "label": "Mode 5",
+      "parameters": {
+        "frequency": 1321.028451704845,
+        "amplitude": 0.040465238019167925,
+        "phase": 0.38577264154984414,
+        "tau": 0.3463064815602532,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 490.0
+      },
+      "reason": "Pic spectral mesuré à 1321.344 Hz. Décroissance estimée τ=0.396 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "mode-6",
+      "type": "modal",
+      "label": "Mode 6",
+      "parameters": {
+        "frequency": 1766.596117228713,
+        "amplitude": 0.030739879710561902,
+        "phase": -0.6543018711075694,
+        "tau": 0.19669961779719466,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 605.0
+      },
+      "reason": "Pic spectral mesuré à 1766.496 Hz. Décroissance estimée τ=0.393 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 330.0,
+        "y": 315.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "gain",
+      "type": "gain",
+      "label": "Gain de sortie",
+      "parameters": {
+        "gain": 1.0
+      },
+      "position": {
+        "x": 570.0,
+        "y": 315.0
+      },
+      "reason": "Gain unité explicite ; aucun changement de niveau caché."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 810.0,
+        "y": 315.0
+      },
+      "reason": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "mode-5-sum",
+      "source": "mode-5",
+      "target": "sum"
+    },
+    {
+      "id": "mode-6-sum",
+      "source": "mode-6",
+      "target": "sum"
+    },
+    {
+      "id": "sum-gain",
+      "source": "sum",
+      "target": "gain"
+    },
+    {
+      "id": "gain-out",
+      "source": "gain",
+      "target": "out"
+    }
+  ]
+}

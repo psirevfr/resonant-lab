@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "name": "2 sources · couleur non linéaire",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 439.0007892438261,
+        "amplitude": 0.4379106690798504,
+        "phase": -2.892249011067331,
+        "tau": 0.5008439328930835,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 439.013 Hz. Décroissance estimée τ=0.521 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 439.15472490569584,
+        "amplitude": 0.2189660830053084,
+        "phase": -0.40509206801277203,
+        "tau": 0.9433047503433272,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 439.151 Hz. Décroissance estimée τ=0.866 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 300.0,
+        "y": 230.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1740.0,
+        "y": 150.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "nl-0",
+      "type": "asymmetric_saturation",
+      "label": "Création d’harmoniques ×4",
+      "parameters": {
+        "drive": 4.0203619424912835,
+        "bias": -0.5474007569534922,
+        "mix": 1.0,
+        "level": 0.2714174602442602
+      },
+      "position": {
+        "x": 600.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-1",
+      "type": "lowpass1",
+      "label": "",
+      "parameters": {
+        "fc": 5389.542213519682
+      },
+      "position": {
+        "x": 820.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "sum-nl-0",
+      "source": "sum",
+      "target": "nl-0"
+    },
+    {
+      "id": "nl-0-nl-1",
+      "source": "nl-0",
+      "target": "nl-1"
+    },
+    {
+      "id": "nl-1-out",
+      "source": "nl-1",
+      "target": "out"
+    }
+  ]
+}

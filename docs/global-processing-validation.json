@@ -1,0 +1,1568 @@
+[
+  {
+    "baseline": 0.1254948075429992,
+    "limit": 0.15059376905259902,
+    "tolerance": 0.2,
+    "final": 0.14561665304637206,
+    "original_blocks": 47,
+    "final_blocks": 14,
+    "original_generators": 40,
+    "final_generators": 12,
+    "reverted": false,
+    "utilities": [
+      {
+        "block_id": "mode-1",
+        "label": "Mode 1",
+        "error_increase_without": 0.027618537392331083
+      },
+      {
+        "block_id": "mode-2",
+        "label": "Mode 2",
+        "error_increase_without": 0.8606210828795817
+      },
+      {
+        "block_id": "mode-3",
+        "label": "Mode 3",
+        "error_increase_without": 1.1579482372985952
+      },
+      {
+        "block_id": "mode-4",
+        "label": "Mode 4",
+        "error_increase_without": 0.007222762088788026
+      },
+      {
+        "block_id": "mode-5",
+        "label": "Mode 5",
+        "error_increase_without": 0.00795772473141626
+      },
+      {
+        "block_id": "mode-6",
+        "label": "Mode 6",
+        "error_increase_without": 0.09653995271005197
+      },
+      {
+        "block_id": "mode-7",
+        "label": "Mode 7",
+        "error_increase_without": 0.0047695537697991786
+      },
+      {
+        "block_id": "mode-8",
+        "label": "Mode 8",
+        "error_increase_without": 0.009822918525296959
+      },
+      {
+        "block_id": "mode-9",
+        "label": "Mode 9",
+        "error_increase_without": 0.011825730283683722
+      },
+      {
+        "block_id": "mode-10",
+        "label": "Mode 10",
+        "error_increase_without": 0.006861951406276656
+      },
+      {
+        "block_id": "mode-11",
+        "label": "Mode 11",
+        "error_increase_without": 0.023178456162169542
+      },
+      {
+        "block_id": "mode-12",
+        "label": "Mode 12",
+        "error_increase_without": 0.004624317483157947
+      }
+    ],
+    "shaping_tested": true,
+    "processing_diagnostics": [
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 1,
+        "architecture": "1 sources · couleur non linéaire",
+        "full_rate_error": 0.3809078458950577,
+        "seed_error": 0.5058110478825962,
+        "fitted_error": 0.3809078458950577,
+        "blocks": 4
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 1,
+        "architecture": "1 sources · resonance non linéaire",
+        "full_rate_error": 0.32403898291950295,
+        "seed_error": 0.46034172908725496,
+        "fitted_error": 0.32403898291950295,
+        "blocks": 6
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 1,
+        "architecture": "1 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.39062791872272806,
+        "seed_error": 0.5749496501633435,
+        "fitted_error": 0.39062791872272806,
+        "blocks": 6
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 2,
+        "architecture": "2 sources · couleur non linéaire",
+        "full_rate_error": 0.31863194311378645,
+        "seed_error": 0.4600161511092046,
+        "fitted_error": 0.31863194311378645,
+        "blocks": 6
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 2,
+        "architecture": "2 sources · resonance non linéaire",
+        "full_rate_error": 0.24449535203177136,
+        "seed_error": 0.41495839771833454,
+        "fitted_error": 0.24449535203177136,
+        "blocks": 8
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 2,
+        "architecture": "2 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.33733082060881836,
+        "seed_error": 0.53979249534732,
+        "fitted_error": 0.33733082060881836,
+        "blocks": 8
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 3,
+        "architecture": "3 sources · couleur non linéaire",
+        "full_rate_error": 0.2671547881962608,
+        "seed_error": 0.4611204463748857,
+        "fitted_error": 0.2671547881962608,
+        "blocks": 7
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 3,
+        "architecture": "3 sources · resonance non linéaire",
+        "full_rate_error": 0.22812109650253215,
+        "seed_error": 0.4042657299766872,
+        "fitted_error": 0.22812109650253215,
+        "blocks": 9
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 3,
+        "architecture": "3 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.31118501117242237,
+        "seed_error": 0.5464494718841879,
+        "fitted_error": 0.31118501117242237,
+        "blocks": 9
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 4,
+        "architecture": "4 sources · couleur non linéaire",
+        "full_rate_error": 0.32779601750353127,
+        "seed_error": 0.4525719930716828,
+        "fitted_error": 0.32779601750353127,
+        "blocks": 8
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 4,
+        "architecture": "4 sources · resonance non linéaire",
+        "full_rate_error": 0.2444038878092667,
+        "seed_error": 0.3949017564941207,
+        "fitted_error": 0.2444038878092667,
+        "blocks": 10
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 4,
+        "architecture": "4 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.34447797602181573,
+        "seed_error": 0.5400115445334985,
+        "fitted_error": 0.34447797602181573,
+        "blocks": 10
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 6,
+        "architecture": "6 sources · parallele non linéaire",
+        "full_rate_error": 0.16617004905909466,
+        "seed_error": 0.18865572886237544,
+        "fitted_error": 0.16617004905909466,
+        "blocks": 12
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 8,
+        "architecture": "8 sources · parallele non linéaire",
+        "full_rate_error": 0.15764820624665032,
+        "seed_error": 0.18172415943918727,
+        "fitted_error": 0.15764820624665032,
+        "blocks": 14
+      }
+    ],
+    "selection": "Minimum de blocs sous la limite d’erreur acceptée ; à égalité, moins de paramètres puis erreur minimale. Version initiale conservée. Utilité : hausse de coût en coupant une source, sans réajuster les autres.",
+    "file": "piano2",
+    "seconds": 44.26617079193238,
+    "original_render_ms": 80.34395799040794,
+    "compact_render_ms": 22.933042026124895,
+    "candidates": [
+      {
+        "errors": {
+          "time": 0.47754236635491387,
+          "spectral": 0.3906693407216579,
+          "spectrogram": 0.46510006311474533,
+          "envelope": 0.3140121457784136,
+          "attack": 0.3492013465876118,
+          "total": 0.4098990095095548
+        },
+        "complexity": 3.5,
+        "score": 0.4098990095095548,
+        "parameter_count": 6,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 1 modes",
+        "blocks": 2
+      },
+      {
+        "errors": {
+          "time": 0.510825505849867,
+          "spectral": 0.3534423861777784,
+          "spectrogram": 0.43244203471860865,
+          "envelope": 0.3058494417563595,
+          "attack": 0.29837290646653025,
+          "total": 0.3809078458950577
+        },
+        "complexity": 6.75,
+        "score": 0.3809078458950577,
+        "parameter_count": 11,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "1 sources · couleur non linéaire",
+        "blocks": 4
+      },
+      {
+        "errors": {
+          "time": 0.4039816066365822,
+          "spectral": 0.36487804871103624,
+          "spectrogram": 0.37224404910717745,
+          "envelope": 0.1383927085549903,
+          "attack": 0.3501195648289428,
+          "total": 0.3408227959083922
+        },
+        "complexity": 7.0,
+        "score": 0.3408227959083922,
+        "parameter_count": 12,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 2 modes",
+        "blocks": 4
+      },
+      {
+        "errors": {
+          "time": 0.3213170647929026,
+          "spectral": 0.2676093841183562,
+          "spectrogram": 0.2810916903904136,
+          "envelope": 0.12481082825741167,
+          "attack": 0.2287023521974485,
+          "total": 0.25238168799364796
+        },
+        "complexity": 9.5,
+        "score": 0.25238168799364796,
+        "parameter_count": 18,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 3 modes",
+        "blocks": 5
+      },
+      {
+        "errors": {
+          "time": 0.5075083326089588,
+          "spectral": 0.3631872157399062,
+          "spectrogram": 0.4423149615182735,
+          "envelope": 0.31143514997303506,
+          "attack": 0.3154580318097825,
+          "total": 0.39062791872272806
+        },
+        "complexity": 10.0,
+        "score": 0.39062791872272806,
+        "parameter_count": 16,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "1 sources · pre-filtre non linéaire",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.44221478808613474,
+          "spectral": 0.3437464193816224,
+          "spectrogram": 0.3433941514676221,
+          "envelope": 0.14059598247055557,
+          "attack": 0.3013814885352784,
+          "total": 0.31863194311378645
+        },
+        "complexity": 10.25,
+        "score": 0.31863194311378645,
+        "parameter_count": 17,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "2 sources · couleur non linéaire",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.5231157093963493,
+          "spectral": 0.27966330440578124,
+          "spectrogram": 0.3799711584721611,
+          "envelope": 0.30314451474377097,
+          "attack": 0.18945630064260893,
+          "total": 0.32403898291950295
+        },
+        "complexity": 10.25,
+        "score": 0.32403898291950295,
+        "parameter_count": 17,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "1 sources · resonance non linéaire",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.28303001286406443,
+          "spectral": 0.2555463813421446,
+          "spectrogram": 0.2639533867709589,
+          "envelope": 0.08817166467568535,
+          "attack": 0.2299018662747438,
+          "total": 0.2358940050219686
+        },
+        "complexity": 12.0,
+        "score": 0.2358940050219686,
+        "parameter_count": 24,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 4 modes",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.5185394267840947,
+          "spectral": 0.2806273664269047,
+          "spectrogram": 0.27452076755224913,
+          "envelope": 0.1461483454601191,
+          "attack": 0.21100026146019182,
+          "total": 0.2671547881962608
+        },
+        "complexity": 12.75,
+        "score": 0.2671547881962608,
+        "parameter_count": 23,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "3 sources · couleur non linéaire",
+        "blocks": 7
+      },
+      {
+        "errors": {
+          "time": 0.4490181284535589,
+          "spectral": 0.3651576882456627,
+          "spectrogram": 0.3599172917452669,
+          "envelope": 0.17369564546686775,
+          "attack": 0.31783719264635113,
+          "total": 0.33733082060881836
+        },
+        "complexity": 13.5,
+        "score": 0.33733082060881836,
+        "parameter_count": 22,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "2 sources · pre-filtre non linéaire",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.4365685766530894,
+          "spectral": 0.2542286661135961,
+          "spectrogram": 0.2611098061421268,
+          "envelope": 0.11658372450086064,
+          "attack": 0.201450816399255,
+          "total": 0.24449535203177136
+        },
+        "complexity": 13.75,
+        "score": 0.24449535203177136,
+        "parameter_count": 23,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "2 sources · resonance non linéaire",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.5924738608705176,
+          "spectral": 0.3344440515892032,
+          "spectrogram": 0.33224946213212453,
+          "envelope": 0.15848170523320293,
+          "attack": 0.30795854417607527,
+          "total": 0.32779601750353127
+        },
+        "complexity": 15.25,
+        "score": 0.32779601750353127,
+        "parameter_count": 29,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "4 sources · couleur non linéaire",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.21758242008389367,
+          "spectral": 0.1739736977603766,
+          "spectrogram": 0.18366536382172577,
+          "envelope": 0.07838312076246098,
+          "attack": 0.15538552081952578,
+          "total": 0.1661505573428776
+        },
+        "complexity": 17.0,
+        "score": 0.1661505573428776,
+        "parameter_count": 36,
+        "generators": 6,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 6 modes",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.28420846473625033,
+          "spectral": 0.25466266892306905,
+          "spectrogram": 0.2620776924693464,
+          "envelope": 0.08313615665656827,
+          "attack": 0.227006828778817,
+          "total": 0.23387799250580402
+        },
+        "complexity": 16.0,
+        "score": 0.23387799250580402,
+        "parameter_count": 28,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "Compact · 4 modes · saturation + filtre",
+        "blocks": 9
+      },
+      {
+        "errors": {
+          "time": 0.7646226563486813,
+          "spectral": 0.3000553028754101,
+          "spectrogram": 0.30417166175180144,
+          "envelope": 0.18766998278557923,
+          "attack": 0.22907537727227884,
+          "total": 0.31118501117242237
+        },
+        "complexity": 16.0,
+        "score": 0.31118501117242237,
+        "parameter_count": 28,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "3 sources · pre-filtre non linéaire",
+        "blocks": 9
+      },
+      {
+        "errors": {
+          "time": 0.46160200879478963,
+          "spectral": 0.2549941718241411,
+          "spectrogram": 0.22658675597553005,
+          "envelope": 0.11935439122217444,
+          "attack": 0.17618436048623917,
+          "total": 0.22812109650253215
+        },
+        "complexity": 16.25,
+        "score": 0.22812109650253215,
+        "parameter_count": 29,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "3 sources · resonance non linéaire",
+        "blocks": 9
+      },
+      {
+        "errors": {
+          "time": 0.7568612402692597,
+          "spectral": 0.31017740294408336,
+          "spectrogram": 0.339707441894679,
+          "envelope": 0.24124501790985114,
+          "attack": 0.28530608652202283,
+          "total": 0.34447797602181573
+        },
+        "complexity": 18.5,
+        "score": 0.34447797602181573,
+        "parameter_count": 34,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "4 sources · pre-filtre non linéaire",
+        "blocks": 10
+      },
+      {
+        "errors": {
+          "time": 0.48090599919070764,
+          "spectral": 0.26539528672790014,
+          "spectrogram": 0.24264803075973135,
+          "envelope": 0.13673276857056826,
+          "attack": 0.1969260299803467,
+          "total": 0.2444038878092667
+        },
+        "complexity": 18.75,
+        "score": 0.2444038878092667,
+        "parameter_count": 35,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "4 sources · resonance non linéaire",
+        "blocks": 10
+      },
+      {
+        "errors": {
+          "time": 0.20224532906594347,
+          "spectral": 0.16417273687644304,
+          "spectrogram": 0.17106435754366045,
+          "envelope": 0.07443041607140398,
+          "attack": 0.15605382403625206,
+          "total": 0.15758233145384715
+        },
+        "complexity": 22.0,
+        "score": 0.15758233145384715,
+        "parameter_count": 48,
+        "generators": 8,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 8 modes",
+        "blocks": 10
+      },
+      {
+        "errors": {
+          "time": 0.29942060562187645,
+          "spectral": 0.2554478404245932,
+          "spectrogram": 0.24881892740046574,
+          "envelope": 0.08892445078045472,
+          "attack": 0.20892099383542578,
+          "total": 0.2270259203555948
+        },
+        "complexity": 19.25,
+        "score": 0.2270259203555948,
+        "parameter_count": 33,
+        "generators": 5,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "Compact · 4 modes + impact",
+        "blocks": 11
+      },
+      {
+        "errors": {
+          "time": 0.21810095382250036,
+          "spectral": 0.17422097596421895,
+          "spectrogram": 0.1836014280387033,
+          "envelope": 0.07762251123938152,
+          "attack": 0.15561252498121875,
+          "total": 0.16617004905909466
+        },
+        "complexity": 23.0,
+        "score": 0.16617004905909466,
+        "parameter_count": 44,
+        "generators": 6,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "6 sources · parallele non linéaire",
+        "blocks": 12
+      },
+      {
+        "errors": {
+          "time": 0.19481347989239603,
+          "spectral": 0.16115477137903506,
+          "spectrogram": 0.16427618646342268,
+          "envelope": 0.06032804231306307,
+          "attack": 0.15181637051945823,
+          "total": 0.15112914643402697
+        },
+        "complexity": 27.0,
+        "score": 0.15112914643402697,
+        "parameter_count": 60,
+        "generators": 10,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 10 modes",
+        "blocks": 12
+      },
+      {
+        "errors": {
+          "time": 0.2029432118763552,
+          "spectral": 0.16471047798969185,
+          "spectrogram": 0.17059824603304707,
+          "envelope": 0.07309193430153064,
+          "attack": 0.15517609817396671,
+          "total": 0.15722310271224266
+        },
+        "complexity": 26.0,
+        "score": 0.15722310271224266,
+        "parameter_count": 52,
+        "generators": 8,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "Compact · 8 modes · saturation + filtre",
+        "blocks": 13
+      },
+      {
+        "errors": {
+          "time": 0.20283796386916408,
+          "spectral": 0.16447257480001287,
+          "spectrogram": 0.17087348020594642,
+          "envelope": 0.07385431311930217,
+          "attack": 0.156573722602099,
+          "total": 0.15764820624665032
+        },
+        "complexity": 28.0,
+        "score": 0.15764820624665032,
+        "parameter_count": 56,
+        "generators": 8,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "8 sources · parallele non linéaire",
+        "blocks": 14
+      },
+      {
+        "errors": {
+          "time": 0.1878352247696051,
+          "spectral": 0.15459744843391315,
+          "spectrogram": 0.1581732590737629,
+          "envelope": 0.06123255336905839,
+          "attack": 0.14526567672114427,
+          "total": 0.14561665304637206
+        },
+        "complexity": 32.0,
+        "score": 0.14561665304637206,
+        "parameter_count": 72,
+        "generators": 12,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 12 modes",
+        "blocks": 14
+      },
+      {
+        "errors": {
+          "time": 0.20630644935346243,
+          "spectral": 0.16302889441621424,
+          "spectrogram": 0.16569580648192866,
+          "envelope": 0.07529849140197628,
+          "attack": 0.15464766133327423,
+          "total": 0.15535396865918333
+        },
+        "complexity": 29.25,
+        "score": 0.15535396865918333,
+        "parameter_count": 57,
+        "generators": 9,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "Compact · 8 modes + impact",
+        "blocks": 15
+      },
+      {
+        "errors": {
+          "time": 0.1880806692414176,
+          "spectral": 0.1548840919840486,
+          "spectrogram": 0.15745471312285134,
+          "envelope": 0.05964191030093222,
+          "attack": 0.14469296883430927,
+          "total": 0.14510078018823738
+        },
+        "complexity": 36.0,
+        "score": 0.14510078018823738,
+        "parameter_count": 76,
+        "generators": 12,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 12 modes · saturation + filtre",
+        "blocks": 17
+      },
+      {
+        "errors": {
+          "time": 0.18058865231590218,
+          "spectral": 0.14660564798589926,
+          "spectrogram": 0.15038632206070748,
+          "envelope": 0.06096671526599701,
+          "attack": 0.13440675564956317,
+          "total": 0.1381201075685673
+        },
+        "complexity": 42.0,
+        "score": 0.1381201075685673,
+        "parameter_count": 96,
+        "generators": 16,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 16 modes",
+        "blocks": 18
+      },
+      {
+        "errors": {
+          "time": 0.19147395392841693,
+          "spectral": 0.15350352717337298,
+          "spectrogram": 0.15304064357864564,
+          "envelope": 0.06188017812374908,
+          "attack": 0.1441248426511224,
+          "total": 0.1434854690854806
+        },
+        "complexity": 39.25,
+        "score": 0.1434854690854806,
+        "parameter_count": 81,
+        "generators": 13,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": false,
+        "name": "Compact · 12 modes + impact",
+        "blocks": 19
+      },
+      {
+        "errors": {
+          "time": 0.18981218287710647,
+          "spectral": 0.13722081468511105,
+          "spectrogram": 0.1277523528309205,
+          "envelope": 0.057831725282284474,
+          "attack": 0.12412460904783053,
+          "total": 0.1254948075429992
+        },
+        "complexity": 108.0,
+        "score": 0.1254948075429992,
+        "parameter_count": 244,
+        "generators": 40,
+        "reference": true,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "39 modes / détaillés · attaque ajustée + impact",
+        "blocks": 47
+      }
+    ]
+  },
+  {
+    "baseline": 0.285567753371501,
+    "limit": 0.34268130404680114,
+    "tolerance": 0.2,
+    "final": 0.33879228570207454,
+    "original_blocks": 48,
+    "final_blocks": 10,
+    "original_generators": 41,
+    "final_generators": 8,
+    "reverted": false,
+    "utilities": [
+      {
+        "block_id": "mode-1",
+        "label": "Mode 1",
+        "error_increase_without": 0.024804682738751804
+      },
+      {
+        "block_id": "mode-2",
+        "label": "Mode 2",
+        "error_increase_without": 0.27059040627688213
+      },
+      {
+        "block_id": "mode-3",
+        "label": "Mode 3",
+        "error_increase_without": 0.19767670951703997
+      },
+      {
+        "block_id": "mode-4",
+        "label": "Mode 4",
+        "error_increase_without": 0.00813184288492147
+      },
+      {
+        "block_id": "mode-5",
+        "label": "Mode 5",
+        "error_increase_without": 0.02285193468053265
+      },
+      {
+        "block_id": "mode-6",
+        "label": "Mode 6",
+        "error_increase_without": 0.03151185624917224
+      },
+      {
+        "block_id": "mode-7",
+        "label": "Mode 7",
+        "error_increase_without": 0.08221962574088781
+      },
+      {
+        "block_id": "mode-8",
+        "label": "Mode 8",
+        "error_increase_without": 0.07400714716684575
+      }
+    ],
+    "shaping_tested": true,
+    "processing_diagnostics": [
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 1,
+        "architecture": "1 sources · couleur non linéaire",
+        "full_rate_error": 0.6700425383524438,
+        "seed_error": 0.7892269319053355,
+        "fitted_error": 0.6700425383524438,
+        "blocks": 4
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 1,
+        "architecture": "1 sources · resonance non linéaire",
+        "full_rate_error": 0.6315990338296446,
+        "seed_error": 0.7872615681398586,
+        "fitted_error": 0.6315990338296446,
+        "blocks": 6
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 1,
+        "architecture": "1 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.6721817773519163,
+        "seed_error": 0.8160631946258452,
+        "fitted_error": 0.6721817773519163,
+        "blocks": 6
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 2,
+        "architecture": "2 sources · couleur non linéaire",
+        "full_rate_error": 0.567492958179624,
+        "seed_error": 0.6583916716839473,
+        "fitted_error": 0.567492958179624,
+        "blocks": 6
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 2,
+        "architecture": "2 sources · resonance non linéaire",
+        "full_rate_error": 0.5281012179654743,
+        "seed_error": 0.6557055366021449,
+        "fitted_error": 0.5281012179654743,
+        "blocks": 8
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 2,
+        "architecture": "2 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.5729650556173086,
+        "seed_error": 0.7020230215962321,
+        "fitted_error": 0.5729650556173086,
+        "blocks": 8
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 3,
+        "architecture": "3 sources · couleur non linéaire",
+        "full_rate_error": 0.4690359382988599,
+        "seed_error": 0.5980815016320273,
+        "fitted_error": 0.4690359382988599,
+        "blocks": 7
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 3,
+        "architecture": "3 sources · resonance non linéaire",
+        "full_rate_error": 0.44288222700262014,
+        "seed_error": 0.5843489701788884,
+        "fitted_error": 0.44288222700262014,
+        "blocks": 9
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 3,
+        "architecture": "3 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.4760141957361392,
+        "seed_error": 0.6657070039342158,
+        "fitted_error": 0.4760141957361392,
+        "blocks": 9
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 4,
+        "architecture": "4 sources · couleur non linéaire",
+        "full_rate_error": 0.41307376688473835,
+        "seed_error": 0.5515736844716582,
+        "fitted_error": 0.41307376688473835,
+        "blocks": 8
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 4,
+        "architecture": "4 sources · resonance non linéaire",
+        "full_rate_error": 0.40621080252894953,
+        "seed_error": 0.528424827699651,
+        "fitted_error": 0.40621080252894953,
+        "blocks": 10
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 4,
+        "architecture": "4 sources · pre-filtre non linéaire",
+        "full_rate_error": 0.4574341760177262,
+        "seed_error": 0.6335696541446705,
+        "fitted_error": 0.4574341760177262,
+        "blocks": 10
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 6,
+        "architecture": "6 sources · parallele non linéaire",
+        "full_rate_error": 0.3529156037018813,
+        "seed_error": 0.3649357304005869,
+        "fitted_error": 0.3529156037018813,
+        "blocks": 12
+      },
+      {
+        "evaluations_budget": 220,
+        "analysis_rate": 12000.0,
+        "sources": 8,
+        "architecture": "8 sources · parallele non linéaire",
+        "full_rate_error": 0.33730145298220926,
+        "seed_error": 0.35514573179875447,
+        "fitted_error": 0.33730145298220926,
+        "blocks": 14
+      }
+    ],
+    "selection": "Minimum de blocs sous la limite d’erreur acceptée ; à égalité, moins de paramètres puis erreur minimale. Version initiale conservée. Utilité : hausse de coût en coupant une source, sans réajuster les autres.",
+    "file": "piano",
+    "seconds": 44.35548475000542,
+    "original_render_ms": 85.11404204182327,
+    "compact_render_ms": 16.54020801652223,
+    "candidates": [
+      {
+        "errors": {
+          "time": 0.8427662454377048,
+          "spectral": 0.6968179166666145,
+          "spectrogram": 0.7667756412591193,
+          "envelope": 0.5854046391646179,
+          "attack": 0.7674072508822047,
+          "total": 0.7372251463481821
+        },
+        "complexity": 3.5,
+        "score": 0.7372251463481821,
+        "parameter_count": 6,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 1 modes",
+        "blocks": 2
+      },
+      {
+        "errors": {
+          "time": 0.8974813167690874,
+          "spectral": 0.6331622623531964,
+          "spectrogram": 0.6878533643435795,
+          "envelope": 0.4377891634073472,
+          "attack": 0.7196776759698201,
+          "total": 0.6700425383524438
+        },
+        "complexity": 6.75,
+        "score": 0.6700425383524438,
+        "parameter_count": 11,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "1 sources · couleur non linéaire",
+        "blocks": 4
+      },
+      {
+        "errors": {
+          "time": 0.629251720112522,
+          "spectral": 0.5934128591607538,
+          "spectrogram": 0.6045835872618779,
+          "envelope": 0.30012206524930274,
+          "attack": 0.7573420029722797,
+          "total": 0.5983391927702759
+        },
+        "complexity": 7.0,
+        "score": 0.5983391927702759,
+        "parameter_count": 12,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 2 modes",
+        "blocks": 4
+      },
+      {
+        "errors": {
+          "time": 0.554166563079482,
+          "spectral": 0.49518043994186123,
+          "spectrogram": 0.5197514180553776,
+          "envelope": 0.2366251650568662,
+          "attack": 0.640473374816057,
+          "total": 0.5077596750269172
+        },
+        "complexity": 9.5,
+        "score": 0.5077596750269172,
+        "parameter_count": 18,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 3 modes",
+        "blocks": 5
+      },
+      {
+        "errors": {
+          "time": 0.9310520389418178,
+          "spectral": 0.6409048881372043,
+          "spectrogram": 0.6954289492411624,
+          "envelope": 0.40643652005250736,
+          "attack": 0.712863372531821,
+          "total": 0.6721817773519163
+        },
+        "complexity": 10.0,
+        "score": 0.6721817773519163,
+        "parameter_count": 16,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "1 sources · pre-filtre non linéaire",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.6464821247625508,
+          "spectral": 0.5859261017573771,
+          "spectrogram": 0.5719804410826086,
+          "envelope": 0.23004104061170416,
+          "attack": 0.7109603327034824,
+          "total": 0.567492958179624
+        },
+        "complexity": 10.25,
+        "score": 0.567492958179624,
+        "parameter_count": 17,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "2 sources · couleur non linéaire",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.8608498926708994,
+          "spectral": 0.5842156049971214,
+          "spectrogram": 0.6462215377080077,
+          "envelope": 0.4449912091573185,
+          "attack": 0.6700018061723347,
+          "total": 0.6315990338296446
+        },
+        "complexity": 10.25,
+        "score": 0.6315990338296446,
+        "parameter_count": 17,
+        "generators": 1,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "1 sources · resonance non linéaire",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.4986749569721194,
+          "spectral": 0.4221133908537981,
+          "spectrogram": 0.4561611446210871,
+          "envelope": 0.21095524963108284,
+          "attack": 0.5312932714907026,
+          "total": 0.4383544168308345
+        },
+        "complexity": 12.0,
+        "score": 0.4383544168308345,
+        "parameter_count": 24,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 4 modes",
+        "blocks": 6
+      },
+      {
+        "errors": {
+          "time": 0.5942675719632877,
+          "spectral": 0.4933371389129322,
+          "spectrogram": 0.4728910627999196,
+          "envelope": 0.19565548274400468,
+          "attack": 0.5509601085498103,
+          "total": 0.4690359382988599
+        },
+        "complexity": 12.75,
+        "score": 0.4690359382988599,
+        "parameter_count": 23,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "3 sources · couleur non linéaire",
+        "blocks": 7
+      },
+      {
+        "errors": {
+          "time": 0.6787472308452461,
+          "spectral": 0.596730473275616,
+          "spectrogram": 0.5734342385427955,
+          "envelope": 0.23198420959749289,
+          "attack": 0.7105369096287415,
+          "total": 0.5729650556173086
+        },
+        "complexity": 13.5,
+        "score": 0.5729650556173086,
+        "parameter_count": 22,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "2 sources · pre-filtre non linéaire",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.6176430675788,
+          "spectral": 0.5330950759611169,
+          "spectrogram": 0.5362102945505579,
+          "envelope": 0.19355375408835312,
+          "attack": 0.6718009452806071,
+          "total": 0.5281012179654743
+        },
+        "complexity": 13.75,
+        "score": 0.5281012179654743,
+        "parameter_count": 23,
+        "generators": 2,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "2 sources · resonance non linéaire",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.5446285930851807,
+          "spectral": 0.4504869714485404,
+          "spectrogram": 0.4195366438792032,
+          "envelope": 0.1769698791512166,
+          "attack": 0.4517752104919427,
+          "total": 0.41307376688473835
+        },
+        "complexity": 15.25,
+        "score": 0.41307376688473835,
+        "parameter_count": 29,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "4 sources · couleur non linéaire",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.42730066899527525,
+          "spectral": 0.3441697903001096,
+          "spectrogram": 0.3751100032307316,
+          "envelope": 0.1685086537877708,
+          "attack": 0.4183093039133062,
+          "total": 0.3569449121091303
+        },
+        "complexity": 17.0,
+        "score": 0.3569449121091303,
+        "parameter_count": 36,
+        "generators": 6,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": true,
+        "name": "Compact · 6 modes",
+        "blocks": 8
+      },
+      {
+        "errors": {
+          "time": 0.5003665637701712,
+          "spectral": 0.42090376268089413,
+          "spectrogram": 0.45568466681763703,
+          "envelope": 0.19538514561625508,
+          "attack": 0.5340717105261248,
+          "total": 0.43674450394402287
+        },
+        "complexity": 16.0,
+        "score": 0.43674450394402287,
+        "parameter_count": 28,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "Compact · 4 modes · saturation + filtre",
+        "blocks": 9
+      },
+      {
+        "errors": {
+          "time": 0.7028834184135747,
+          "spectral": 0.5254436605342414,
+          "spectrogram": 0.468878137523862,
+          "envelope": 0.17039161543736075,
+          "attack": 0.5334827064708844,
+          "total": 0.4760141957361392
+        },
+        "complexity": 16.0,
+        "score": 0.4760141957361392,
+        "parameter_count": 28,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "3 sources · pre-filtre non linéaire",
+        "blocks": 9
+      },
+      {
+        "errors": {
+          "time": 0.6317227926493079,
+          "spectral": 0.47030541511170537,
+          "spectrogram": 0.4365953561561698,
+          "envelope": 0.16909253075043998,
+          "attack": 0.5167703720790688,
+          "total": 0.44288222700262014
+        },
+        "complexity": 16.25,
+        "score": 0.44288222700262014,
+        "parameter_count": 29,
+        "generators": 3,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "3 sources · resonance non linéaire",
+        "blocks": 9
+      },
+      {
+        "errors": {
+          "time": 0.8636548997627258,
+          "spectral": 0.4709059291212339,
+          "spectrogram": 0.4388434049133762,
+          "envelope": 0.1821850673709204,
+          "attack": 0.4838051408130021,
+          "total": 0.4574341760177262
+        },
+        "complexity": 18.5,
+        "score": 0.4574341760177262,
+        "parameter_count": 34,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "4 sources · pre-filtre non linéaire",
+        "blocks": 10
+      },
+      {
+        "errors": {
+          "time": 0.5464823092259302,
+          "spectral": 0.4292454649133678,
+          "spectrogram": 0.40833399837858564,
+          "envelope": 0.17934085881572137,
+          "attack": 0.4589431119944035,
+          "total": 0.40621080252894953
+        },
+        "complexity": 18.75,
+        "score": 0.40621080252894953,
+        "parameter_count": 35,
+        "generators": 4,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "4 sources · resonance non linéaire",
+        "blocks": 10
+      },
+      {
+        "errors": {
+          "time": 0.3963308147147151,
+          "spectral": 0.33512752104278093,
+          "spectrogram": 0.35212939569521956,
+          "envelope": 0.1322275215235388,
+          "attack": 0.4167062772771435,
+          "total": 0.33879228570207454
+        },
+        "complexity": 22.0,
+        "score": 0.33879228570207454,
+        "parameter_count": 48,
+        "generators": 8,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 8 modes",
+        "blocks": 10
+      },
+      {
+        "errors": {
+          "time": 0.5061542660690225,
+          "spectral": 0.4154561022186168,
+          "spectrogram": 0.4389461715193802,
+          "envelope": 0.20930432905885168,
+          "attack": 0.5028932312362282,
+          "total": 0.42485719607130507
+        },
+        "complexity": 19.25,
+        "score": 0.42485719607130507,
+        "parameter_count": 33,
+        "generators": 5,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "Compact · 4 modes + impact",
+        "blocks": 11
+      },
+      {
+        "errors": {
+          "time": 0.4353219361464213,
+          "spectral": 0.34623695713629116,
+          "spectrogram": 0.3708796700610767,
+          "envelope": 0.13561390712466836,
+          "attack": 0.4210846025175923,
+          "total": 0.3529156037018813
+        },
+        "complexity": 23.0,
+        "score": 0.3529156037018813,
+        "parameter_count": 44,
+        "generators": 6,
+        "reference": false,
+        "within_tolerance": false,
+        "pareto": false,
+        "name": "6 sources · parallele non linéaire",
+        "blocks": 12
+      },
+      {
+        "errors": {
+          "time": 0.37559922529625356,
+          "spectral": 0.3227122728990732,
+          "spectrogram": 0.33603760021520956,
+          "envelope": 0.11723617327144395,
+          "attack": 0.4164639602583985,
+          "total": 0.32636656553385174
+        },
+        "complexity": 27.0,
+        "score": 0.32636656553385174,
+        "parameter_count": 60,
+        "generators": 10,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 10 modes",
+        "blocks": 12
+      },
+      {
+        "errors": {
+          "time": 0.39768637022377834,
+          "spectral": 0.33506128455816775,
+          "spectrogram": 0.3519122621196069,
+          "envelope": 0.12200413657734645,
+          "attack": 0.41759293624068455,
+          "total": 0.3377511550147971
+        },
+        "complexity": 26.0,
+        "score": 0.3377511550147971,
+        "parameter_count": 52,
+        "generators": 8,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": false,
+        "name": "Compact · 8 modes · saturation + filtre",
+        "blocks": 13
+      },
+      {
+        "errors": {
+          "time": 0.40116979864170293,
+          "spectral": 0.3389183617047055,
+          "spectrogram": 0.3515378539891811,
+          "envelope": 0.11198947572965191,
+          "attack": 0.41685159033350627,
+          "total": 0.33730145298220926
+        },
+        "complexity": 28.0,
+        "score": 0.33730145298220926,
+        "parameter_count": 56,
+        "generators": 8,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": false,
+        "name": "8 sources · parallele non linéaire",
+        "blocks": 14
+      },
+      {
+        "errors": {
+          "time": 0.3712469967194913,
+          "spectral": 0.3174508976157168,
+          "spectrogram": 0.3315891008841542,
+          "envelope": 0.11655843873528361,
+          "attack": 0.40980278070213016,
+          "total": 0.3217731484030244
+        },
+        "complexity": 32.0,
+        "score": 0.3217731484030244,
+        "parameter_count": 72,
+        "generators": 12,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 12 modes",
+        "blocks": 14
+      },
+      {
+        "errors": {
+          "time": 0.42586272121077684,
+          "spectral": 0.32394522184951613,
+          "spectrogram": 0.3307238579113933,
+          "envelope": 0.13131441981500708,
+          "attack": 0.39781789300351594,
+          "total": 0.3264689142098267
+        },
+        "complexity": 29.25,
+        "score": 0.3264689142098267,
+        "parameter_count": 57,
+        "generators": 9,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": false,
+        "name": "Compact · 8 modes + impact",
+        "blocks": 15
+      },
+      {
+        "errors": {
+          "time": 0.3723416796720659,
+          "spectral": 0.31752126325089697,
+          "spectrogram": 0.3314381542269582,
+          "envelope": 0.10787448081241033,
+          "attack": 0.41056381171968614,
+          "total": 0.3209245487561544
+        },
+        "complexity": 36.0,
+        "score": 0.3209245487561544,
+        "parameter_count": 76,
+        "generators": 12,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 12 modes · saturation + filtre",
+        "blocks": 17
+      },
+      {
+        "errors": {
+          "time": 0.356473373566179,
+          "spectral": 0.30533487808493515,
+          "spectrogram": 0.32213875072770937,
+          "envelope": 0.11137346215873671,
+          "attack": 0.39305914453086765,
+          "total": 0.31041699015858704
+        },
+        "complexity": 42.0,
+        "score": 0.31041699015858704,
+        "parameter_count": 96,
+        "generators": 16,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 16 modes",
+        "blocks": 18
+      },
+      {
+        "errors": {
+          "time": 0.4013746256118163,
+          "spectral": 0.305325394847022,
+          "spectrogram": 0.3088186805331795,
+          "envelope": 0.11630037233672882,
+          "attack": 0.3914274165319639,
+          "total": 0.3089440492184218
+        },
+        "complexity": 39.25,
+        "score": 0.3089440492184218,
+        "parameter_count": 81,
+        "generators": 13,
+        "reference": false,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "Compact · 12 modes + impact",
+        "blocks": 19
+      },
+      {
+        "errors": {
+          "time": 0.3710517758465463,
+          "spectral": 0.29376583071431944,
+          "spectrogram": 0.2804839571125945,
+          "envelope": 0.09961179066867731,
+          "attack": 0.3649172371781715,
+          "total": 0.285567753371501
+        },
+        "complexity": 110.5,
+        "score": 0.285567753371501,
+        "parameter_count": 250,
+        "generators": 41,
+        "reference": true,
+        "within_tolerance": true,
+        "pareto": true,
+        "name": "40 modes / résonances isolées · attaque ajustée + impact",
+        "blocks": 48
+      }
+    ]
+  }
+]

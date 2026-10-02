@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "name": "3 sources · resonance non linéaire",
+  "sample_rate": 48000,
+  "duration": 3,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 438.9996984531843,
+        "amplitude": 0.44065841318743104,
+        "phase": -2.604017857611193,
+        "tau": 0.3302087806614378,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30,
+        "y": 30
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 439.16193256440874,
+        "amplitude": 0.08222085495218451,
+        "phase": -0.11898736990953648,
+        "tau": 1.8941719974707896,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30,
+        "y": 145
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 878.3571943772076,
+        "amplitude": 0.09808911933284299,
+        "phase": 0.8882047418546286,
+        "tau": 0.17966144656056832,
+        "attack": 0.0005,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 30,
+        "y": 260
+      },
+      "reason": "Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 300,
+        "y": 230
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1740,
+        "y": 150
+      },
+      "reason": ""
+    },
+    {
+      "id": "nl-0",
+      "type": "asymmetric_saturation",
+      "label": "Création d’harmoniques ×4",
+      "parameters": {
+        "drive": 4.155454474400081,
+        "bias": 0.7881345931776979,
+        "mix": 1,
+        "level": 0.2980935334300651
+      },
+      "position": {
+        "x": 600,
+        "y": 350
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-1",
+      "type": "highpass",
+      "label": "",
+      "parameters": {
+        "fc": 49.196030661378074,
+        "q": 0.8814890083411778
+      },
+      "position": {
+        "x": 820,
+        "y": 350
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-2",
+      "type": "peak_eq",
+      "label": "Correction des harmoniques",
+      "parameters": {
+        "fc": 1621.9476840488048,
+        "q": 2.3076511138243894,
+        "db": 5.553818564210312
+      },
+      "position": {
+        "x": 1040,
+        "y": 350
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-3",
+      "type": "lowpass",
+      "label": "",
+      "parameters": {
+        "fc": 3263.2026117185833,
+        "q": 0.7971881112538421
+      },
+      "position": {
+        "x": 1260,
+        "y": 350
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "sum-nl-0",
+      "source": "sum",
+      "target": "nl-0"
+    },
+    {
+      "id": "nl-0-nl-1",
+      "source": "nl-0",
+      "target": "nl-1"
+    },
+    {
+      "id": "nl-1-nl-2",
+      "source": "nl-1",
+      "target": "nl-2"
+    },
+    {
+      "id": "nl-2-nl-3",
+      "source": "nl-2",
+      "target": "nl-3"
+    },
+    {
+      "id": "nl-3-out",
+      "source": "nl-3",
+      "target": "out"
+    }
+  ]
+}

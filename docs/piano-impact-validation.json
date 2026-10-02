@@ -1,0 +1,553 @@
+[
+  {
+    "file": "piano.wav",
+    "selection_start": 0,
+    "duration": 3,
+    "fs": 48000,
+    "weights": {
+      "time": 0.1,
+      "spectral": 0.25,
+      "spectrogram": 0.5,
+      "envelope": 0.15,
+      "attack": 0.25
+    },
+    "complexity_penalty": 0.0001,
+    "f0": 438.74659942688606,
+    "B": null,
+    "candidates": [
+      {
+        "name": "40 modes / r\u00e9sonances isol\u00e9es \u00b7 attaque ajust\u00e9e + impact",
+        "errors": {
+          "time": 0.36543606657244415,
+          "spectral": 0.30057059429129185,
+          "spectrogram": 0.2970960333167715,
+          "envelope": 0.10705523586676718,
+          "attack": 0.38018107016788577,
+          "total": 0.2970702598483517
+        },
+        "score": 0.30812025984835173,
+        "blocks": 48
+      },
+      {
+        "name": "40 modes / r\u00e9sonances isol\u00e9es \u00b7 attaque ajust\u00e9e",
+        "errors": {
+          "time": 0.35652509961010515,
+          "spectral": 0.31102669454911036,
+          "spectrogram": 0.3029272103651849,
+          "envelope": 0.10637053060298392,
+          "attack": 0.3834888620685022,
+          "total": 0.3013604671107629
+        },
+        "score": 0.31168546711076295,
+        "blocks": 43
+      },
+      {
+        "name": "40 modes / r\u00e9sonances isol\u00e9es",
+        "errors": {
+          "time": 0.35631701262509574,
+          "spectral": 0.31320034465362906,
+          "spectrogram": 0.3058628047712157,
+          "envelope": 0.11707389355248908,
+          "attack": 0.3869457979875667,
+          "total": 0.30492857867303175
+        },
+        "score": 0.3152535786730317,
+        "blocks": 43
+      },
+      {
+        "name": "30 modes / d\u00e9taill\u00e9s \u00b7 attaque ajust\u00e9e",
+        "errors": {
+          "time": 0.3493537682616286,
+          "spectral": 0.31126616643638144,
+          "spectrogram": 0.3302773060027339,
+          "envelope": 0.10591872735765887,
+          "attack": 0.4126077329491131,
+          "total": 0.3175442510220418
+        },
+        "score": 0.32536925102204184,
+        "blocks": 33
+      },
+      {
+        "name": "18 modes / battements \u00b7 attaque ajust\u00e9e",
+        "errors": {
+          "time": 0.36910610995668697,
+          "spectral": 0.3208237473485133,
+          "spectrogram": 0.3318319931564187,
+          "envelope": 0.11663221728783087,
+          "attack": 0.40629414003897685,
+          "total": 0.3216807296111402
+        },
+        "score": 0.3265057296111402,
+        "blocks": 21
+      },
+      {
+        "name": "30 modes / d\u00e9taill\u00e9s",
+        "errors": {
+          "time": 0.35148350781349086,
+          "spectral": 0.32207262567745604,
+          "spectrogram": 0.33415253945115586,
+          "envelope": 0.1173750236194662,
+          "attack": 0.41758892533149194,
+          "total": 0.32379700944166717
+        },
+        "score": 0.3316220094416672,
+        "blocks": 33
+      },
+      {
+        "name": "18 modes / battements",
+        "errors": {
+          "time": 0.37485486366401566,
+          "spectral": 0.3367354168614261,
+          "spectrogram": 0.33909283620175745,
+          "envelope": 0.14416527492416045,
+          "attack": 0.42573991432926817,
+          "total": 0.33542042280286233
+        },
+        "score": 0.34024542280286235,
+        "blocks": 21
+      },
+      {
+        "name": "19 modes amortis",
+        "errors": {
+          "time": 0.776522267069175,
+          "spectral": 0.6284804093588902,
+          "spectrogram": 0.5248496255965921,
+          "envelope": 0.46986116460295774,
+          "attack": 0.6349533239304905,
+          "total": 0.581131718014402
+        },
+        "score": 0.586206718014402,
+        "blocks": 22
+      },
+      {
+        "name": "19 modes amortis + LPF 6000 Hz",
+        "errors": {
+          "time": 0.7865912804193579,
+          "spectral": 0.6285236514376866,
+          "spectrogram": 0.5249445656885804,
+          "envelope": 0.4702568333519952,
+          "attack": 0.6353664539125312,
+          "total": 0.5821139697812637
+        },
+        "score": 0.5873389697812638,
+        "blocks": 23
+      },
+      {
+        "name": "19 modes amortis + LPF 2000 Hz",
+        "errors": {
+          "time": 0.859081532963419,
+          "spectral": 0.6334246980321245,
+          "spectrogram": 0.5311045728142695,
+          "envelope": 0.4861973359008975,
+          "attack": 0.6520075465571872,
+          "total": 0.5965984809887513
+        },
+        "score": 0.6018234809887514,
+        "blocks": 23
+      },
+      {
+        "name": "4 modes amortis",
+        "errors": {
+          "time": 0.7916473607329186,
+          "spectral": 0.6547070233617152,
+          "spectrogram": 0.5675062299656684,
+          "envelope": 0.4831682607924297,
+          "attack": 0.6800270137077911,
+          "total": 0.6152612795538936
+        },
+        "score": 0.6165862795538937,
+        "blocks": 7
+      },
+      {
+        "name": "1 modes amortis",
+        "errors": {
+          "time": 0.8695769996674899,
+          "spectral": 0.7734668671413971,
+          "spectrogram": 0.7071151694646732,
+          "envelope": 0.5772170120945905,
+          "attack": 0.8468554480817341,
+          "total": 0.7457427322552456
+        },
+        "score": 0.7463177322552456,
+        "blocks": 4
+      },
+      {
+        "name": "Bruit filtr\u00e9 amorti",
+        "errors": {
+          "time": 1.0223985239190179,
+          "spectral": 0.9651301061037942,
+          "spectrogram": 0.9280791499738545,
+          "envelope": 0.8171069872995668,
+          "attack": 0.9114319249385966,
+          "total": 0.9263887865874894
+        },
+        "score": 0.9269387865874894,
+        "blocks": 4
+      }
+    ],
+    "selected": "40 modes / r\u00e9sonances isol\u00e9es \u00b7 attaque ajust\u00e9e + impact",
+    "optimization": {
+      "initial": 0.2970702598483517,
+      "final": 0.285567753371501,
+      "evaluations": 181,
+      "converged": false,
+      "message": "Budget d\u2019\u00e9valuations atteint ; meilleur mod\u00e8le conserv\u00e9.",
+      "parameters": [
+        "gain:gain",
+        "impact-noise:amplitude",
+        "impact-hp:fc",
+        "impact-lp:fc",
+        "impact-env:tau",
+        "mode-1:amplitude",
+        "mode-1:tau",
+        "mode-2:amplitude",
+        "mode-2:tau",
+        "mode-3:amplitude",
+        "mode-3:tau",
+        "mode-4:amplitude"
+      ],
+      "bounds": [
+        {
+          "parameter": "gain:gain",
+          "min": -4,
+          "max": 4
+        },
+        {
+          "parameter": "impact-noise:amplitude",
+          "min": 0.021025356626966887,
+          "max": 0.08410142650786755
+        },
+        {
+          "parameter": "impact-hp:fc",
+          "min": 40.0,
+          "max": 160.0
+        },
+        {
+          "parameter": "impact-lp:fc",
+          "min": 400.0,
+          "max": 1600.0
+        },
+        {
+          "parameter": "impact-env:tau",
+          "min": 0.075,
+          "max": 0.3
+        },
+        {
+          "parameter": "mode-1:amplitude",
+          "min": 0.001017898206966335,
+          "max": 0.00407159282786534
+        },
+        {
+          "parameter": "mode-1:tau",
+          "min": 0.3020079972226424,
+          "max": 1.2080319888905695
+        },
+        {
+          "parameter": "mode-2:amplitude",
+          "min": 0.0012221463919421351,
+          "max": 0.0048885855677685405
+        },
+        {
+          "parameter": "mode-2:tau",
+          "min": 0.14688296213855853,
+          "max": 0.5875318485542341
+        },
+        {
+          "parameter": "mode-3:amplitude",
+          "min": 0.0007853006371759345,
+          "max": 0.003141202548703738
+        },
+        {
+          "parameter": "mode-3:tau",
+          "min": 0.31411948996761047,
+          "max": 1.2564779598704419
+        },
+        {
+          "parameter": "mode-4:amplitude",
+          "min": 0.002889374818872938,
+          "max": 0.011557499275491752
+        }
+      ]
+    },
+    "seconds": 24.152
+  },
+  {
+    "file": "piano2.wav",
+    "selection_start": 0,
+    "duration": 3,
+    "fs": 48000,
+    "weights": {
+      "time": 0.1,
+      "spectral": 0.25,
+      "spectrogram": 0.5,
+      "envelope": 0.15,
+      "attack": 0.25
+    },
+    "complexity_penalty": 0.0001,
+    "f0": 438.8029167724123,
+    "B": {
+      "B": 0.000846846254585148,
+      "f0_ideal": 438.6566137498657,
+      "rmse_hz": 0.49622268070318715,
+      "harmonic_rmse_hz": 17.0716850072792,
+      "count": 8,
+      "method": "Moindres carr\u00e9s born\u00e9s : f\u2099=n f\u2080 \u221a(1+B n\u00b2). Indice descriptif, pas intervalle de confiance."
+    },
+    "candidates": [
+      {
+        "name": "39 modes / d\u00e9taill\u00e9s \u00b7 attaque ajust\u00e9e + impact",
+        "errors": {
+          "time": 0.18075135848703885,
+          "spectral": 0.14295646186761654,
+          "spectrogram": 0.14215482413965327,
+          "envelope": 0.061147605055210386,
+          "attack": 0.13164051484182326,
+          "total": 0.1335791462833376
+        },
+        "score": 0.14437914628333762,
+        "blocks": 47
+      },
+      {
+        "name": "39 modes / d\u00e9taill\u00e9s \u00b7 attaque ajust\u00e9e",
+        "errors": {
+          "time": 0.177470324960949,
+          "spectral": 0.14381363141663164,
+          "spectrogram": 0.14652438040357568,
+          "envelope": 0.06058551352248394,
+          "attack": 0.13202687432836407,
+          "total": 0.1352457409300034
+        },
+        "score": 0.1453207409300034,
+        "blocks": 42
+      },
+      {
+        "name": "23 modes / battements \u00b7 attaque ajust\u00e9e",
+        "errors": {
+          "time": 0.1847655461429741,
+          "spectral": 0.14790102246839285,
+          "spectrogram": 0.15430741599262823,
+          "envelope": 0.07418060716742944,
+          "attack": 0.1377922489941666,
+          "total": 0.14254453724109264
+        },
+        "score": 0.14861953724109264,
+        "blocks": 26
+      },
+      {
+        "name": "48 modes / r\u00e9sonances isol\u00e9es \u00b7 attaque ajust\u00e9e",
+        "errors": {
+          "time": 0.1958557500191585,
+          "spectral": 0.15534530253923773,
+          "spectrogram": 0.15801388376740433,
+          "envelope": 0.0770946264407135,
+          "attack": 0.14864722362965557,
+          "total": 0.14892387391515868
+        },
+        "score": 0.16124887391515869,
+        "blocks": 51
+      },
+      {
+        "name": "39 modes / d\u00e9taill\u00e9s",
+        "errors": {
+          "time": 0.19530064091888524,
+          "spectral": 0.1565954380795546,
+          "spectrogram": 0.16384353037695568,
+          "envelope": 0.07488643037516257,
+          "attack": 0.15639553383648963,
+          "total": 0.15274602945252144
+        },
+        "score": 0.16282102945252144,
+        "blocks": 42
+      },
+      {
+        "name": "23 modes / battements",
+        "errors": {
+          "time": 0.20188784363458684,
+          "spectral": 0.16214395761918518,
+          "spectrogram": 0.17016123205744565,
+          "envelope": 0.08813469775814387,
+          "attack": 0.1631910438821328,
+          "total": 0.15985868434498607
+        },
+        "score": 0.16593368434498607,
+        "blocks": 26
+      },
+      {
+        "name": "48 modes / r\u00e9sonances isol\u00e9es",
+        "errors": {
+          "time": 0.20875699970591163,
+          "spectral": 0.1695229904689757,
+          "spectrogram": 0.16215694348996665,
+          "envelope": 0.09037741261192488,
+          "attack": 0.16804029584068375,
+          "total": 0.15992128414782247
+        },
+        "score": 0.17224628414782248,
+        "blocks": 51
+      },
+      {
+        "name": "21 modes amortis",
+        "errors": {
+          "time": 0.7285773174073976,
+          "spectral": 0.5780926356520772,
+          "spectrogram": 0.6422777992423762,
+          "envelope": 0.6170283289374618,
+          "attack": 0.6647081325166202,
+          "total": 0.6378008581957773
+        },
+        "score": 0.6433758581957773,
+        "blocks": 24
+      },
+      {
+        "name": "21 modes amortis + LPF 6000 Hz",
+        "errors": {
+          "time": 0.7344788385024262,
+          "spectral": 0.5781210277309575,
+          "spectrogram": 0.6423565742481473,
+          "envelope": 0.6171854813513837,
+          "attack": 0.6648433981753794,
+          "total": 0.6383560797228864
+        },
+        "score": 0.6440810797228864,
+        "blocks": 25
+      },
+      {
+        "name": "4 modes amortis",
+        "errors": {
+          "time": 0.733656820950754,
+          "spectral": 0.5868390119385727,
+          "spectrogram": 0.6506865990394977,
+          "envelope": 0.6208024168090341,
+          "attack": 0.6753921200921675,
+          "total": 0.6459097017150915
+        },
+        "score": 0.6472347017150916,
+        "blocks": 7
+      },
+      {
+        "name": "21 modes amortis + LPF 2000 Hz",
+        "errors": {
+          "time": 0.7801923319975838,
+          "spectral": 0.5801661510991662,
+          "spectrogram": 0.6443967171228645,
+          "envelope": 0.620273533448626,
+          "attack": 0.6687656811477044,
+          "total": 0.6443932638721618
+        },
+        "score": 0.6501182638721618,
+        "blocks": 25
+      },
+      {
+        "name": "1 modes amortis",
+        "errors": {
+          "time": 0.7674864645242695,
+          "spectral": 0.640436850447084,
+          "spectrogram": 0.7020564772671585,
+          "envelope": 0.6369229400116883,
+          "attack": 0.7211870436573303,
+          "total": 0.6909770396910904
+        },
+        "score": 0.6915520396910904,
+        "blocks": 4
+      },
+      {
+        "name": "Bruit filtr\u00e9 amorti",
+        "errors": {
+          "time": 1.02121075830733,
+          "spectral": 0.974573403355063,
+          "spectrogram": 0.9494226915780082,
+          "envelope": 0.8469625646580304,
+          "attack": 0.9411075796651363,
+          "total": 0.9462376416587931
+        },
+        "score": 0.9467876416587931,
+        "blocks": 4
+      }
+    ],
+    "selected": "39 modes / d\u00e9taill\u00e9s \u00b7 attaque ajust\u00e9e + impact",
+    "optimization": {
+      "initial": 0.1335791462833376,
+      "final": 0.1254948075429992,
+      "evaluations": 181,
+      "converged": false,
+      "message": "Budget d\u2019\u00e9valuations atteint ; meilleur mod\u00e8le conserv\u00e9.",
+      "parameters": [
+        "gain:gain",
+        "impact-noise:amplitude",
+        "impact-hp:fc",
+        "impact-lp:fc",
+        "impact-env:tau",
+        "mode-1:amplitude",
+        "mode-1:tau",
+        "mode-2:amplitude",
+        "mode-2:tau",
+        "mode-3:amplitude",
+        "mode-3:tau",
+        "mode-4:amplitude"
+      ],
+      "bounds": [
+        {
+          "parameter": "gain:gain",
+          "min": -4,
+          "max": 4
+        },
+        {
+          "parameter": "impact-noise:amplitude",
+          "min": 0.022203604452133326,
+          "max": 0.0888144178085333
+        },
+        {
+          "parameter": "impact-hp:fc",
+          "min": 40.0,
+          "max": 160.0
+        },
+        {
+          "parameter": "impact-lp:fc",
+          "min": 400.0,
+          "max": 1600.0
+        },
+        {
+          "parameter": "impact-env:tau",
+          "min": 0.075,
+          "max": 0.3
+        },
+        {
+          "parameter": "mode-1:amplitude",
+          "min": 0.00555021434047035,
+          "max": 0.0222008573618814
+        },
+        {
+          "parameter": "mode-1:tau",
+          "min": 14.999999999973243,
+          "max": 30
+        },
+        {
+          "parameter": "mode-2:amplitude",
+          "min": 0.1976683064984425,
+          "max": 0.79067322599377
+        },
+        {
+          "parameter": "mode-2:tau",
+          "min": 0.26063427664446703,
+          "max": 1.0425371065778681
+        },
+        {
+          "parameter": "mode-3:amplitude",
+          "min": 0.10934346561068002,
+          "max": 0.4373738624427201
+        },
+        {
+          "parameter": "mode-3:tau",
+          "min": 0.42890849049286045,
+          "max": 1.7156339619714418
+        },
+        {
+          "parameter": "mode-4:amplitude",
+          "min": 0.007569235434870147,
+          "max": 0.03027694173948059
+        }
+      ]
+    },
+    "seconds": 24.183
+  }
+]

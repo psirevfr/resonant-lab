@@ -1,0 +1,82 @@
+[
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 2,
+    "architecture": "2 sources \u00b7 couleur non lin\u00e9aire",
+    "full_rate_error": 0.3519723825660263,
+    "seed_error": 0.4623850577617373,
+    "fitted_error": 0.3519723825660263,
+    "blocks": 6
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 2,
+    "architecture": "2 sources \u00b7 resonance non lin\u00e9aire",
+    "full_rate_error": 0.3009991346821058,
+    "seed_error": 0.4234912832713807,
+    "fitted_error": 0.3009991346821058,
+    "blocks": 8
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 2,
+    "architecture": "2 sources \u00b7 pre-filtre non lin\u00e9aire",
+    "full_rate_error": 0.3445497380916988,
+    "seed_error": 0.5426040914805856,
+    "fitted_error": 0.3445497380916988,
+    "blocks": 8
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 4,
+    "architecture": "4 sources \u00b7 couleur non lin\u00e9aire",
+    "full_rate_error": 0.3457116988232445,
+    "seed_error": 0.4524406855339847,
+    "fitted_error": 0.3457116988232445,
+    "blocks": 8
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 4,
+    "architecture": "4 sources \u00b7 resonance non lin\u00e9aire",
+    "full_rate_error": 0.2662519272511164,
+    "seed_error": 0.3965917454415644,
+    "fitted_error": 0.2662519272511164,
+    "blocks": 10
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 4,
+    "architecture": "4 sources \u00b7 pre-filtre non lin\u00e9aire",
+    "full_rate_error": 0.36262618632409005,
+    "seed_error": 0.5397837627943668,
+    "fitted_error": 0.36262618632409005,
+    "blocks": 10
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 6,
+    "architecture": "6 sources \u00b7 parallele non lin\u00e9aire",
+    "full_rate_error": 0.17074822480062546,
+    "seed_error": 0.19959610628068594,
+    "fitted_error": 0.17074822480062546,
+    "blocks": 12
+  },
+  {
+    "evaluations_budget": 220,
+    "analysis_rate": 12000.0,
+    "sources": 8,
+    "architecture": "8 sources \u00b7 parallele non lin\u00e9aire",
+    "full_rate_error": 0.16182455679563304,
+    "seed_error": 0.19113804023976236,
+    "fitted_error": 0.16182455679563304,
+    "blocks": 14
+  }
+]

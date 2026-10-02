@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "name": "2 sources · resonance non linéaire",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 438.8891681188236,
+        "amplitude": 0.0854892376148465,
+        "phase": 0.48464061934314934,
+        "tau": 1.1490579649895984,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 438.932 Hz. Décroissance estimée τ=1.191 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 439.29590313906505,
+        "amplitude": 0.0922286184292676,
+        "phase": 2.243526930682616,
+        "tau": 0.7822739917176871,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 439.308 Hz. Décroissance estimée τ=0.695 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 300.0,
+        "y": 230.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1740.0,
+        "y": 150.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "nl-0",
+      "type": "asymmetric_saturation",
+      "label": "Création d’harmoniques ×4",
+      "parameters": {
+        "drive": 3.868543250455915,
+        "bias": -0.8241675993925399,
+        "mix": 1.0,
+        "level": 0.30512763342029003
+      },
+      "position": {
+        "x": 600.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-1",
+      "type": "highpass",
+      "label": "",
+      "parameters": {
+        "fc": 50.82349156197957,
+        "q": 0.5665754075939701
+      },
+      "position": {
+        "x": 820.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-2",
+      "type": "peak_eq",
+      "label": "Correction des harmoniques",
+      "parameters": {
+        "fc": 897.0648466659076,
+        "q": 4.526980358846495,
+        "db": 9.554701503110692
+      },
+      "position": {
+        "x": 1040.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-3",
+      "type": "lowpass",
+      "label": "",
+      "parameters": {
+        "fc": 3262.5627956153103,
+        "q": 1.3358811267263897
+      },
+      "position": {
+        "x": 1260.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "sum-nl-0",
+      "source": "sum",
+      "target": "nl-0"
+    },
+    {
+      "id": "nl-0-nl-1",
+      "source": "nl-0",
+      "target": "nl-1"
+    },
+    {
+      "id": "nl-1-nl-2",
+      "source": "nl-1",
+      "target": "nl-2"
+    },
+    {
+      "id": "nl-2-nl-3",
+      "source": "nl-2",
+      "target": "nl-3"
+    },
+    {
+      "id": "nl-3-out",
+      "source": "nl-3",
+      "target": "out"
+    }
+  ]
+}

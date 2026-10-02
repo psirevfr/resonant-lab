@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "name": "6 sources · parallele non linéaire",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "modal",
+      "label": "Mode 1",
+      "parameters": {
+        "frequency": 438.9270119407,
+        "amplitude": 0.04983095109100984,
+        "phase": 0.2543662363276589,
+        "tau": 1.2434168780063728,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Pic spectral mesuré à 438.932 Hz. Décroissance estimée τ=1.191 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-2",
+      "type": "modal",
+      "label": "Mode 2",
+      "parameters": {
+        "frequency": 439.30210869428015,
+        "amplitude": 0.07395465621514424,
+        "phase": 2.2530804654817596,
+        "tau": 0.7321493378302955,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Pic spectral mesuré à 439.308 Hz. Décroissance estimée τ=0.695 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-3",
+      "type": "modal",
+      "label": "Mode 3",
+      "parameters": {
+        "frequency": 878.6982227545632,
+        "amplitude": 0.05142434995754507,
+        "phase": 0.306610903842844,
+        "tau": 0.3398733681023038,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Pic spectral mesuré à 878.697 Hz. Décroissance estimée τ=0.348 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-4",
+      "type": "modal",
+      "label": "Mode 4",
+      "parameters": {
+        "frequency": 879.3530756943222,
+        "amplitude": 0.06077327155081575,
+        "phase": 2.4664479531206984,
+        "tau": 0.13837781183061865,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Pic spectral mesuré à 879.333 Hz. Décroissance estimée τ=0.152 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-5",
+      "type": "modal",
+      "label": "Mode 5",
+      "parameters": {
+        "frequency": 1321.0794295987716,
+        "amplitude": 0.029993048011406495,
+        "phase": -0.27044673423327675,
+        "tau": 0.2776067420992323,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 490.0
+      },
+      "reason": "Pic spectral mesuré à 1321.070 Hz. Décroissance estimée τ=0.316 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "mode-6",
+      "type": "modal",
+      "label": "Mode 6",
+      "parameters": {
+        "frequency": 1766.388123460617,
+        "amplitude": 0.0273504493751525,
+        "phase": 1.975673869626974,
+        "tau": 0.28554370243362326,
+        "attack": 0.006,
+        "onset": 0.008145833333333333
+      },
+      "position": {
+        "x": 30.0,
+        "y": 605.0
+      },
+      "reason": "Pic spectral mesuré à 1766.402 Hz. Décroissance estimée τ=0.329 s par régression log-amplitude STFT ; phase et amplitude par projection temporelle. R² descriptif : None."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 300.0,
+        "y": 230.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1740.0,
+        "y": 150.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "nl-0",
+      "type": "asymmetric_saturation",
+      "label": "Création d’harmoniques ×4",
+      "parameters": {
+        "drive": 2.0,
+        "bias": 1.8,
+        "mix": 1.0,
+        "level": 0.07999999999999999
+      },
+      "position": {
+        "x": 600.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-1",
+      "type": "highpass",
+      "label": "",
+      "parameters": {
+        "fc": 1053.4378365168782,
+        "q": 0.707
+      },
+      "position": {
+        "x": 820.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-2",
+      "type": "lowpass",
+      "label": "",
+      "parameters": {
+        "fc": 4389.32431882033,
+        "q": 0.707
+      },
+      "position": {
+        "x": 1040.0,
+        "y": 350.0
+      },
+      "reason": "Traitement réel ajusté dans une recherche de topologie globale ; paramètres libres explicitement bornés, décision finale sur le rendu à la fréquence originale."
+    },
+    {
+      "id": "nl-mix",
+      "type": "sum",
+      "label": "Direct + harmoniques",
+      "parameters": {},
+      "position": {
+        "x": 1500.0,
+        "y": 150.0
+      },
+      "reason": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-sum",
+      "source": "mode-1",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-sum",
+      "source": "mode-2",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-sum",
+      "source": "mode-3",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-sum",
+      "source": "mode-4",
+      "target": "sum"
+    },
+    {
+      "id": "mode-5-sum",
+      "source": "mode-5",
+      "target": "sum"
+    },
+    {
+      "id": "mode-6-sum",
+      "source": "mode-6",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-nl-0",
+      "source": "mode-2",
+      "target": "nl-0"
+    },
+    {
+      "id": "nl-0-nl-1",
+      "source": "nl-0",
+      "target": "nl-1"
+    },
+    {
+      "id": "nl-1-nl-2",
+      "source": "nl-1",
+      "target": "nl-2"
+    },
+    {
+      "id": "sum-nl-mix",
+      "source": "sum",
+      "target": "nl-mix"
+    },
+    {
+      "id": "nl-2-nl-mix",
+      "source": "nl-2",
+      "target": "nl-mix"
+    },
+    {
+      "id": "nl-mix-out",
+      "source": "nl-mix",
+      "target": "out"
+    }
+  ]
+}

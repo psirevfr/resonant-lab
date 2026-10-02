@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "name": "Banc LTI : passe-bas",
+  "sample_rate": 44100,
+  "duration": 2.0,
+  "nodes": [
+    {
+      "id": "in",
+      "type": "input",
+      "label": "Entrée impulsionnelle",
+      "parameters": {},
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "filter",
+      "type": "lowpass",
+      "label": "Passe-bas 1200 Hz",
+      "parameters": {
+        "fc": 1200.0,
+        "q": 0.70710678
+      },
+      "position": {
+        "x": 260.0,
+        "y": 0.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie",
+      "parameters": {},
+      "position": {
+        "x": 520.0,
+        "y": 0.0
+      },
+      "reason": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "in-filter",
+      "source": "in",
+      "target": "filter"
+    },
+    {
+      "id": "filter-out",
+      "source": "filter",
+      "target": "out"
+    }
+  ]
+}
