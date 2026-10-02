@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 from typing import Optional
 from fastapi import Request, HTTPException, status
-from passlib.context import CryptContext
+import bcrypt
 from jose import jwt, JWTError
 
 # Config de sécurité
@@ -11,7 +11,7 @@ ALGORITHM = "HS256"
 TOKEN_EXPIRE_HOURS = 24
 
 # Hachage des mots de passe
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def get_db():
     conn = sqlite3.connect("users.db")
@@ -35,10 +35,15 @@ def init_db():
     conn.close()
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    # bcrypt attend des bytes et un sel unique
+    hashed_bytes = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return hashed_bytes.decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode('utf-8'), 
+        hashed_password.encode('utf-8')
+    )
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
