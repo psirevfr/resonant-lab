@@ -25,6 +25,7 @@ from .optimization import run_optimization
 from .export import graph_svg
 from .media import wav_response
 
+
 app=FastAPI(title='Résonant Lab',version='0.1.0')
 recordings=OrderedDict(); renders=OrderedDict(); jobs=OrderedDict(); downloads=OrderedDict(); lock=RLock()
 executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='identification')
@@ -227,3 +228,92 @@ if DIST.exists():
     def index(): return FileResponse(DIST/'index.html')
     @app.get('/favicon.svg')
     def favicon(): return FileResponse(DIST/'favicon.svg')
+    
+    
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse, RedirectResponse
+
+from lab.auth import (
+    init_db,
+    get_db,
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    require_user
+)
+
+app = FastAPI(title="Résonant")
+
+@app.on_event("startup")
+def startup_event():
+    init_db()
+
+# Style CSS regroupé pour alléger le code
+CSS = "<style>body{font-family:sans-serif; max-width:600px; margin:auto; padding:2rem; line-height:1.5;} input,button{width:100%; padding:10px; margin-bottom:15px; box-sizing:border-box;} button{background:#0066cc; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px;} a{color:#0066cc; text-decoration:none;}</style>"
+
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    user = get_current_user(request)
+    if user:
+        return f"{CSS}<h1>Bienvenue, {user['username']} !</h1><p>Tu es connecté.</p><a href='/dashboard'>➡️ Espace Membre</a> | <a href='/logout' style='color:red;'>Déconnexion</a>"
+    return f"{CSS}<h1>Résonant</h1><p>Ce site héberge la plateforme. Connecte-toi pour y accéder.</p><a href='/login'><button style='width:auto;'>Se connecter</button></a> <a href='/register'>Créer un compte</a>"
+
+
+@app.get("/register", response_class=HTMLResponse)
+def register_page(request: Request):
+    if get_current_user(request):
+        return RedirectResponse(url="/dashboard", status_code=303)
+    return f"{CSS}<h2>Inscription</h2><form method='post' action='/register'><input type='text' name='username' placeholder='Pseudo' required /><input type='email' name='email' placeholder='Email' required /><input type='password' name='password' placeholder='Mot de passe' required /><button type='submit'>Créer mon compte</button></form><p align='center'><a href='/login'>Déjà membre ? Se connecter</a></p>"
+
+
+@app.post("/register")
+def register(username: str = Form(...), email: str = Form(...), password: str = Form(...)):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
+    if cursor.fetchone():
+        conn.close()
+        raise HTTPException(status_code=400, detail="Pseudo ou email déjà utilisé.")
+    
+    cursor.execute("INSERT INTO users (username, email, hashed_password) VALUES (?, ?, ?)", (username, email, hash_password(password)))
+    conn.commit()
+    conn.close()
+    return RedirectResponse(url="/login?registered=true", status_code=303)
+
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    if get_current_user(request):
+        return RedirectResponse(url="/dashboard", status_code=303)
+    msg = "<p style='color:green;'>Compte créé avec succès ! Tu peux te connecter.</p>" if request.query_params.get("registered") else ""
+    return f"{CSS}<h2>Connexion</h2>{msg}<form method='post' action='/login'><input type='text' name='username' placeholder='Pseudo' required /><input type='password' name='password' placeholder='Mot de passe' required /><button type='submit'>Se connecter</button></form><p align='center'><a href='/register'>Pas de compte ? S'inscrire</a></p>"
+
+
+@app.post("/login")
+def login(username: str = Form(...), password: str = Form(...)):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if not user or not verify_password(password, user["hashed_password"]):
+        raise HTTPException(status_code=400, detail="Identifiants incorrects.")
+    
+    response = RedirectResponse(url="/dashboard", status_code=303)
+    response.set_cookie(key="access_token", value=create_access_token(data={"sub": user["username"]}), httponly=True, secure=True, samesite="lax")
+    return response
+
+
+@app.get("/logout")
+def logout():
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie("access_token")
+    return response
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard(current_user: dict = Depends(require_user)):
+    return f"{CSS}<h1>Espace Membre</h1><p>Bienvenue <strong>{current_user['username']}</strong> ! Tu as désormais accès aux fonctionnalités de Résonant.</p><p><a href='/logout' style='color:red;'>Se déconnecter</a></p>"
