@@ -1,0 +1,1329 @@
+{
+  "version": 1,
+  "name": "Compact · traitements utiles",
+  "sample_rate": 48000,
+  "duration": 3.0,
+  "nodes": [
+    {
+      "id": "mode-1",
+      "type": "oscillator",
+      "label": "Mode 1 · sinus",
+      "parameters": {
+        "frequency": 438.3990639424802,
+        "amplitude": 0.010554288805014356,
+        "phase": 3.092637556289958
+      },
+      "position": {
+        "x": 30.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-2",
+      "type": "oscillator",
+      "label": "Mode 2 · sinus",
+      "parameters": {
+        "frequency": 439.01265407082093,
+        "amplitude": 0.39512300316757454,
+        "phase": -2.790786494824445
+      },
+      "position": {
+        "x": 30.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-3",
+      "type": "oscillator",
+      "label": "Mode 3 · sinus",
+      "parameters": {
+        "frequency": 439.1507784537859,
+        "amplitude": 0.21931590210731938,
+        "phase": -0.25002898379923977
+      },
+      "position": {
+        "x": 30.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-4",
+      "type": "oscillator",
+      "label": "Mode 4 · sinus",
+      "parameters": {
+        "frequency": 441.481324666492,
+        "amplitude": 0.017292963420225176,
+        "phase": -2.026510010581738
+      },
+      "position": {
+        "x": 30.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-6",
+      "type": "oscillator",
+      "label": "Mode 6 · sinus",
+      "parameters": {
+        "frequency": 877.9698257268501,
+        "amplitude": 0.01498519908642606,
+        "phase": -0.4741955648956768
+      },
+      "position": {
+        "x": 30.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-7",
+      "type": "oscillator",
+      "label": "Mode 7 · sinus",
+      "parameters": {
+        "frequency": 878.5187199049902,
+        "amplitude": 0.1009252733845845,
+        "phase": 1.1242486694334595
+      },
+      "position": {
+        "x": 30.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-8",
+      "type": "oscillator",
+      "label": "Mode 8 · sinus",
+      "parameters": {
+        "frequency": 878.704484275878,
+        "amplitude": 0.0011634993302590043,
+        "phase": 0.5981686164232407
+      },
+      "position": {
+        "x": 270.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-9",
+      "type": "oscillator",
+      "label": "Mode 9 · sinus",
+      "parameters": {
+        "frequency": 879.4065699698319,
+        "amplitude": 0.008061000350493187,
+        "phase": -2.9153940574608406
+      },
+      "position": {
+        "x": 270.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-10",
+      "type": "oscillator",
+      "label": "Mode 10 · sinus",
+      "parameters": {
+        "frequency": 1318.061372747754,
+        "amplitude": 0.053644478669628085,
+        "phase": -0.9661295004737163
+      },
+      "position": {
+        "x": 270.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-11",
+      "type": "oscillator",
+      "label": "Mode 11 · sinus",
+      "parameters": {
+        "frequency": 1319.688071574153,
+        "amplitude": 0.011539169391060837,
+        "phase": 0.8243018471893713
+      },
+      "position": {
+        "x": 270.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-12",
+      "type": "oscillator",
+      "label": "Mode 12 · sinus",
+      "parameters": {
+        "frequency": 1320.6683054209373,
+        "amplitude": 0.08499191184043497,
+        "phase": 1.998542070543433
+      },
+      "position": {
+        "x": 270.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-13",
+      "type": "oscillator",
+      "label": "Mode 13 · sinus",
+      "parameters": {
+        "frequency": 1320.9558722466916,
+        "amplitude": 0.0063391555120736595,
+        "phase": -0.07120142564538767
+      },
+      "position": {
+        "x": 270.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-14",
+      "type": "oscillator",
+      "label": "Mode 14 · sinus",
+      "parameters": {
+        "frequency": 1321.3436757112238,
+        "amplitude": 0.032421685312105084,
+        "phase": 0.021956428292735808
+      },
+      "position": {
+        "x": 510.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-15",
+      "type": "oscillator",
+      "label": "Mode 15 · sinus",
+      "parameters": {
+        "frequency": 1764.5530682179951,
+        "amplitude": 0.008183548557819676,
+        "phase": -0.47843566187730957
+      },
+      "position": {
+        "x": 510.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-17",
+      "type": "oscillator",
+      "label": "Mode 17 · sinus",
+      "parameters": {
+        "frequency": 1766.496239554382,
+        "amplitude": 0.015279977685750994,
+        "phase": -0.931758542076917
+      },
+      "position": {
+        "x": 510.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-19",
+      "type": "oscillator",
+      "label": "Mode 19 · sinus",
+      "parameters": {
+        "frequency": 1771.5469866170756,
+        "amplitude": 0.0038608174104789923,
+        "phase": -2.89399778476567
+      },
+      "position": {
+        "x": 510.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-20",
+      "type": "oscillator",
+      "label": "Mode 20 · sinus",
+      "parameters": {
+        "frequency": 2213.8982456100102,
+        "amplitude": 0.004716009570898396,
+        "phase": -0.2486225237006927
+      },
+      "position": {
+        "x": 510.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-21",
+      "type": "oscillator",
+      "label": "Mode 21 · sinus",
+      "parameters": {
+        "frequency": 2215.5336186665972,
+        "amplitude": 0.0008251802626664008,
+        "phase": -0.09128660239294462
+      },
+      "position": {
+        "x": 510.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-22",
+      "type": "oscillator",
+      "label": "Mode 22 · sinus",
+      "parameters": {
+        "frequency": 2216.0338957067675,
+        "amplitude": 0.004146774002902359,
+        "phase": 0.9328998118117333
+      },
+      "position": {
+        "x": 750.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-24",
+      "type": "oscillator",
+      "label": "Mode 24 · sinus",
+      "parameters": {
+        "frequency": 2221.211484803182,
+        "amplitude": 0.002793756467063961,
+        "phase": 0.817966442468002
+      },
+      "position": {
+        "x": 750.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-25",
+      "type": "oscillator",
+      "label": "Mode 25 · sinus",
+      "parameters": {
+        "frequency": 2669.7486527888236,
+        "amplitude": 0.009884345868433017,
+        "phase": 1.1853731990481684
+      },
+      "position": {
+        "x": 750.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-26",
+      "type": "oscillator",
+      "label": "Mode 26 · sinus",
+      "parameters": {
+        "frequency": 2671.485245757315,
+        "amplitude": 0.007511015413691454,
+        "phase": -0.4273050235576612
+      },
+      "position": {
+        "x": 750.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-27",
+      "type": "oscillator",
+      "label": "Mode 27 · sinus",
+      "parameters": {
+        "frequency": 2672.4037871468367,
+        "amplitude": 0.001118787709567612,
+        "phase": -2.75884011054006
+      },
+      "position": {
+        "x": 750.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-30",
+      "type": "oscillator",
+      "label": "Mode 30 · sinus",
+      "parameters": {
+        "frequency": 3131.3894380889365,
+        "amplitude": 0.005783172172288058,
+        "phase": 1.4394795321586464
+      },
+      "position": {
+        "x": 750.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-31",
+      "type": "oscillator",
+      "label": "Mode 31 · sinus",
+      "parameters": {
+        "frequency": 3133.6502535942877,
+        "amplitude": 0.0010989437054155704,
+        "phase": -0.46207821208700395
+      },
+      "position": {
+        "x": 990.0,
+        "y": 30.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-32",
+      "type": "oscillator",
+      "label": "Mode 32 · sinus",
+      "parameters": {
+        "frequency": 3134.2719503600206,
+        "amplitude": 0.0067548795401939955,
+        "phase": 0.19351604138190126
+      },
+      "position": {
+        "x": 990.0,
+        "y": 145.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-36",
+      "type": "oscillator",
+      "label": "Mode 36 · sinus",
+      "parameters": {
+        "frequency": 3601.0903916825196,
+        "amplitude": 0.004288188700198077,
+        "phase": 2.033988384865591
+      },
+      "position": {
+        "x": 990.0,
+        "y": 260.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-37",
+      "type": "oscillator",
+      "label": "Mode 37 · sinus",
+      "parameters": {
+        "frequency": 3601.8179922487006,
+        "amplitude": 0.004442115684184516,
+        "phase": -2.7644494756543843
+      },
+      "position": {
+        "x": 990.0,
+        "y": 375.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-38",
+      "type": "oscillator",
+      "label": "Mode 38 · sinus",
+      "parameters": {
+        "frequency": 3602.861555939883,
+        "amplitude": 0.002980756918321278,
+        "phase": 2.0146622913488947
+      },
+      "position": {
+        "x": 990.0,
+        "y": 490.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "mode-39",
+      "type": "oscillator",
+      "label": "Mode 39 · sinus",
+      "parameters": {
+        "frequency": 3605.0768886023834,
+        "amplitude": 0.0017187649452490203,
+        "phase": 2.754485104940823
+      },
+      "position": {
+        "x": 990.0,
+        "y": 605.0
+      },
+      "reason": "Mode amorti ajusté sur une trajectoire complexe. Jusqu’à 5 composantes proches par groupe permettent des battements et plusieurs décroissances. Pénalité locale 0.0005 par mode ; groupe conservé si SSE relative < 0,35. Isolement supplémentaire : aucun Hz. Les mêmes filtres d’analyse sont appliqués aux mesures et aux fonctions ajustées. Aucune onde enregistrée ni enveloppe échantillonnée n’est rejouée. Attaque commune calibrée : début 0.011354 s, constante 0.000500 s ; fréquences et décroissances libres préservées. Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe."
+    },
+    {
+      "id": "sum",
+      "type": "sum",
+      "label": "Somme des modes",
+      "parameters": {},
+      "position": {
+        "x": 1260.0,
+        "y": 230.0
+      },
+      "reason": "Superposition linéaire des modes détectés."
+    },
+    {
+      "id": "gain",
+      "type": "gain",
+      "label": "Gain de sortie",
+      "parameters": {
+        "gain": 1.0064900526566252
+      },
+      "position": {
+        "x": 1480.0,
+        "y": 230.0
+      },
+      "reason": "Gain unité explicite ; aucun changement de niveau caché."
+    },
+    {
+      "id": "out",
+      "type": "output",
+      "label": "Sortie mono",
+      "parameters": {},
+      "position": {
+        "x": 1700.0,
+        "y": 230.0
+      },
+      "reason": ""
+    },
+    {
+      "id": "impact-noise",
+      "type": "noise",
+      "label": "Impact · bruit blanc",
+      "parameters": {
+        "amplitude": 0.08827283068011979,
+        "seed": 42.0
+      },
+      "position": {
+        "x": 1920.0,
+        "y": 230.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.133579."
+    },
+    {
+      "id": "impact-lp",
+      "type": "lowpass",
+      "label": "Impact · couleur",
+      "parameters": {
+        "fc": 400.07932835362226,
+        "q": 0.7071067811865476
+      },
+      "position": {
+        "x": 2140.0,
+        "y": 230.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.133579."
+    },
+    {
+      "id": "impact-env",
+      "type": "envelope",
+      "label": "Impact · enveloppe",
+      "parameters": {
+        "attack": 0.0007,
+        "tau": 0.2999851259336958,
+        "onset": 0.004354166666666667
+      },
+      "position": {
+        "x": 2360.0,
+        "y": 230.0
+      },
+      "reason": "Bruit d’impact candidat ajusté sur le résidu du modèle tonal. Recherche fc∈{800,2500,7000,14000} Hz et τ∈{8,25,70,150} ms ; amplitude mise à l’échelle du RMS résiduel sur 120 ms, puis testée à 25/50/75/100 %. Graine 42 inchangée. Ce bruit ne prétend pas identifier une collision marteau-corde exacte. Coût mesuré 0.133579."
+    },
+    {
+      "id": "impact-sum",
+      "type": "sum",
+      "label": "Modes + impact",
+      "parameters": {},
+      "position": {
+        "x": 2580.0,
+        "y": 230.0
+      },
+      "reason": "Somme explicite des modes déterministes et du bruit transitoire. Aucune copie du WAV dans le graphe."
+    },
+    {
+      "id": "mode-1-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-1",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 29.99900839557972,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 270.0,
+        "y": 30.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-2-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-2",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.5213957825587443,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 270.0,
+        "y": 145.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-3-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-3",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.8655168322890023,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 270.0,
+        "y": 260.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-4-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-4",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.29567697169064255,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 270.0,
+        "y": 375.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-6-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-6",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.9572715609037621,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 270.0,
+        "y": 490.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-7-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-7",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.21050345060009704,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 270.0,
+        "y": 605.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-8-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-8",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 29.999999999972225,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 510.0,
+        "y": 30.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-9-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-9",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.839113147783831,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 510.0,
+        "y": 145.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-10-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-10",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.05214538900152431,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 510.0,
+        "y": 260.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-11-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-11",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.7574532098664458,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 510.0,
+        "y": 375.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-12-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-12",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.04497945572369584,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 510.0,
+        "y": 490.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-13-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-13",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 1.5986864055382346,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 510.0,
+        "y": 605.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-14-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-14",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.3964783915959137,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 750.0,
+        "y": 30.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-15-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-15",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.43589252476064133,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 750.0,
+        "y": 145.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-17-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-17",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.393280711438936,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 750.0,
+        "y": 260.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-19-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-19",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.06614487950437685,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 750.0,
+        "y": 375.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-20-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-20",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.15464590958748586,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 750.0,
+        "y": 490.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-21-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-21",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.9310315185022554,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 750.0,
+        "y": 605.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-22-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-22",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.4862391274739199,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 990.0,
+        "y": 30.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-24-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-24",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.10533404879428271,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 990.0,
+        "y": 145.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-25-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-25",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.1529662822746124,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 990.0,
+        "y": 260.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-26-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-26",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.1815661962322249,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 990.0,
+        "y": 375.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-27-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-27",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.6529342791146426,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 990.0,
+        "y": 490.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-30-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-30",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.16554289602703764,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 990.0,
+        "y": 605.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-31-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-31",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.7648885203390449,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 1230.0,
+        "y": 30.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-32-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-32",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.20521624325788843,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 1230.0,
+        "y": 145.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-36-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-36",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.20427738552091995,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 1230.0,
+        "y": 260.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-37-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-37",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.22631545353957835,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 1230.0,
+        "y": 375.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-38-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-38",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.49936383994115363,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 1230.0,
+        "y": 490.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    },
+    {
+      "id": "mode-39-env",
+      "type": "envelope",
+      "label": "Enveloppe · mode-39",
+      "parameters": {
+        "attack": 0.0005,
+        "tau": 0.36220574837333647,
+        "onset": 0.011354166666666667
+      },
+      "position": {
+        "x": 1230.0,
+        "y": 605.0
+      },
+      "reason": "Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite."
+    }
+  ],
+  "edges": [
+    {
+      "id": "mode-1-env-sum",
+      "source": "mode-1-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-2-env-sum",
+      "source": "mode-2-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-3-env-sum",
+      "source": "mode-3-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-4-env-sum",
+      "source": "mode-4-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-6-env-sum",
+      "source": "mode-6-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-7-env-sum",
+      "source": "mode-7-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-8-env-sum",
+      "source": "mode-8-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-9-env-sum",
+      "source": "mode-9-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-10-env-sum",
+      "source": "mode-10-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-11-env-sum",
+      "source": "mode-11-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-12-env-sum",
+      "source": "mode-12-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-13-env-sum",
+      "source": "mode-13-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-14-env-sum",
+      "source": "mode-14-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-15-env-sum",
+      "source": "mode-15-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-17-env-sum",
+      "source": "mode-17-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-19-env-sum",
+      "source": "mode-19-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-20-env-sum",
+      "source": "mode-20-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-21-env-sum",
+      "source": "mode-21-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-22-env-sum",
+      "source": "mode-22-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-24-env-sum",
+      "source": "mode-24-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-25-env-sum",
+      "source": "mode-25-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-26-env-sum",
+      "source": "mode-26-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-27-env-sum",
+      "source": "mode-27-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-30-env-sum",
+      "source": "mode-30-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-31-env-sum",
+      "source": "mode-31-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-32-env-sum",
+      "source": "mode-32-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-36-env-sum",
+      "source": "mode-36-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-37-env-sum",
+      "source": "mode-37-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-38-env-sum",
+      "source": "mode-38-env",
+      "target": "sum"
+    },
+    {
+      "id": "mode-39-env-sum",
+      "source": "mode-39-env",
+      "target": "sum"
+    },
+    {
+      "id": "sum-gain",
+      "source": "sum",
+      "target": "gain"
+    },
+    {
+      "id": "impact-noise-impact-lp",
+      "source": "impact-noise",
+      "target": "impact-lp"
+    },
+    {
+      "id": "impact-lp-impact-env",
+      "source": "impact-lp",
+      "target": "impact-env"
+    },
+    {
+      "id": "gain-impact-sum",
+      "source": "gain",
+      "target": "impact-sum"
+    },
+    {
+      "id": "impact-env-impact-sum",
+      "source": "impact-env",
+      "target": "impact-sum"
+    },
+    {
+      "id": "impact-sum-out",
+      "source": "impact-sum",
+      "target": "out"
+    },
+    {
+      "id": "mode-1-mode-1-env",
+      "source": "mode-1",
+      "target": "mode-1-env"
+    },
+    {
+      "id": "mode-2-mode-2-env",
+      "source": "mode-2",
+      "target": "mode-2-env"
+    },
+    {
+      "id": "mode-3-mode-3-env",
+      "source": "mode-3",
+      "target": "mode-3-env"
+    },
+    {
+      "id": "mode-4-mode-4-env",
+      "source": "mode-4",
+      "target": "mode-4-env"
+    },
+    {
+      "id": "mode-6-mode-6-env",
+      "source": "mode-6",
+      "target": "mode-6-env"
+    },
+    {
+      "id": "mode-7-mode-7-env",
+      "source": "mode-7",
+      "target": "mode-7-env"
+    },
+    {
+      "id": "mode-8-mode-8-env",
+      "source": "mode-8",
+      "target": "mode-8-env"
+    },
+    {
+      "id": "mode-9-mode-9-env",
+      "source": "mode-9",
+      "target": "mode-9-env"
+    },
+    {
+      "id": "mode-10-mode-10-env",
+      "source": "mode-10",
+      "target": "mode-10-env"
+    },
+    {
+      "id": "mode-11-mode-11-env",
+      "source": "mode-11",
+      "target": "mode-11-env"
+    },
+    {
+      "id": "mode-12-mode-12-env",
+      "source": "mode-12",
+      "target": "mode-12-env"
+    },
+    {
+      "id": "mode-13-mode-13-env",
+      "source": "mode-13",
+      "target": "mode-13-env"
+    },
+    {
+      "id": "mode-14-mode-14-env",
+      "source": "mode-14",
+      "target": "mode-14-env"
+    },
+    {
+      "id": "mode-15-mode-15-env",
+      "source": "mode-15",
+      "target": "mode-15-env"
+    },
+    {
+      "id": "mode-17-mode-17-env",
+      "source": "mode-17",
+      "target": "mode-17-env"
+    },
+    {
+      "id": "mode-19-mode-19-env",
+      "source": "mode-19",
+      "target": "mode-19-env"
+    },
+    {
+      "id": "mode-20-mode-20-env",
+      "source": "mode-20",
+      "target": "mode-20-env"
+    },
+    {
+      "id": "mode-21-mode-21-env",
+      "source": "mode-21",
+      "target": "mode-21-env"
+    },
+    {
+      "id": "mode-22-mode-22-env",
+      "source": "mode-22",
+      "target": "mode-22-env"
+    },
+    {
+      "id": "mode-24-mode-24-env",
+      "source": "mode-24",
+      "target": "mode-24-env"
+    },
+    {
+      "id": "mode-25-mode-25-env",
+      "source": "mode-25",
+      "target": "mode-25-env"
+    },
+    {
+      "id": "mode-26-mode-26-env",
+      "source": "mode-26",
+      "target": "mode-26-env"
+    },
+    {
+      "id": "mode-27-mode-27-env",
+      "source": "mode-27",
+      "target": "mode-27-env"
+    },
+    {
+      "id": "mode-30-mode-30-env",
+      "source": "mode-30",
+      "target": "mode-30-env"
+    },
+    {
+      "id": "mode-31-mode-31-env",
+      "source": "mode-31",
+      "target": "mode-31-env"
+    },
+    {
+      "id": "mode-32-mode-32-env",
+      "source": "mode-32",
+      "target": "mode-32-env"
+    },
+    {
+      "id": "mode-36-mode-36-env",
+      "source": "mode-36",
+      "target": "mode-36-env"
+    },
+    {
+      "id": "mode-37-mode-37-env",
+      "source": "mode-37",
+      "target": "mode-37-env"
+    },
+    {
+      "id": "mode-38-mode-38-env",
+      "source": "mode-38",
+      "target": "mode-38-env"
+    },
+    {
+      "id": "mode-39-mode-39-env",
+      "source": "mode-39",
+      "target": "mode-39-env"
+    }
+  ]
+}

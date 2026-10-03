@@ -9,6 +9,7 @@ from .schema import Block,Patch
 from .blocks import parameters,process
 from .identify import link
 from .graph import render,validate
+from .instrument import physical_count
 
 
 def architecture(source,style):
@@ -85,7 +86,16 @@ def fit_architecture(p,x,weights,budget=220):
     for drive in (2,12,45):
         for bias in (0,.8,1.8):
             z=initial.copy();z[di]=np.log(drive);z[bi]=bias;cost(z)
-    optimize.minimize(cost,best[1],method='Powell',bounds=bounds,options={'maxfev':budget,'maxiter':5,'xtol':.003,'ftol':.0003})
+    # Give the processing its own budget: a large source bank otherwise exhausts
+    # Powell's evaluations before drive, bias and filter controls are visited.
+    processing=[i for i,(k,_,_) in enumerate(variables) if nodes[k].type!='modal']
+    stage_budget=max(20,budget//2)
+    anchor=best[1].copy()
+    def processing_cost(z):
+        proposal=anchor.copy();proposal[processing]=z
+        return cost(proposal)
+    optimize.minimize(processing_cost,anchor[processing],method='Powell',bounds=[bounds[i] for i in processing],options={'maxfev':stage_budget,'maxiter':4,'xtol':.003,'ftol':.0003})
+    optimize.minimize(cost,best[1],method='Powell',bounds=bounds,options={'maxfev':max(15,budget-stage_budget),'maxiter':5,'xtol':.003,'ftol':.0003})
     decode(best[1]);q=p.model_copy(deep=True)
     for node in q.nodes:node.parameters=values[node.id]
     validate(q)
@@ -103,5 +113,5 @@ def search(proposals,x,weights,objective,budget=220):
             # Both seed and fit are scored at full rate: analysis resampling
             # cannot cause an unchecked regression in the final decision.
             a=objective(render(seed));b=objective(render(fitted));chosen=fitted if b<a else seed
-            candidates.append(chosen);diagnostics.append({**info,'full_rate_error':min(a,b),'seed_error':a,'fitted_error':b,'blocks':len(chosen.nodes)})
+            candidates.append(chosen);diagnostics.append({**info,'full_rate_error':min(a,b),'seed_error':a,'fitted_error':b,'blocks':physical_count(chosen)})
     return candidates,diagnostics

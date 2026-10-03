@@ -138,7 +138,12 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
     candidates=[]
     def add(p,reference=False):
         y=render(p);errors=objective.components(y);bands=band_errors(x,y,p.sample_rate);count=sum(len(parameters(n.type,n.parameters,p.sample_rate)) for n in p.nodes)
-        candidates.append({'patch':p.model_dump(),'errors':errors,'complexity':complexity(p),'score':errors['total'],'parameter_count':count,'modules':physical_count(p),'bands':bands,'generators':sum(REGISTRY[n.type].inputs==0 for n in p.nodes),'reference':reference,'within_tolerance':errors['total']<=limit and (not protect_texture or (errors['attack']<=max(reference_attack*(1+tolerance),.01)+1e-12 and all(bands[k]<=max(reference_bands[k]*(1+tolerance),.03)+1e-12 for k in bands)))})
+        reasons=[]
+        if errors['total']>limit:reasons.append('Erreur globale')
+        if protect_texture:
+            if errors['attack']>max(reference_attack*(1+tolerance),.01)+1e-12:reasons.append('Attaque')
+            reasons.extend('Bande '+k for k in bands if bands[k]>max(reference_bands[k]*(1+tolerance),.03)+1e-12)
+        candidates.append({'patch':p.model_dump(),'errors':errors,'complexity':complexity(p),'score':errors['total'],'parameter_count':count,'modules':physical_count(p),'bands':bands,'rejection_reasons':reasons,'generators':sum(REGISTRY[n.type].inputs==0 for n in p.nodes),'reference':reference,'within_tolerance':not reasons})
     add(original,True)
     clean=tidy(original)
     if len(clean.nodes)<len(original.nodes):add(clean)
@@ -207,6 +212,26 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
         q=pruned.model_copy(deep=True);q.nodes=[n for n in q.nodes if n.id!=node.id];q.edges=[e for e in q.edges if e.source!=node.id]
         q=tidy(q);q.name='Compact · élagage vérifié';add(q)
         if candidates[-1]['within_tolerance']:pruned=q
+    # Remove a processor only after measuring the actual bypassed graph. Control
+    # envelopes and MIDI VCA remain part of the playable instrument contract.
+    for node in list(pruned.nodes):
+        if node.type not in ('gain','lowpass','lowpass1','highpass','bandpass','notch','peak_eq','saturation','asymmetric_saturation') or node.id.startswith('keyboard-'):continue
+        incoming=[e for e in pruned.edges if e.target==node.id]
+        if len(incoming)!=1:continue
+        q=pruned.model_copy(deep=True);source=incoming[0].source
+        q.edges=[Edge(id=f'{source}-{e.target}',source=source,target=e.target) if e.source==node.id else e for e in q.edges if e.target!=node.id]
+        q.nodes=[n for n in q.nodes if n.id!=node.id]
+        try:q=tidy(q)
+        except ValueError:continue  # bypass would duplicate an existing cable
+        q.name='Compact · traitements utiles';add(q)
+        if candidates[-1]['within_tolerance']:pruned=q
+    chosen=min([c for c in candidates if c['within_tolerance']],key=size)
+    from .shared_envelopes import share_envelopes
+    shared_sources=proposals+[collapse_modes(Patch.model_validate(chosen['patch']))]
+    for source in shared_sources:
+        for groups in (1,2,3,4,6,8):
+            shared=share_envelopes(source,groups)
+            if shared is not None:add(shared)
     chosen=min([c for c in candidates if c['within_tolerance']],key=size)
     for c in candidates:
         c['pareto']=not any(other['modules']<=c['modules'] and other['errors']['total']<=c['errors']['total'] and (other['modules']<c['modules'] or other['errors']['total']<c['errors']['total']) for other in candidates)

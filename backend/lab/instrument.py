@@ -25,8 +25,8 @@ def expand_modes(patch):
         if len(eid)>80 or eid in ids:raise ValueError('Identifiant incompatible avec le dépliage des modes.')
         ids.add(eid)
         n.type='oscillator';n.parameters={'frequency':v['frequency'],'amplitude':v['amplitude'],'phase':phase_wrap(v['phase']-2*np.pi*v['frequency']*v['onset'])}
-        n.label=(n.label or n.id)+' · sinus'
-        n.reason+=' Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe.'
+        n.label=((n.label or n.id)+' · sinus')[:160]
+        n.reason=(n.reason+' Oscillateur explicite ; la phase à t=0 compense le début de son enveloppe.')[:4000]
         env=Block(id=eid,type='envelope',label=f'Enveloppe · {n.id}',parameters={k:v[k] for k in ('attack','tau','onset')},position={'x':n.position.get('x',0)+240,'y':n.position.get('y',0)},reason='Attaque, décroissance et début du mode original, rendus explicitement par ce VCA à enveloppe exponentielle. Aucun ADSR implicite.')
         p.nodes.append(env)
         for e in p.edges:
@@ -38,6 +38,20 @@ def expand_modes(patch):
 def collapse_modes(patch):
     """Invert only exclusive oscillator → exponential-envelope pairs."""
     p=patch.model_copy(deep=True)
+    # Invert explicit oscillator banks sharing a sum → envelope, when every
+    # source is exclusive to that bank. This preserves subsequent simplification.
+    for env in list(p.nodes):
+        if env.type!='envelope':continue
+        parent=next((n for n in p.nodes if any(e.source==n.id and e.target==env.id for e in p.edges)),None)
+        if parent is None or parent.type!='sum' or sum(e.source==parent.id for e in p.edges)!=1:continue
+        sources=[n for n in p.nodes if any(e.source==n.id and e.target==parent.id for e in p.edges)]
+        if not sources or any(n.type!='oscillator' or sum(e.source==n.id for e in p.edges)!=1 for n in sources):continue
+        w=parameters('envelope',env.parameters,p.sample_rate)
+        for osc in sources:
+            v=parameters('oscillator',osc.parameters,p.sample_rate)
+            osc.type='modal';osc.parameters={**v,**w,'phase':phase_wrap(v['phase']+2*np.pi*v['frequency']*w['onset'])}
+        p.nodes.remove(env)
+        p.edges=[Edge(id=f'{parent.id}-{e.target}',source=parent.id,target=e.target) if e.source==env.id else e for e in p.edges if e.target!=env.id]
     for osc in list(p.nodes):
         if osc.type!='oscillator':continue
         outgoing=[e for e in p.edges if e.source==osc.id]
@@ -58,7 +72,12 @@ def physical_count(patch):
 
 def prepare(patch):
     p=expand_modes(patch)
-    if any(n.id.startswith('keyboard-') for n in p.nodes):return p
+    ids={n.id:n.type for n in p.nodes}
+    reserved={'keyboard-velocity':'gain','keyboard-adsr':'adsr'}
+    if set(ids)&set(reserved):
+        if not all(ids.get(k)==v for k,v in reserved.items()):raise ValueError('Modules de contrôle MIDI incomplets ou incompatibles.')
+        return p
+    if len(p.nodes)>126:raise ValueError('Préparation MIDI limitée à 128 modules.')
     out=next(n.id for n in p.nodes if n.type=='output');parent=next(e.source for e in p.edges if e.target==out)
     p.edges=[e for e in p.edges if e.target!=out]
     p.nodes.extend([
@@ -85,7 +104,13 @@ def transpose(patch,note,reference_note,velocity=127,gate=60,track_filters=True)
                 if n.type=='oscillator':v['amplitude']=0;muted.append(n.id)
                 new=min(47000,p.sample_rate*.49)
             if n.type=='oscillator':
-                envs=[a for a in p.nodes if a.type=='envelope' and any(e.source==n.id and e.target==a.id for e in p.edges)]
+                targets={e.target for e in p.edges if e.source==n.id}
+                for _ in p.nodes:
+                    sums={a.id for a in p.nodes if a.type=='sum' and a.id in targets}
+                    more={e.target for e in p.edges if e.source in sums}
+                    if more<=targets:break
+                    targets|=more
+                envs=[a for a in p.nodes if a.type=='envelope' and a.id in targets]
                 onset=parameters('envelope',envs[0].parameters,p.sample_rate)['onset'] if len(envs)==1 else 0
                 v['phase']=phase_wrap(v['phase']-2*np.pi*(new-old)*onset)
             v['frequency']=float(max(1,new))

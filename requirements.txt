@@ -3,3 +3,6 @@ uvicorn
 python-jose[cryptography]
 python-multipart
 bcrypt
+numpy
+scipy
+soundfile

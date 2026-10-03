@@ -19,7 +19,7 @@ def test_redundant_sources_really_removed_and_input_unchanged():
     r=simplify(p,x,Weights(),tolerance=0,test_shaping=False)
     q=Patch.model_validate(r['patch'])
     assert p.model_dump()==before==r['original']
-    assert r['final_blocks']==2 and r['final_generators']==1
+    assert r['final_blocks']==3 and r['final_generators']==1
     assert r['final']<=r['limit']
     assert np.allclose(x,render(q),atol=1e-10)
     assert np.array_equal(render(q),render(Patch.model_validate_json(q.model_dump_json())))

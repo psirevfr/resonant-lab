@@ -25,3 +25,9 @@ starlette==1.7.0
 typing-inspection==0.4.4
 typing_extensions==4.16.0
 uvicorn==0.54.0
+bcrypt==5.0.0
+python-jose==3.5.0
+cryptography==50.0.2
+ecdsa==0.19.2
+rsa==4.9.1
+pyasn1==0.6.4
