@@ -36,7 +36,7 @@ export async function renderPatchClientSide(patch: any): Promise {
 function bufferToWavBlob(buffer: AudioBuffer): Blob {
     const numOfChan = buffer.numberOfChannels;
     const length = buffer.length * numOfChan * 2 + 44;
-    const out = new DataView(ArrayBuffer(length));
+    const out = new DataView(new ArrayBuffer(length));
     let channels = [];
     let sampleRate = buffer.sampleRate;
     let offset = 0;
