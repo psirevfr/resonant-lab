@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from lab.app import app
-from lab.auth import require_user
+from lab.auth import require_user,require_api_user
 from lab.schema import Patch,Block,Weights
 from lab.identify import link
 from lab.graph import render
@@ -66,8 +66,10 @@ def test_audio_routes_coexist_with_account_routes_and_require_auth():
     assert r.status_code==200 and r.content[:4]==b'RIFF'
     assert c.post('/api/instrument/note',json={'patch':p,'note':109}).status_code==422
     app.dependency_overrides.pop(require_user)
+    app.dependency_overrides.pop(require_api_user)
     assert c.post('/api/instrument/prepare',json=p).status_code==401
-    assert c.get('/dashboard').status_code==401
+    assert c.get('/mon-lab/').status_code==200
+    assert 'Connexion' in c.get('/mon-lab/').text
     assert c.get('/login').status_code==200
     assert c.get('/api/health').status_code==200
 

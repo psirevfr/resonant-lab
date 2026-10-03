@@ -70,13 +70,12 @@ def test_shaping_score_is_actual_executed_graph():
     assert {'saturation','lowpass','gain'}.issubset(n.type for n in q.nodes)
 
 
-def test_compact_api_validates_and_returns_reversible_patch():
+def test_compact_api_validates_and_returns_reversible_patch(complete_job):
     c=TestClient(app);p=redundant()
     assert c.post('/api/compact',json={'patch':p.model_dump()}).status_code==422
     a=c.post('/api/audio',files={'file':('reference.wav',wav_bytes(render(p),p.sample_rate),'audio/wav')}).json()
     req={'patch':p.model_dump(),'audio_id':a['id'],'tolerance':0,'test_shaping':False}
-    response=c.post('/api/compact',json=req)
-    assert response.status_code==200,response.text
-    r=response.json();assert r['original']==p.model_dump()
+    response=c.post('/api/compact',json=req,headers={'Idempotency-Key':'compact'})
+    r=complete_job(response);assert r['original']==p.model_dump()
     assert r['final']<=r['limit'] and r['final_blocks']<len(p.nodes)
     assert c.post('/api/compact',json={**req,'tolerance':-1}).status_code==422

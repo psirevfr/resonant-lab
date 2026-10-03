@@ -5,14 +5,13 @@ from lab.graph import render
 
 client=TestClient(app)
 
-def test_end_to_end():
+def test_end_to_end(complete_job):
     demo=client.post('/api/demo'); assert demo.status_code==200
     audio=demo.json(); assert audio['metadata']['channels']==1
     req={'audio_id':audio['id'],'duration':.5,'max_partials':4}
     a=client.post('/api/analyze',json=req); assert a.status_code==200, a.text
     assert a.json()['f0']>200
-    g=client.post('/api/generate',json=req); assert g.status_code==200,g.text
-    patch=g.json()['patch']
+    g=client.post('/api/generate',json=req,headers={'Idempotency-Key':'generation'}); patch=complete_job(g)['patch']
     r=client.post('/api/render',json={'patch':patch,'audio_id':audio['id']}); assert r.status_code==200,r.text
     assert r.json()['errors']['total']>=0
     assert client.get('/api/render/'+r.json()['id']+'/wav').content[:4]==b'RIFF'

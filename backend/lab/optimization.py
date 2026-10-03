@@ -8,10 +8,9 @@ from .metrics import Objective
 
 class Finished(Exception): pass
 
-def run_optimization(request: OptimizeRequest,x,progress,cancel):
+def validate_request(request):
     patch=request.patch.model_copy(deep=True); validate(patch)
     if patch.duration>12: raise ValueError('Optimisation limitée à une sélection de 12 secondes.')
-    objective=Objective(x,patch.sample_rate,request.weights)
     selected=[]
     ordered=sorted(patch.nodes,key=lambda n:(0 if n.type=='gain' else 1 if n.id.startswith('impact-') else 2))
     for node in ordered:
@@ -32,6 +31,11 @@ def run_optimization(request: OptimizeRequest,x,progress,cancel):
     if not selected: raise ValueError('Aucun paramètre optimisable sélectionné.')
     if len(selected)>24: raise ValueError('Sélectionner au plus 24 paramètres.')
     if request.parameter_ids and set(request.parameter_ids)-{f'{n.id}:{k}' for n,k,*_ in selected}: raise ValueError('Sélection de paramètres invalide.')
+    return patch,selected
+
+def run_optimization(request: OptimizeRequest,x,progress,cancel):
+    patch,selected=validate_request(request)
+    objective=Objective(x,patch.sample_rate,request.weights)
     initial=objective(render(patch)); best=initial; best_patch=patch.model_copy(deep=True)
     history=[initial]; evaluations=0; max_evaluations=min(400,request.max_iterations*12+1)
     def cost(v):
