@@ -1,3 +1,4 @@
+import { renderPatchClientSide } from './audioEngine';
 import {useEffect,useRef,useState,useMemo} from 'react';
 import {Activity,Upload,Download,AudioWaveform,FlaskConical,Network,Plus,Search,ChevronRight,RotateCcw,Settings2,X,Check,LoaderCircle,FileAudio,Save,BookOpen,Scissors} from 'lucide-react';
 import type {Patch,Catalog,AudioData,Analysis,Generation,RenderResult,Candidate,Weights,Job,Bode,CompactResult} from './types';
@@ -18,13 +19,45 @@ export function App(){
 
  const [catalog,setCatalog]=useState<Catalog>({}),[patch,setPatch]=useState<Patch>(initialPatch),[audio,setAudio]=useState<AudioData|null>(null),[analysis,setAnalysis]=useState<Analysis|null>(null),[candidates,setCandidates]=useState<Candidate[]>([]),[result,setResult]=useState<RenderResult|null>(null),[selected,setSelected]=useState('filter'),[tab,setTab]=useState('graph'),[busy,setBusy]=useState(''),[rendering,setRendering]=useState(false),[error,setError]=useState(''),[renderError,setRenderError]=useState(''),[notice,setNotice]=useState(''),[search,setSearch]=useState(''),[start,setStart]=useState(0),[duration,setDuration]=useState(3),[maxPartials,setMaxPartials]=useState(24),[penalty,setPenalty]=useState(.0001),[weights,setWeights]=useState<Weights>({time:.1,spectral:.25,spectrogram:.5,envelope:.15,attack:.25}),[showSettings,setShowSettings]=useState(false),[showExports,setShowExports]=useState(false),[detailed,setDetailed]=useState(true),[includeImpact,setIncludeImpact]=useState(true),[refineModes,setRefineModes]=useState(true),[method,setMethod]=useState('Powell'),[iterations,setIterations]=useState(15),[parameterIds,setParameterIds]=useState<string[]>([]),[jobId,setJobId]=useState(''),[job,setJob]=useState<Job|null>(null),[globalBode,setGlobalBode]=useState<Bode|null>(null),[globalSource,setGlobalSource]=useState(''),[snapshots,setSnapshots]=useState<{name:string;patch:Patch;error:number|null}[]>([]),[revision,setRevision]=useState(0);
  const [protectTexture,setProtectTexture]=useState(true);
+ const [modelAudioUrl, setModelAudioUrl] = useState(null);
+ const [modelBlob, setModelBlob] = useState(null);
  const [compact,setCompact]=useState<CompactResult|null>(null),[tolerance,setTolerance]=useState(20),[testShaping,setTestShaping]=useState(true);
  const uploadRef=useRef<HTMLInputElement>(null),patchRef=useRef<HTMLInputElement>(null);
  const locked=!!busy||!!jobId;
  const signature=useMemo(()=>JSON.stringify({nodes:patch.nodes.map(({position,...n})=>n),edges:patch.edges,fs:patch.sample_rate,duration:patch.duration}),[patch]);
  const selectedBlock=patch.nodes.find(n=>n.id===selected);
  useEffect(()=>{api<Catalog>('/blocks').then(setCatalog).catch(e=>setError('Serveur indisponible : '+e.message))},[]);
- useEffect(()=>{if(!Object.keys(catalog).length||locked)return;const controller=new AbortController();setResult(null);setRenderError('');setRendering(true);const timer=setTimeout(()=>{api<RenderResult>('/render',{patch,audio_id:audio?.id,start,weights},controller.signal).then(r=>{setResult(r);setRenderError('')}).catch(e=>{if(e.name!=='AbortError')setRenderError(e.message)}).finally(()=>{if(!controller.signal.aborted)setRendering(false)})},450);return()=>{clearTimeout(timer);controller.abort()}},[signature,audio?.id,start,weights,catalog,locked,revision]);
+ // NOUVEAU BLOC CLIENT-SIDE :
+ useEffect(()=>{
+   if(!Object.keys(catalog).length||locked)return;
+   let active=true;
+   setRenderError('');
+   setRendering(true);
+   const timer=setTimeout(async()=>{
+     try {
+       const wavBlob = await renderPatchClientSide(patch);
+       if(!active) return;
+       const url = URL.createObjectURL(wavBlob);
+       setModelBlob(wavBlob);
+       setModelAudioUrl(prev=>{
+         if(prev) URL.revokeObjectURL(prev);
+         return url;
+       });
+       setResult({
+         id: 'local',
+         view: { min: [], max: [], rms: [] },
+         sample_rate: patch.sample_rate,
+         clipping: false
+       });
+       setRenderError('');
+     } catch(e:any) {
+       if(active) setRenderError(e.message||'Erreur de rendu local');
+     } finally {
+       if(active) setRendering(false);
+     }
+   },450);
+   return()=>{active=false;clearTimeout(timer)};
+ },[signature,catalog,locked,revision]);AbortController();setResult(null);setRenderError('');setRendering(true);const timer=setTimeout(()=>{api<RenderResult>('/render',{patch,audio_id:audio?.id,start,weights},controller.signal).then(r=>{setResult(r);setRenderError('')}).catch(e=>{if(e.name!=='AbortError')setRenderError(e.message)}).finally(()=>{if(!controller.signal.aborted)setRendering(false)})},450);return()=>{clearTimeout(timer);controller.abort()}},[signature,audio?.id,start,weights,catalog,locked,revision]);
  useEffect(()=>{setGlobalBode(null)},[signature]);
  useEffect(()=>{if(!jobId)return;let stopped=false;let timeout:ReturnType<typeof setTimeout>;async function poll(){try{const j=await api<Job>('/jobs/'+jobId);if(stopped)return;setJob(j);if(j.status==='completed'&&j.result){setPatch(j.result.patch);setNotice(`Optimisation : ${j.result.initial.toFixed(4)} → ${j.result.final.toFixed(4)}. ${j.result.message}`);setJobId('');return}if(j.status==='failed'){setError(j.error??'Échec de l’optimisation');setJobId('');return}timeout=setTimeout(()=>void poll(),500)}catch(e){if(!stopped){setError(String(e));timeout=setTimeout(()=>void poll(),1500)}}}void poll();return()=>{stopped=true;clearTimeout(timeout)}},[jobId]);
  async function task(label:string,fn:()=>Promise<void>){setBusy(label);setError('');try{await fn()}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy('')}}
@@ -40,7 +73,7 @@ export function App(){
  function addBlock(type:string){const added=appendModule(patch,type,catalog,{x:100+(patch.nodes.length%4)*230,y:300+Math.floor(patch.nodes.length/4)*110});edit(added.patch);setSelected(added.id);setTab('graph')}
  async function chooseCandidate(c:Candidate){await task('Dépliage des modules',async()=>edit(await api<Patch>('/patch/expand',c.patch)));setSelected(c.patch.nodes[0]?.id??'');setTab('graph')}
  async function importPatch(file:File){await task('Validation du modèle',async()=>{if(file.size>2_000_000)throw Error('JSON limité à 2 Mo.');const p=await api<Patch>('/patch/validate',JSON.parse(await file.text()));setPatch(await api<Patch>('/patch/expand',p));setSelected(p.nodes[0]?.id??'');setTab('graph');setNotice('Modèle importé et validé.');setCompact(null);setCandidates([]);setParameterIds([])})}
- async function doExport(kind:string){setShowExports(false);await task('Export',async()=>{if(kind==='json'){const normalized=await api<Patch>('/patch/validate',patch);await saveDownload(JSON.stringify(normalized,null,2),'resonant.monpatch')}if(kind==='wav'){if(!result)throw Error('Générez un signal valide avant l’export.');const response=await fetch('/api/render/'+result.id+'/wav');if(!response.ok)throw Error('Rendu expiré.');await saveDownload(await response.blob(),'resonant.wav')}if(kind==='svg'||kind==='csv')await saveDownload(await exportBlob('/export/'+kind,patch),'resonant.'+kind);if(kind==='png'){const blob=await exportBlob('/export/svg',patch);const url=URL.createObjectURL(blob);try{const image=new Image();image.src=url;await image.decode();const canvas=document.createElement('canvas');canvas.width=image.width*2;canvas.height=image.height*2;canvas.getContext('2d')!.drawImage(image,0,0,canvas.width,canvas.height);const png=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve));if(png)await saveDownload(png,'resonant-graphe.png')}finally{URL.revokeObjectURL(url)}}if(kind==='report')setExportFile(await exportReport(patch,audio,analysis,result,weights,start))})}
+ async function doExport(kind:string){setShowExports(false);await task('Export',async()=>{if(kind==='json'){const normalized=await api<Patch>('/patch/validate',patch);await saveDownload(JSON.stringify(normalized,null,2),'resonant.monpatch')}if(kind==='wav'){if(!modelBlob)throw Error('Générez un signal valide avant l’export.');await saveDownload(modelBlob,'resonant.wav')}if(kind==='svg'||kind==='csv')await saveDownload(await exportBlob('/export/'+kind,patch),'resonant.'+kind);if(kind==='png'){const blob=await exportBlob('/export/svg',patch);const url=URL.createObjectURL(blob);try{const image=new Image();image.src=url;await image.decode();const canvas=document.createElement('canvas');canvas.width=image.width*2;canvas.height=image.height*2;canvas.getContext('2d')!.drawImage(image,0,0,canvas.width,canvas.height);const png=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve));if(png)await saveDownload(png,'resonant-graphe.png')}finally{URL.revokeObjectURL(url)}}if(kind==='report')setExportFile(await exportReport(patch,audio,analysis,result,weights,start))})}
  function updateSelection(s:number,d:number){setCompact(null);setStart(s);setDuration(d);setAnalysis(null);setCandidates([]);setPatch(p=>({...p,duration:d}))}
  const categories=Array.from(new Set(Object.values(catalog).map(d=>d.category)));
  const displayStatus=busy|| (jobId?'Optimisation en cours':rendering?'Calcul du signal':renderError?'Graphe à compléter':result?'Moteur prêt':'Connexion au moteur');
@@ -62,7 +95,7 @@ export function App(){
  <Keyboard patch={patch} disabled={locked} onPatch={p=>{edit(p);setSelected(p.nodes[0]?.id??'')}} onError={setError}/>
  <SignalPanel original={audio?.view} result={result} analysis={analysis}/>
  <div className="error-metrics"><span>ERREUR RELATIVE</span>{result?.errors?Object.entries(result.errors).map(([k,v])=><div key={k} className={k==='total'?'total':''}><span>{({time:'Temps',spectral:'Spectre',spectrogram:'STFT',envelope:'Enveloppe',attack:'Attaque',total:'Pondérée'} as Record<string,string>)[k]}</span><b>{v.toFixed(4)}</b></div>):<small>{audio?'Calcul de la comparaison en cours ; le graphe doit être valide.':'Importez une référence pour comparer les signaux.'}</small>}</div>
- <Player originalUrl={audio?`/api/audio/${audio.id}/segment?start=${start}&duration=${patch.duration}`:undefined} modelUrl={result?`/api/render/${result.id}/wav`:undefined} onError={setError}/>
+ <Player originalUrl={audio?`/api/audio/${audio.id}/segment?start=${start}&duration=${patch.duration}`:undefined} modelUrl={modelAudioUrl||undefined} onError={setError}/>
  <details className="global-section"><summary><Activity size={14}/> Fonction de transfert du réseau</summary><div className="global-controls"><select aria-label="Source pour le Bode global" value={globalSource} onChange={e=>setGlobalSource(e.target.value)}><option value="">Choisir le point d’injection</option>{patch.nodes.filter(n=>catalog[n.type]?.inputs===0).map(n=><option key={n.id} value={n.id}>{n.label||n.type}</option>)}</select><button disabled={!globalSource||locked} onClick={()=>void task('Calcul du transfert global',async()=>setGlobalBode(await api<Bode>('/transfer/global',{patch,source_id:globalSource})))}>Calculer H(z) global</button></div><p>Le transfert est défini d’une source vers la sortie, autres sources à zéro. Enveloppes et non-linéarités excluent une représentation LTI globale.</p>{globalBode&&<><p>{globalBode.description}</p><Plot height={210} data={[{x:globalBode.frequency,y:globalBode.magnitude,type:'scatter',mode:'lines',name:'Gain dB'},{x:globalBode.frequency,y:globalBode.phase,type:'scatter',mode:'lines',name:'Phase °',yaxis:'y2'}]} layout={{showlegend:true,xaxis:{type:'log',title:{text:'Fréquence (Hz)'}},yaxis:{title:{text:'Gain (dB)'}},yaxis2:{title:{text:'Phase (°)'},overlaying:'y',side:'right'},margin:{l:60,r:60,t:20,b:40}}}/></>}</details>
  </main>
  <Inspector block={selectedBlock} catalog={catalog} fs={patch.sample_rate} locked={locked} selectedParameters={parameterIds} onToggleParameter={id=>setParameterIds(ids=>ids.includes(id)?ids.filter(i=>i!==id):[...ids,id])} onParameter={(key,value)=>edit({...patch,nodes:patch.nodes.map(n=>n.id===selected?{...n,parameters:{...n.parameters,[key]:value}}:n)})} onDelete={()=>{edit({...patch,nodes:patch.nodes.filter(n=>n.id!==selected),edges:patch.edges.filter(e=>e.source!==selected&&e.target!==selected)});setSelected('')}} onDuplicate={()=>{if(!selectedBlock)return;const id=crypto.randomUUID();edit({...patch,nodes:[...patch.nodes,{...structuredClone(selectedBlock),id,position:{x:selectedBlock.position.x+40,y:selectedBlock.position.y+120},label:selectedBlock.label+' · copie'}]});setSelected(id)}}/>
