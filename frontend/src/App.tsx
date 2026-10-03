@@ -39,13 +39,10 @@ useEffect(()=>{
        if(!active) return;
        const url = URL.createObjectURL(wavBlob);
        setModelBlob(wavBlob);
-       setModelAudioUrl(prev=>{
-         if(prev) URL.revokeObjectURL(prev);
-         return url;
-       });
+       setModelAudioUrl(url as any);
        setResult({
          id: 'local',
-         view: { min: [], max: [], rms: [] },
+         view: { peak: 0, rms: 0, duration: patch.duration } as any,
          sample_rate: patch.sample_rate,
          clipping: false
        });

@@ -1,6 +1,6 @@
 // frontend/src/audioEngine.ts
 
-export async function renderPatchClientSide(patch: any): Promise {
+export async function renderPatchClientSide(patch: any) {
     const sampleRate = patch.sample_rate || 44100;
     const duration = patch.duration || 3.0;
     const numSamples = Math.round(duration * sampleRate);
