@@ -38,14 +38,14 @@ useEffect(()=>{
        const wavBlob = await renderPatchClientSide(patch);
        if(!active) return;
        const url = URL.createObjectURL(wavBlob);
-       setModelBlob(wavBlob);
+       setModelBlob(wavBlob as any);
        setModelAudioUrl(url as any);
        setResult({
          id: 'local',
          view: { peak: 0, rms: 0, duration: patch.duration } as any,
          sample_rate: patch.sample_rate,
          clipping: false
-       });
+       } as any);
        setRenderError('');
      } catch(e:any) {
        if(active) setRenderError(e.message||'Erreur de rendu local');
