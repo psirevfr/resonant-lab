@@ -1,9 +1,8 @@
 """Local-only API. Audio remains in RAM, with bounded session caches."""
 from collections import OrderedDict
-from concurrent.futures import ThreadPoolExecutor
 from io import StringIO
 from pathlib import Path
-from threading import Event, RLock
+from threading import RLock
 from uuid import uuid4
 import csv
 import numpy as np
@@ -35,68 +34,40 @@ from .media import wav_response
 # Imports de l'authentification
 from .auth import (
     init_db, get_db, hash_password, verify_password,
-    create_access_token, get_current_user, require_user
+    create_access_token, get_current_user, require_user, require_api_user, check_origin, csrf_token, revoke_session
 )
 
 app=FastAPI(title='Résonant Lab',version='0.1.0')
 
-API_KEY_NAME = "X-API-Key"
-api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+from . import job_store
 
-def get_api_key(api_key: str = Security(api_key_header)):
-    if not api_key:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Clé d'accès manquante (header X-API-Key requis)."
-        )
-    
-    # Connexion à ta base SQLite
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT username FROM users WHERE api_key = ?", (api_key,))
-    user = cursor.fetchone()
-    conn.close()
-    
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Clé d'accès invalide."
-        )
-    return user[0]
+@app.get('/api/dev/status')
+def developer_status(user:dict=Depends(require_api_user)):
+    return {'status':'online','authenticated_as':user['username']}
 
-@app.get("/api/dev/status")
-def developer_status(current_user: str = Depends(get_api_key)):
-    return {
-        "status": "online",
-        "authenticated_as": current_user,
-        "message": "Accès développeur/IA autorisé avec succès."
-    }
+api_router=APIRouter(dependencies=[Depends(require_api_user)])
 
-# Toutes les routes /api/ nécessitent d'être connecté
-api_router=APIRouter(dependencies=[Depends(require_user)])
-
-recordings=OrderedDict(); renders=OrderedDict(); jobs=OrderedDict(); downloads=OrderedDict(); lock=RLock()
-executor=ThreadPoolExecutor(max_workers=1,thread_name_prefix='identification')
+recordings=OrderedDict(); renders=OrderedDict(); downloads=OrderedDict(); lock=RLock()
 
 @app.exception_handler(ValueError)
 async def invalid(_,exc): return JSONResponse(status_code=422,content={'detail':str(exc)})
 
-def get_recording(key):
+def get_recording(key,owner):
     with lock:
-        if key not in recordings: raise HTTPException(404,'Audio absent de la session ; réimporter le WAV.')
-        return recordings[key]
+        if key not in recordings or recordings[key][0]!=owner: raise HTTPException(404,'Audio absent de la session ; réimporter le WAV.')
+        return recordings[key][1]
 
-def store_audio(record):
+def store_audio(record,owner):
     key=uuid4().hex
     with lock:
-        recordings[key]=record
-        while len(recordings)>4 or (len(recordings)>1 and sum(r.samples.nbytes+len(r.original) for r in recordings.values())>400_000_000): recordings.popitem(last=False)
+        recordings[key]=(owner,record)
+        while len(recordings)>4 or (len(recordings)>1 and sum(r.samples.nbytes+len(r.original) for _,r in recordings.values())>400_000_000): recordings.popitem(last=False)
     return key
 
-def target_audio(req):
+def target_audio(req,owner):
     n=round(req.patch.duration*req.patch.sample_rate)
     if not req.audio_id: return None
-    rec=get_recording(req.audio_id)
+    rec=get_recording(req.audio_id,owner)
     if req.start+req.patch.duration > len(rec.samples)/rec.sample_rate+2/req.patch.sample_rate: raise ValueError('La durée du modèle dépasse la sélection disponible dans le WAV.')
     x=excerpt(rec,req.start,req.patch.duration,req.patch.sample_rate)
     return np.pad(x,(0,max(0,n-len(x))))[:n]
@@ -108,36 +79,54 @@ def health(): return {'status':'ok','version':'0.1.0'}
 def blocks(): return catalog()
 
 @api_router.post('/api/audio')
-def upload(file: UploadFile=File(...)):
-    data=file.file.read(128*1024*1024+1); rec=read_wav(data,Path(file.filename or 'audio.wav').name); key=store_audio(rec)
+def upload(file: UploadFile=File(...),user:dict=Depends(require_api_user)):
+    data=file.file.read(128*1024*1024+1); rec=read_wav(data,Path(file.filename or 'audio.wav').name); key=store_audio(rec,user["id"])
     return {'id':key,'metadata':rec.metadata(),'view':view(rec.mono,rec.sample_rate)}
 
 @api_router.post('/api/demo')
-def demo():
+def demo(user:dict=Depends(require_api_user)):
     fs=44100; t=np.arange(fs*3)/fs
     x=sum(a*np.exp(-t/tau)*(1-np.exp(-t/.005))*np.sin(2*np.pi*f*t) for a,f,tau in [(0.45,261.63,1.5),(.23,523.6,.8),(.12,786.8,.5),(.07,1051.6,.35)])
-    rec=read_wav(wav_bytes(x,fs),'Note modale de démonstration.wav'); key=store_audio(rec)
+    rec=read_wav(wav_bytes(x,fs),'Note modale de démonstration.wav'); key=store_audio(rec,user["id"])
     return {'id':key,'metadata':rec.metadata(),'view':view(x,fs)}
 
 @api_router.get('/api/audio/{key}/wav')
-def original(key:str,request:Request): return wav_response(get_recording(key).original,request.headers.get('range'))
+def original(key:str,request:Request,user:dict=Depends(require_api_user)): return wav_response(get_recording(key,user["id"]).original,request.headers.get('range'))
 
 @api_router.get('/api/audio/{key}/segment')
-def segment(key:str,request:Request,start:float=0,duration:float=3):
+def segment(key:str,request:Request,start:float=0,duration:float=3,user:dict=Depends(require_api_user)):
     if start<0 or duration<=0 or duration>60: raise ValueError('Sélection invalide.')
-    rec=get_recording(key); x=excerpt(rec,start,duration)
+    rec=get_recording(key,user["id"]); x=excerpt(rec,start,duration)
     return wav_response(wav_bytes(x,rec.sample_rate),request.headers.get('range'))
 
 @api_router.post('/api/analyze')
-def analysis(req:AnalyzeRequest):
-    rec=get_recording(req.audio_id); x=excerpt(rec,req.start,req.duration)
+def analysis(req:AnalyzeRequest,user:dict=Depends(require_api_user)):
+    rec=get_recording(req.audio_id,user["id"]); x=excerpt(rec,req.start,req.duration)
     return analyze(x,rec.sample_rate,req.max_partials)
 
-@api_router.post('/api/generate')
-def identify(req:GenerateRequest):
-    rec=get_recording(req.audio_id); fs=rec.sample_rate if rec.sample_rate in (44100,48000,96000) else 44100
-    x=excerpt(rec,req.start,req.duration,fs)
-    return generate(x,fs,req.max_partials,req.complexity_penalty,req.weights,req.refine_modes,req.include_impact,req.detailed)
+def submit(kind,req,request,user):
+    data=req.model_dump();idem=request.headers.get('idempotency-key')
+    job_store.maintain()
+    previous=job_store.replay(user['id'],kind,data,idem)
+    if previous:return previous
+    if kind=='generate':
+        rec=get_recording(req.audio_id,user['id'])
+        fs=rec.sample_rate if rec.sample_rate in (44100,48000,96000) else 44100
+        if req.start+req.duration>len(rec.samples)/rec.sample_rate+1/fs:raise ValueError('Sélection hors du WAV.')
+        x=excerpt(rec,req.start,req.duration,fs)
+    else:
+        validate(req.patch)
+        if req.patch.duration>12:raise ValueError('Calcul limité à 12 secondes.')
+        x=target_audio(req,user['id']);fs=req.patch.sample_rate
+        if x is None:raise ValueError('Importez une référence pour ce calcul.')
+        if kind=='optimize':
+            from .optimization import validate_request
+            validate_request(req)
+    return job_store.enqueue(user['id'],kind,data,x,fs,idem)
+
+@api_router.post('/api/generate',status_code=202)
+def identify(req:GenerateRequest,request:Request,user:dict=Depends(require_api_user)):
+    return submit('generate',req,request,user)
 
 @api_router.post('/api/patch/expand')
 def expand(req:Patch):return expand_modes(req).model_dump()
@@ -156,25 +145,23 @@ def instrument_patch(req:InstrumentRequest):
     p,muted=transpose(req.patch,req.note,req.reference_note,req.velocity,req.gate,req.track_filters)
     return {'patch':p.model_dump(),'muted':muted}
 
-@api_router.post('/api/compact')
-def compact(req:CompactRequest):
-    x=target_audio(req)
-    if x is None:raise ValueError('Importez un WAV de référence avant de simplifier.')
-    return simplify(req.patch,x,req.weights,req.tolerance,req.test_shaping,req.protect_texture)
+@api_router.post('/api/compact',status_code=202)
+def compact(req:CompactRequest,request:Request,user:dict=Depends(require_api_user)):
+    return submit('compact',req,request,user)
 
 @api_router.post('/api/render')
-def simulate(req:RenderRequest):
-    x=target_audio(req); y=render(req.patch); key=uuid4().hex
+def simulate(req:RenderRequest,user:dict=Depends(require_api_user)):
+    x=target_audio(req,user["id"]); y=render(req.patch); key=uuid4().hex
     with lock:
-        renders[key]=wav_bytes(y,req.patch.sample_rate)
+        renders[key]=(user["id"],wav_bytes(y,req.patch.sample_rate))
         while len(renders)>4: renders.popitem(last=False)
     return {'id':key,'view':view(y,req.patch.sample_rate),'reference':view(x,req.patch.sample_rate) if x is not None else None,'difference':view(x-y,req.patch.sample_rate) if x is not None else None,'errors':Objective(x,req.patch.sample_rate,req.weights).components(y) if x is not None else None,'clipping':bool(np.max(abs(y))>1),'sample_rate':req.patch.sample_rate}
 
 @api_router.get('/api/render/{key}/wav')
-def rendered(key:str,request:Request):
+def rendered(key:str,request:Request,user:dict=Depends(require_api_user)):
     with lock:
-        if key not in renders: raise HTTPException(404,'Rendu expiré ; générer à nouveau.')
-        return wav_response(renders[key],request.headers.get('range'))
+        if key not in renders or renders[key][0]!=user["id"]: raise HTTPException(404,'Rendu expiré ; générer à nouveau.')
+        return wav_response(renders[key][1],request.headers.get('range'))
 
 class TransferRequest(BaseModel):
     node: Block
@@ -212,7 +199,7 @@ def csv_export(patch:Patch):
     return Response(out.getvalue(),media_type='text/csv')
 
 @api_router.post('/api/exports')
-def prepare_download(file: UploadFile=File(...)):
+def prepare_download(file: UploadFile=File(...),user:dict=Depends(require_api_user)):
     types={'.monpatch':'application/json','.json':'application/json','.wav':'audio/wav',
            '.svg':'image/svg+xml','.png':'image/png','.csv':'text/csv','.html':'text/html'}
     suffix=Path(file.filename or '').suffix.lower()
@@ -221,52 +208,46 @@ def prepare_download(file: UploadFile=File(...)):
     if len(data)>32_000_000: raise ValueError('Export limité à 32 Mo.')
     key=uuid4().hex; name='resonant'+suffix
     with lock:
-        downloads[key]=(name,types[suffix],data)
+        downloads[key]=(name,types[suffix],data,user["id"])
         while len(downloads)>8 or sum(len(d[2]) for d in downloads.values())>64_000_000:
             downloads.popitem(last=False)
     return {'url':f'/api/exports/{key}','name':name}
 
 @api_router.get('/api/exports/{key}')
-def download_export(key:str):
+def download_export(key:str,user:dict=Depends(require_api_user)):
     with lock:
-        if key not in downloads: raise HTTPException(404,'Export expiré ; préparez à nouveau le fichier.')
-        name,media_type,data=downloads[key]
+        if key not in downloads or downloads[key][3]!=user["id"]: raise HTTPException(404,'Export expiré ; préparez à nouveau le fichier.')
+        name,media_type,data,_=downloads[key]
     return Response(data,media_type=media_type,headers={
         'Content-Disposition':f'attachment; filename="{name}"',
         'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'})
 
-@api_router.post('/api/optimize')
-def optimize(req:OptimizeRequest):
-    if not req.audio_id: raise ValueError('Importer une référence pour optimiser.')
-    validate(req.patch); x=target_audio(req)
-    with lock:
-        if any(j['status'] in ('queued','running') for j in jobs.values()): raise HTTPException(409,'Une optimisation est déjà en cours.')
-        key=uuid4().hex; event=Event(); jobs[key]={'status':'queued','cancel':event,'progress':{}}
-        while len(jobs)>12: jobs.popitem(last=False)
-    def progress(data):
-        with lock: jobs[key]['progress']=data
-    def work():
-        with lock: jobs[key]['status']='running'
-        try:
-            result=run_optimization(req,x,progress,event)
-            with lock: jobs[key].update(status='completed',result=result)
-        except Exception as exc:
-            with lock: jobs[key].update(status='failed',error=str(exc))
-    executor.submit(work)
-    return {'id':key}
+@api_router.post('/api/optimize',status_code=202)
+def optimize(req:OptimizeRequest,request:Request,user:dict=Depends(require_api_user)):
+    return submit('optimize',req,request,user)
+
+@api_router.get('/api/jobs')
+def recent_jobs(user:dict=Depends(require_api_user)):
+    job_store.maintain();return job_store.recent(user['id'])
 
 @api_router.get('/api/jobs/{key}')
-def job(key:str):
-    with lock:
-        if key not in jobs: raise HTTPException(404,'Tâche inconnue.')
-        return {k:v for k,v in jobs[key].items() if k!='cancel'}
+def job(key:str,user:dict=Depends(require_api_user)):
+    job_store.maintain();return job_store.read(key,user['id'])
+
+@api_router.get('/api/jobs/{key}/result')
+def job_result(key:str,user:dict=Depends(require_api_user)):
+    result=job_store.read(key,user['id'],True)
+    if result['status']!='succeeded':raise HTTPException(409,'Le résultat n’est pas disponible.')
+    return result['result']
 
 @api_router.post('/api/jobs/{key}/cancel')
-def cancel_job(key:str):
-    with lock:
-        if key not in jobs: raise HTTPException(404,'Tâche inconnue.')
-        jobs[key]['cancel'].set()
-    return {'ok':True}
+def cancel_job(key:str,user:dict=Depends(require_api_user)):
+    return job_store.cancel(key,user['id'])
+
+@api_router.get('/api/me')
+def me(request:Request,user:dict=Depends(require_api_user)):
+    token=request.cookies.get('access_token','')
+    return {**user,'csrf_token':csrf_token(token) if token else None}
 
 # Inclusion des routes protégées de l'API
 app.include_router(api_router)
@@ -285,78 +266,113 @@ if DIST.exists():
 
 @app.on_event("startup")
 def startup_event():
-    init_db()
+    init_db();job_store.init_jobs();job_store.maintain()
 
-# Fonction anti-bug pour l'interface de chat
-def build_html(text):
-    return text.replace("((", "<").replace("))", ">")
+from .pages import auth_form,signed_out
+import hmac
+import re
+import secrets
 
-CSS = build_html("((style))body{font-family:-apple-system, BlinkMacSystemFont, sans-serif; max-width:650px; margin:auto; padding:2rem; line-height:1.6; color:#333;} input,button{width:100%; padding:12px; margin-bottom:15px; box-sizing:border-box; border-radius:6px; border:1px solid #ccc;} button{background:#0066cc; color:white; border:none; cursor:pointer; font-weight:bold; font-size:16px;} button:hover{background:#0052a3;} a{color:#0066cc; text-decoration:none;} .card{background:#f8f9fa; padding:20px; border-radius:8px; border:1px solid #e9ecef; margin:20px 0;}((/style))")
+STATIC=Path(__file__).resolve().parents[1]/'static'
 
-@app.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    user = get_current_user(request)
-    if user:
-        return build_html(f"{CSS}((h1))Résonant((/h1))((p))Bonjour ((strong)){escape(user['username'])}((/strong)).((/p))((a href='/dashboard'))((button style='width:auto;'))➡️ Aller à l'Espace Membre((/button))((/a)) ((a href='/logout' style='color:#dc3545; margin-left:15px;'))Déconnexion((/a))")
-    return build_html(f"{CSS}((h1))Bienvenue sur Résonant((/h1))((p))La plateforme interactive dédiée aux sciences et à l'ingénierie.((/p))((a href='/login'))((button style='width:auto;'))Se connecter((/button))((/a)) ((a href='/register' style='margin-left:10px;'))Créer un compte((/a))")
+@app.get('/auth.css')
+def auth_css():return FileResponse(STATIC/'auth.css')
 
-@app.get("/register", response_class=HTMLResponse)
-def register_page(request: Request):
-    if get_current_user(request):
-        return RedirectResponse(url="/dashboard", status_code=303)
-    return build_html(f"{CSS}((h2))Inscription((/h2))((form method='post' action='/register'))((input type='text' name='username' placeholder='Pseudo' required /))((input type='email' name='email' placeholder='Email' required /))((input type='password' name='password' placeholder='Mot de passe' required /))((button type='submit'))Créer mon compte((/button))((/form))((p align='center'))((a href='/login'))Déjà membre ? Se connecter((/a))((/p))")
+@app.get('/auth.js')
+def auth_js():return FileResponse(STATIC/'auth.js')
 
-@app.post("/register")
-def register(username: str = Form(...), email: str = Form(...), password: str = Form(...)):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id FROM users WHERE username = ? OR email = ?", (username, email))
-    if cursor.fetchone():
-        conn.close()
-        raise HTTPException(status_code=400, detail="Pseudo ou email déjà utilisé.")
-    
-    cursor.execute("INSERT INTO users (username, email, hashed_password) VALUES (?, ?, ?)", (username, email, hash_password(password)))
-    conn.commit()
-    conn.close()
-    return RedirectResponse(url="/login?registered=true", status_code=303)
+def secure_cookie(request):
+    # Production is HTTPS; loopback development can use plain HTTP.
+    return request.url.hostname not in ('127.0.0.1','localhost','::1') or request.url.scheme=='https'
 
-@app.get("/login", response_class=HTMLResponse)
-def login_page(request: Request):
-    if get_current_user(request):
-        return RedirectResponse(url="/dashboard", status_code=303)
-    msg = build_html("((p style='color:#28a745; font-weight:bold;'))Compte créé ! Tu peux te connecter.((/p))") if request.query_params.get("registered") else ""
-    return build_html(f"{CSS}((h2))Connexion((/h2)){msg}((form method='post' action='/login'))((input type='text' name='username' placeholder='Pseudo' required /))((input type='password' name='password' placeholder='Mot de passe' required /))((button type='submit'))Se connecter((/button))((/form))((p align='center'))((a href='/register'))Pas de compte ? S'inscrire((/a))((/p))")
-
-@app.post("/login")
-def login(username: str = Form(...), password: str = Form(...)):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    user = cursor.fetchone()
-    conn.close()
-    
-    if not user or not verify_password(password, user["hashed_password"]):
-        raise HTTPException(status_code=400, detail="Identifiants incorrects.")
-    
-    response = RedirectResponse(url="/dashboard", status_code=303)
-    response.set_cookie(key="access_token", value=create_access_token(data={"sub": user["username"]}), httponly=True, secure=True, samesite="lax")
+def form_response(request,mode,error='',username='',email='',status=200):
+    nonce=secrets.token_urlsafe(32)
+    response=HTMLResponse(auth_form(mode,nonce,error,username,email,bool(request.query_params.get('registered'))),status_code=status,headers={'Cache-Control':'no-store'})
+    response.set_cookie('resonant_form',nonce,httponly=True,secure=secure_cookie(request),samesite='strict',max_age=1800)
     return response
 
-@app.get("/logout")
-def logout():
-    response = RedirectResponse(url="/login", status_code=303)
-    response.delete_cookie("access_token")
-    return response
+def check_form(request,csrf):
+    check_origin(request)
+    nonce=request.cookies.get('resonant_form','')
+    if not nonce or not hmac.compare_digest(csrf,csrf_token(nonce)):raise HTTPException(403,'Formulaire expiré. Rechargez la page.')
 
-@app.get("/dashboard", response_class=HTMLResponse)
-def dashboard(current_user: dict = Depends(require_user)):
-    return build_html(f"{CSS}((div style='display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px;'))((h2))Espace Membre((/h2))((a href='/logout' style='color:#dc3545; font-weight:bold;'))Déconnexion((/a))((/div))((p))Bienvenue ((strong)){escape(current_user['username'])}((/strong)). Tu es connecté(e) avec succès.((/p))((div class='card'))((h3 style='margin-top:0;'))🚀 Accès au Lab Résonant((/h3))((p))Accède à tes outils, simulations, fiches de révision et modules interactifs.((/p))((a href='/mon-lab'))((button style='background:#28a745; width:auto; padding:10px 24px;'))Lancer l'application((/button))((/a))((/div))")
+def valid_email(email):
+    return len(email)<=254 and re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+',email) is not None
 
-@app.get("/mon-lab", response_class=HTMLResponse)
-def mon_lab(current_user: dict = Depends(require_user)):
-    # Si le frontend est généré, on le sert ici !
-    if (DIST/'index.html').exists(): 
-        return FileResponse(DIST/'index.html')
-    
-    # Fallback visuel si l'app n'est pas encore build
-    return build_html(f"{CSS}((div style='background:#000; color:#fff; padding:20px; border-radius:8px;'))((h1 style='margin-top:0;'))⚡ Résonant Lab((/h1))((p))Connecté en tant que : ((strong)){escape(current_user['username'])}((/strong))((/p))((/div))((h3))Application non trouvée((/h3))((p))Le fichier index.html du frontend n'est pas présent dans le dossier dist. Compile le projet pour le voir apparaître ici.((/p))((p style='margin-top:40px;'))((a href='/dashboard'))⬅️ Retour au Dashboard((/a))((/p))")
+@app.get('/')
+def home():return RedirectResponse('/mon-lab/',status_code=303)
+
+@app.get('/login',response_class=HTMLResponse)
+def login_page(request:Request):
+    if get_current_user(request):return RedirectResponse('/mon-lab/',status_code=303)
+    return form_response(request,'login')
+
+@app.post('/login')
+def login(request:Request,username:str=Form(...),password:str=Form(...),csrf:str=Form(...)):
+    check_form(request,csrf)
+    conn=get_db()
+    try:user=conn.execute('SELECT * FROM users WHERE username=?',(username,)).fetchone()
+    finally:conn.close()
+    if not user or not verify_password(password,user['hashed_password']):
+        return form_response(request,'login','Pseudo ou mot de passe incorrect.',username=username,status=400)
+    response=RedirectResponse('/mon-lab/',status_code=303)
+    response.set_cookie('access_token',create_access_token({'sub':user['username']}),httponly=True,secure=secure_cookie(request),samesite='lax',max_age=86400)
+    response.delete_cookie('resonant_form');return response
+
+@app.get('/register',response_class=HTMLResponse)
+def register_page(request:Request):
+    if get_current_user(request):return RedirectResponse('/mon-lab/',status_code=303)
+    return form_response(request,'register')
+
+@app.post('/register')
+def register(request:Request,username:str=Form(...),email:str=Form(...),password:str=Form(...),csrf:str=Form(...)):
+    check_form(request,csrf);username=username.strip();email=email.strip()
+    error=None
+    if not re.fullmatch(r'[\w .-]{3,64}',username):error='Pseudo : 3 à 64 lettres, chiffres, espaces, points ou tirets.'
+    elif not valid_email(email):error='Adresse e-mail invalide.'
+    if error:return form_response(request,'register',error,username,email,422)
+    try:hashed=hash_password(password)
+    except ValueError as exc:return form_response(request,'register',str(exc),username,email,422)
+    conn=get_db()
+    try:
+        conn.execute('INSERT INTO users(username,email,hashed_password) VALUES (?,?,?)',(username,email,hashed));conn.commit()
+    except sqlite3.IntegrityError:
+        return form_response(request,'register','Pseudo ou e-mail déjà utilisé.',username,email,400)
+    finally:conn.close()
+    return RedirectResponse('/login?registered=true',status_code=303)
+
+@app.get('/logout')
+def logout_confirmation():return RedirectResponse('/mon-lab/',status_code=303)
+
+@app.post('/api/logout')
+def logout(request:Request,user:dict=Depends(require_api_user)):
+    revoke_session(request);response=JSONResponse({'ok':True});response.delete_cookie('access_token');response.headers['Cache-Control']='no-store';return response
+
+@app.get('/dashboard')
+def dashboard():return RedirectResponse('/mon-lab/',status_code=303)
+
+@app.get('/mon-lab')
+def mon_lab_redirect():return RedirectResponse('/mon-lab/',status_code=308)
+
+@app.get('/mon-lab/',response_class=HTMLResponse)
+def mon_lab(request:Request):
+    if not get_current_user(request):return HTMLResponse(signed_out(),headers={'Cache-Control':'no-store'})
+    if (DIST/'index.html').exists():return FileResponse(DIST/'index.html',headers={'Cache-Control':'no-store'})
+    return HTMLResponse('Interface non compilée. Exécutez le build frontend.',status_code=503)
+
+class AccountUpdate(BaseModel):
+    email:str
+    current_password:str
+
+@app.post('/api/account')
+def update_account(req:AccountUpdate,user:dict=Depends(require_api_user)):
+    email=req.email.strip()
+    if not valid_email(email):raise HTTPException(422,'Adresse e-mail invalide.')
+    conn=get_db()
+    try:
+        row=conn.execute('SELECT hashed_password FROM users WHERE id=?',(user['id'],)).fetchone()
+        if not row or not verify_password(req.current_password,row['hashed_password']):raise HTTPException(403,'Mot de passe actuel incorrect.')
+        try:conn.execute('UPDATE users SET email=? WHERE id=?',(email,user['id']));conn.commit()
+        except sqlite3.IntegrityError:raise HTTPException(409,'Cette adresse est déjà utilisée.')
+    finally:conn.close()
+    return {'id':user['id'],'username':user['username'],'email':email}
