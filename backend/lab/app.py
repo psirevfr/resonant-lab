@@ -8,6 +8,9 @@ from uuid import uuid4
 import csv
 import numpy as np
 
+from fastapi import Security, HTTPException, status, Depends
+from fastapi.security.api_key import APIKeyHeader
+import sqlite3
 from fastapi import FastAPI, APIRouter, Depends, UploadFile, File, HTTPException, Request, Form, status
 from fastapi.responses import Response, JSONResponse, FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -36,6 +39,39 @@ from .auth import (
 )
 
 app=FastAPI(title='Résonant Lab',version='0.1.0')
+
+API_KEY_NAME = "X-API-Key"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+def get_api_key(api_key: str = Security(api_key_header)):
+    if not api_key:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Clé d'accès manquante (header X-API-Key requis)."
+        )
+    
+    # Connexion à ta base SQLite
+    conn = sqlite3.connect("users.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT username FROM users WHERE api_key = ?", (api_key,))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Clé d'accès invalide."
+        )
+    return user[0]
+
+@app.get("/api/dev/status")
+def developer_status(current_user: str = Depends(get_api_key)):
+    return {
+        "status": "online",
+        "authenticated_as": current_user,
+        "message": "Accès développeur/IA autorisé avec succès."
+    }
+
 # Toutes les routes /api/ nécessitent d'être connecté
 api_router=APIRouter(dependencies=[Depends(require_user)])
 
