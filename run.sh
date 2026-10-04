@@ -1,12 +1,26 @@
 #!/usr/bin/env bash
+# Local launcher: production supervisors should manage run-web.sh and worker.sh separately.
 set -euo pipefail
 cd "$(dirname "$0")"
-if [ ! -x .venv/bin/python ] || [ ! -f frontend/dist/index.html ]; then
-  printf 'Installation absente : lancer ./setup.sh avec Python 3.12+ et Node.js 20+.\n' >&2
-  exit 1
-fi
-export PYTHONPATH="$PWD/backend"
-export OPENBLAS_NUM_THREADS="${OPENBLAS_NUM_THREADS:-1}"
-export VECLIB_MAXIMUM_THREADS="${VECLIB_MAXIMUM_THREADS:-1}"
-printf 'Résonant : http://127.0.0.1:8000 — Ctrl+C pour arrêter.\n'
-exec .venv/bin/python -m uvicorn lab.app:app --host 127.0.0.1 --port 8000
+worker_pid=''
+web_pid=''
+cleanup() {
+  for child in "$web_pid" "$worker_pid"; do
+    if [ -n "$child" ]; then kill -TERM "$child" 2>/dev/null || true; fi
+  done
+  for child in "$web_pid" "$worker_pid"; do
+    if [ -n "$child" ]; then wait "$child" 2>/dev/null || true; fi
+  done
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM HUP
+./worker.sh &
+worker_pid=$!
+./run-web.sh &
+web_pid=$!
+printf 'Résonant : http://%s:%s — serveur et worker actifs ; Ctrl+C pour arrêter.\n' "${RESONANT_HOST:-127.0.0.1}" "${RESONANT_PORT:-8000}"
+# Bash 3 (macOS): monitor both children without wait -n.
+while kill -0 "$web_pid" 2>/dev/null && kill -0 "$worker_pid" 2>/dev/null; do sleep 1; done
+printf 'Un processus s’est arrêté ; arrêt de son compagnon.\n' >&2
+exit 1

@@ -1,0 +1,19 @@
+[Unit]
+Description=Resonant Lab persistent compute worker
+After=network.target
+
+[Service]
+Type=simple
+User=romadem17
+WorkingDirectory=/home/romadem17/resonant-deploiement/resonant-lab
+EnvironmentFile=/etc/resonant-lab.env
+ExecStart=/home/romadem17/resonant-deploiement/resonant-lab/worker.sh
+Restart=on-failure
+RestartSec=5
+Nice=10
+KillMode=control-group
+TimeoutStopSec=15
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

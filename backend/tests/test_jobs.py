@@ -159,3 +159,27 @@ def test_independent_processes_cannot_claim_same_job():
     processes=[subprocess.Popen(command,stdout=subprocess.PIPE,text=True) for _ in range(3)]
     results=[p.communicate(timeout=10)[0].strip() for p in processes]
     assert sum(r!='None' for r in results)==1
+
+
+def test_compact_rejects_non_modal_graph_before_queue():
+    from lab.schema import Patch,Block,Edge
+    audio=client.post('/api/demo').json()
+    patch=Patch(duration=.05,nodes=[Block(id='s',type='oscillator'),Block(id='o',type='output')],edges=[Edge(id='e',source='s',target='o')])
+    response=client.post('/api/compact',json={'audio_id':audio['id'],'patch':patch.model_dump()})
+    assert response.status_code==422
+    assert s.recent(1)==[]
+
+
+def test_backup_preserves_data_and_refuses_overwrite(tmp_path):
+    import importlib.util
+    from pathlib import Path
+    spec=importlib.util.spec_from_file_location('backup_db',Path(__file__).resolve().parents[2]/'scripts/backup_db.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    destination=tmp_path/'backup.sqlite'
+    enqueue()
+    module.backup(os.environ['RESONANT_DB_PATH'],destination)
+    import sqlite3
+    with sqlite3.connect(destination) as c:
+        assert c.execute('SELECT COUNT(*) FROM compute_jobs').fetchone()[0]==1
+    with pytest.raises(FileExistsError):module.backup(os.environ['RESONANT_DB_PATH'],destination)
+    assert destination.stat().st_mode&0o777==0o600

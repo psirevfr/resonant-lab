@@ -120,18 +120,24 @@ def shaping(patch,objective):
     return tidy(p)
 
 
-def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=False):
+def validate_simplification(patch,tolerance=.2):
+    """Cheap semantic checks shared by submission and worker; no audio rendering."""
     validate(patch)
     if not np.isfinite(tolerance) or not 0<=tolerance<=1:raise ValueError("Tolérance invalide (0 à 1).")
-    if len(x)!=round(patch.duration*patch.sample_rate):raise ValueError("Longueur de référence incompatible avec le modèle.")
     if patch.duration>12:raise ValueError('Simplification limitée à 12 secondes.')
-    original=patch.model_copy(deep=True);objective=Objective(x,patch.sample_rate,weights)
     folded=collapse_modes(patch)
     modes=[n.model_copy(deep=True) for n in folded.nodes if n.type=='modal']
     if not modes:raise ValueError('Générez un modèle modal avant de le simplifier.')
     for n in modes:n.parameters=parameters(n.type,n.parameters,patch.sample_rate)
     if any(n.parameters['onset']!=modes[0].parameters['onset'] or n.parameters['attack']!=modes[0].parameters['attack'] for n in modes):
         raise ValueError('Cette simplification exige un début et une attaque communs aux modes.')
+    return folded,modes
+
+
+def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=False):
+    folded,modes=validate_simplification(patch,tolerance)
+    if len(x)!=round(patch.duration*patch.sample_rate):raise ValueError("Longueur de référence incompatible avec le modèle.")
+    original=patch.model_copy(deep=True);objective=Objective(x,patch.sample_rate,weights)
     baseline=objective(render(original));limit=baseline*(1+tolerance)+1e-12
     reference_bands=band_errors(x,render(original),patch.sample_rate)
     reference_attack=objective.components(render(original))["attack"]

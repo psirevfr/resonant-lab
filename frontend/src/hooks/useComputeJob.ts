@@ -9,6 +9,7 @@ export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,resu
  const storage=owner===undefined?null:`resonant-job:${owner}`;
  function persist(value:Submission|null){if(!storage)return;try{if(value)localStorage.setItem(storage,JSON.stringify(value));else localStorage.removeItem(storage)}catch{/* Tracking still works in memory when storage is unavailable. */}}
  useEffect(()=>{
+  setSubmission(null);setJob(null);setMessage('');setTrackingError(false);locked.current=false;
   if(!storage)return;
   try{const saved=JSON.parse(localStorage.getItem(storage)||'null');if(saved&&['generate','optimize','compact'].includes(saved.kind)&&typeof saved.key==='string'){setSubmission(saved);locked.current=true}}catch{localStorage.removeItem(storage)}
  },[storage]);
@@ -24,7 +25,10 @@ export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,resu
     if(status.status==='succeeded'){
      setMessage('Calcul terminé. Chargement du modèle…');
      const result=await api<unknown>('/jobs/'+current.id+'/result',undefined,controller.signal);if(stopped)return;
-     await callback.current(current.kind,result);if(stopped)return;
+     try{await callback.current(current.kind,result)}catch(e){
+      if(e instanceof ApiError)throw e;
+      setTrackingError(true);setMessage('Le calcul est terminé, mais le modèle ne peut pas être chargé. Réessayez le chargement depuis Mes calculs.');persist(null);setSubmission(null);locked.current=false;return;
+     }if(stopped)return;
      persist(null);setSubmission(null);locked.current=false;setMessage('Calcul terminé. Modèle chargé.');return;
     }
     if(status.status==='failed'||status.status==='cancelled'){
@@ -37,7 +41,7 @@ export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,resu
     if(e instanceof ApiError&&e.status===401){setMessage('Session expirée. Reconnectez-vous, puis reprenez le suivi ; le calcul peut continuer.');return}
     if(e instanceof ApiError&&[400,403,404,409,413,422,429].includes(e.status)){
      setMessage(e.message);
-     if(!current.id){persist(null);setSubmission(null);locked.current=false}
+     if(!current.id||e.status===404){persist(null);setSubmission(null);locked.current=false}
      return;
     }
     setMessage('Suivi momentanément indisponible. Cela ne confirme pas un échec du calcul. Nouvelle vérification automatique…');

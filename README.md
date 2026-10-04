@@ -1,6 +1,6 @@
 # Résonant — laboratoire de synthèse physique
 
-Application locale fonctionnelle pour passer d’une **note WAV isolée** à un graphe de synthèse explicite, modifiable et exportable. Python exécute réellement les blocs affichés ; React affiche l’analyse et permet l’édition du graphe. Aucune reconstruction neuronale, aucun échantillon original stocké dans les blocs, aucun score de confiance inventé.
+Application locale fonctionnelle pour passer d’une **note WAV isolée** à un graphe de synthèse explicite, modifiable et exportable. Python identifie et optimise les modèles ; le navigateur exécute les blocs affichés dans un Web Worker et exporte le WAV localement. Aucune reconstruction neuronale, aucun échantillon original stocké dans les blocs, aucun score de confiance inventé.
 
 Cette version 0.1 couvre le parcours import → analyse → choix d’un modèle → synthèse → comparaison → modification → optimisation → export. C’est une base scientifique expérimentale, **pas un inverseur universel d’instruments** : le modèle physique réel n’est généralement pas identifiable de façon unique à partir d’un enregistrement.
 
@@ -31,8 +31,8 @@ Si `python3` désigne un ancien Python : `PYTHON_BIN=/chemin/vers/python3.12 ./s
 3. **Analyser** : fondamentale estimée, partiels, enveloppe RMS, constante de décroissance de chaque mode, inharmonicité lorsque les critères sont satisfaits.
 4. **Générer le modèle** : le moteur compare plusieurs architectures et sélectionne le meilleur score erreur + complexité. Les autres candidats restent accessibles dans **Analyse & modèles**. Les réglages permettent de désactiver la recherche détaillée, l’affinage des modes ou le bruit d’impact pour comparer leur apport. La recherche détaillée est plus lente et peut créer plusieurs modes voisins pour un seul pic spectral.
 5. Le signal se calcule automatiquement. Écouter **A · Original** puis **B · Synthèse** ; les deux écoutent la même sélection mono et gardent la position lors du basculement. Le WAV d’origine stéréo reste intact côté serveur. Le mode **Aveugle** tire au sort l’identité de A et B ; ce n’est pas un protocole ABX statistique.
-6. Cliquer un bloc et changer ses paramètres. Le signal, le spectre, le spectrogramme et les erreurs sont recalculés après une courte temporisation. Pour un filtre, le Bode et les coefficients affichés proviennent du même calcul que le traitement audio.
-7. Cocher les paramètres à optimiser dans l’inspecteur, ou laisser le choix par défaut, puis **Optimiser**. La progression rapporte les évaluations réelles. L’arrêt conserve le meilleur modèle trouvé.
+6. Cliquer un bloc et changer ses paramètres. Le signal, le spectre et le spectrogramme sont recalculés localement après une courte temporisation. Les coûts scientifiques restent ceux de la dernière analyse ou optimisation serveur. Pour un filtre, le Bode et les coefficients affichés proviennent du même calcul que le traitement audio.
+7. Cocher les paramètres à optimiser dans l’inspecteur, ou laisser le choix par défaut, puis **Optimiser**. La progression rapporte les évaluations réelles. Une annulation arrête le calcul sans publier de résultat ; les résultats réussis sont retrouvables dans **Mon Lab → Mes calculs**.
 8. Exporter le modèle en **JSON / `.monpatch`**, le son en **WAV float**, le schéma en **SVG/PNG**, les paramètres en **CSV**, ou le **rapport HTML autonome**. Un lien de téléchargement reste visible après chaque export ; les huit derniers exports sont conservés dans un cache local en mémoire de 64 Mo au maximum (32 Mo par fichier). Ouvrir le rapport et utiliser son bouton d’impression pour enregistrer un PDF.
 
 Le modèle automatique peut ne contenir aucun filtre : c’est normal. Une banque de modes suffit parfois et ajouter un filtre n’est alors pas justifié. Pour étudier un filtre, utiliser le patch manuel de départ, sélectionner un candidat filtré, ou ouvrir `examples/banc-lti.monpatch`.
@@ -61,7 +61,7 @@ Le modèle automatique peut ne contenir aucun filtre : c’est normal. Une banqu
 | Comparaison | Erreurs relatives temps, FFT, STFT, enveloppe et attaque à deux résolutions ; poids configurables ; A/B, boucle, volume, A/B à identité masquée |
 | Export | JSON, WAV float sans normalisation, CSV, SVG, PNG, rapport HTML avec figures et impression PDF |
 
-Les curseurs temporels des vues signal, enveloppe et spectrogramme partagent une position. Les onglets affichent une représentation à la fois ; le spectrogramme propose original, synthèse et résidu dans un sélecteur avec la même échelle dBFS. Le Bode a son propre curseur fréquentiel. Le spectre affiché utilise Welch ; le terme d’erreur spectrale utilise la FFT complète de la sélection (voir les équations).
+Les curseurs temporels des vues signal, enveloppe et spectrogramme partagent une position. Les onglets affichent une représentation à la fois ; le spectrogramme propose original, synthèse et résidu dans un sélecteur avec la même échelle dBFS. Le Bode a son propre curseur fréquentiel. Les vues scientifiques Python utilisent Welch, les vues de rendu local utilisent une FFT bornée ; le terme d’erreur spectrale utilise la FFT complète de la sélection (voir les équations).
 
 ## Architecture
 
@@ -94,7 +94,9 @@ backend/lab/
   metrics.py              erreurs normalisées et pondération
   optimization.py         optimisation bornée et arrêt contrôlé
   export.py               SVG et échappement du contenu
-  app.py                  API FastAPI locale, caches et tâches d’optimisation
+  app.py                  API FastAPI, sessions et caches privés
+  job_store.py            file SQLite persistante commune
+  worker.py               superviseur des processus CPU
 backend/tests/            tests numériques et API
 scripts/make_fixtures.py   signaux synthétiques connus
 ```
@@ -109,7 +111,7 @@ Le registre `Definition` décrit le contrat abstrait d’un bloc (nombre d’ent
 | **Python + frontend React** | **SciPy/NumPy pour les modèles, filtres et optimiseurs ; séparation UI/calcul claire ; tests numériques simples** | Serveur local requis ; pas de DSP audio temps réel garanti |
 | Rust/C++ + frontend | Bon contrôle de la mémoire et des performances temps réel | Complexité initiale et chaîne de compilation plus lourdes pour l’optimisation scientifique |
 
-Le moteur utilise des tableaux NumPy et les filtres compilés de SciPy. L’optimisation tourne dans un thread dédié ; l’UI suit sa progression sans bloquer. Le rendu est hors ligne, recalculé après modification ; ce n’est pas un instrument à faible latence piloté par MIDI. Un moteur Rust/WASM pourra remplacer le simulateur à contrat de patch constant si cela devient nécessaire.
+La génération, l’optimisation et la simplification passent par une file SQLite persistante commune, exécutée par un worker séparé (un calcul à la fois par défaut). Le rendu audio hors ligne tourne dans un Web Worker côté navigateur ; le clavier utilise Web Audio. Voir [la stabilisation](docs/STABILISATION.md) et [le déploiement et retour arrière](docs/DEPLOIEMENT.md).
 
 ## Limites et interprétation
 
@@ -121,9 +123,9 @@ Le moteur utilise des tableaux NumPy et les filtres compilés de SciPy. L’opti
 - Import borné à 128 Mo, 5 minutes et 30 millions d’échantillons ; les originaux restent intacts. Analyse/optimisation d’une sélection de 0,05 à 12 s. Rendu manuel jusqu’à 60 s, sous la limite de 100 millions d’échantillons × blocs actifs. Les vues longues sont réduites, sans modifier les données audio.
 - Synthèse mono à 44,1/48/96 kHz. Les autres fréquences d’import sont rééchantillonnées avec filtrage polyphasé pour générer le modèle à 44,1 kHz.
 - Les blocs disjoints de la sortie n’affectent pas l’audio. Pas de rétroaction dans les graphes v1.
-- La saturation n’est pas suréchantillonnée. Les exports WAV float préservent les dépassements de ±1 ; l’interface les signale pour l’écoute.
-- Audio et résultats vivent en mémoire (quatre originaux/rendus récents, budget mémoire des originaux). Un redémarrage du serveur efface cette session. Le JSON contient le modèle, pas le WAV source.
-- Les curseurs sont interactifs mais il n’y a pas encore de montage multipiste, MIDI, export de circuit électronique, modèle de corde couplée, table d’harmonie ou simulation FEM.
+- La saturation tanh simple n’est pas suréchantillonnée ; la saturation asymétrique propose un suréchantillonnage ×4. Les exports WAV float préservent les dépassements de ±1 ; l’interface les signale pour l’écoute.
+- Les originaux et téléchargements temporaires restent en mémoire, mais les jobs et modèles calculés sont persistants en SQLite. Un redémarrage peut exiger de réimporter le WAV pour comparer. Le JSON contient le modèle, pas le WAV source.
+- Les curseurs sont interactifs et un clavier MIDI est disponible ; il n’y a pas encore de montage multipiste, export de circuit électronique, modèle de corde couplée, table d’harmonie ou simulation FEM.
 
 ## Validation
 
@@ -133,7 +135,7 @@ Le moteur utilise des tableaux NumPy et les filtres compilés de SciPy. L’opti
 PYTHONPATH=backend .venv/bin/python scripts/make_fixtures.py
 ```
 
-Les 38 tests couvrent lecture WAV, analyse spectrale/fréquentielle, enveloppe, estimation d’inharmonicité, réponse impulsionnelle versus Bode, simulation, branches parallèles, rejet des graphes invalides, sérialisation, reconstruction et optimisation effective. Les tests API exécutent aussi import/démonstration → analyse → modèle → synthèse → exports.
+Les tests couvrent lecture WAV, analyse spectrale/fréquentielle, enveloppe, estimation d’inharmonicité, réponse impulsionnelle versus Bode, simulation, branches parallèles, rejet des graphes invalides, sérialisation, reconstruction et optimisation effective. Les tests API exécutent aussi import/démonstration → analyse → modèle → synthèse → exports.
 
 Les dernières mesures sur les trois premières secondes de `piano.wav` et `piano2.wav` sont conservées dans `docs/piano-impact-validation.json`. Les modèles et WAV reconstruits sont `examples/piano-impact.*` et `examples/piano2-impact.*`. Le script `PYTHONPATH=backend OPENBLAS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 .venv/bin/python scripts/validate_piano.py` reproduit génération détaillée et 181 évaluations Powell. Coûts finaux : **0,285568** et **0,125495**, avec les poids et bornes consignés dans le JSON. Le budget est épuisé sans convergence revendiquée. `docs/piano-validation.json` conserve la première mesure historique avec un modèle plus simple. **Une baisse d’erreur ne garantit pas une équivalence perceptuelle** : écouter le résultat et examiner les résidus. Les valeurs sont des erreurs relatives, pas des pourcentages de ressemblance.
 
@@ -148,7 +150,7 @@ cd frontend
 npm run dev
 ```
 
-Interface de développement : http://127.0.0.1:5173, API documentée automatiquement : http://127.0.0.1:8000/docs. Pour compiler : `cd frontend && npm run build`. `run.sh` sert ensuite ce build avec un seul serveur.
+Interface de développement : http://127.0.0.1:5173, API documentée automatiquement : http://127.0.0.1:8000/docs. Pour compiler : `cd frontend && npm run build`. `run.sh` sert ensuite ce build et démarre le worker. En développement, lancer également `./worker.sh` dans un autre terminal.
 
 Consulter [les modèles mathématiques](docs/MATHEMATIQUES.md) pour les équations, hypothèses, critères d’erreur et règles de sélection.
 

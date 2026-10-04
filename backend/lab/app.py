@@ -22,7 +22,7 @@ from .blocks import catalog,parameters
 from .audio import read_wav,wav_bytes,excerpt,view
 from .analysis import analyze
 from .identify import generate
-from .compact import simplify
+from .compact import validate_simplification
 from .instrument import expand_modes,prepare,transpose
 from .graph import render,validate
 from .metrics import Objective
@@ -122,6 +122,7 @@ def submit(kind,req,request,user):
         if kind=='optimize':
             from .optimization import validate_request
             validate_request(req)
+        else:validate_simplification(req.patch,req.tolerance)
     return job_store.enqueue(user['id'],kind,data,x,fs,idem)
 
 @api_router.post('/api/generate',status_code=202)

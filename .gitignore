@@ -2,6 +2,19 @@
 __pycache__/
 .pytest_cache/
 frontend/node_modules/
-frontend/dist/
+# Built assets are tracked for this deployment; include new hashed assets.
 *.log
 .DS_Store
+
+.local/
+.resonant-locks/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+.env
+.env.*
+!*.env.example
+
+frontend/.test-build/
+frontend/tests/fixtures/
