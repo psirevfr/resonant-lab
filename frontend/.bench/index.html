@@ -1,0 +1,19 @@
+<!doctype html><html lang="fr"><meta charset="utf-8"><title>Résonant — benchmark local</title><style>body{background:#111920;color:#eee;font:16px system-ui;padding:24px}button{padding:16px}pre{white-space:pre-wrap}</style><h1>Benchmark synthétique local</h1><p>Aucune donnée utilisateur ni serveur de production.</p><button id="run">Mesurer avant / après (7 répétitions)</button><pre id="output">Prêt</pre><script type="module">
+const fixture=await fetch('./fixtures.json').then(r=>r.json());const output=document.querySelector('#output');
+document.querySelector('#run').onclick=async()=>{
+ document.querySelector('#run').disabled=true;
+ const context=new AudioContext(),rows=[];let warm;
+ for(let i=0;i<7;i++){
+  const patch=structuredClone(fixture.patch);patch.nodes[0].parameters.amplitude+=i===6?.005:i*.001;const payload={...fixture,patch};
+  const t=performance.now(),old=new Worker('./baseline-worker.mjs',{type:'module'}),id='old-'+i;
+  const before=await new Promise((resolve,reject)=>{old.onmessage=e=>resolve(e.data);old.onerror=reject;old.postMessage({id,...payload})});
+  await context.decodeAudioData(before.wav);const oldReady=performance.now()-t;old.terminate();
+  const start=performance.now();if(!warm)warm=new Worker('./current-worker.mjs',{type:'module'});
+  const next=await new Promise((resolve,reject)=>{warm.onmessage=e=>resolve(e.data);warm.onerror=reject;warm.postMessage({id:'new-'+i,type:'audio-ready',key:JSON.stringify(patch),...payload})});
+  if(next.error)throw Error(next.error);const pcm=next.value,buffer=context.createBuffer(1,pcm.samples.length,pcm.sample_rate);buffer.copyToChannel(pcm.samples,0);
+  rows.push({run:i,cold:i===0,before_audio_ready_ms:oldReady,after_audio_ready_ms:performance.now()-start,before:before.timings,after:pcm.timings,peak_delta:Math.abs(before.peak-pcm.peak)});
+  output.textContent=JSON.stringify({userAgent:navigator.userAgent,hardwareConcurrency:navigator.hardwareConcurrency,deviceMemory:navigator.deviceMemory??null,context_sample_rate:context.sampleRate,render_sample_rate:fixture.patch.sample_rate,rows},null,2);
+ }
+ warm.terminate();await context.close();document.querySelector('#run').disabled=false;
+};
+</script></html>

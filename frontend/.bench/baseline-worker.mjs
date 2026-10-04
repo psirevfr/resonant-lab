@@ -1,0 +1,2 @@
+import {renderGraph,signalView,encodeWav} from './baseline.mjs';
+self.onmessage=e=>{const {id,patch,catalog}=e.data,t0=performance.now(),s=renderGraph(patch,catalog),t1=performance.now(),wav=encodeWav(s,patch.sample_rate),t2=performance.now();const view=signalView(s,patch.sample_rate);signalView(s,patch.sample_rate);signalView(new Float64Array(s.length),patch.sample_rate);self.postMessage({id,wav,peak:view.peak,timings:{render_ms:t1-t0,encode_ms:t2-t1,views_ms:performance.now()-t2}},{transfer:[wav]})};

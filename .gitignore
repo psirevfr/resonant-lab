@@ -18,3 +18,7 @@ frontend/node_modules/
 
 frontend/.test-build/
 frontend/tests/fixtures/
+
+client_secret*.json
+drive_token.json
+users.db
