@@ -164,11 +164,11 @@ brutes sont dans `compute-benchmark.json`. Le CPU précis et le pic mémoire n'o
 
 | Médiane de calcul, même référence | Python natif | WebAssembly/Node |
 |---|---:|---:|
-| Génération | 0,481 s | 1,166 s |
+| Génération | 0,467 s | 1,111 s |
 | Optimisation | 0,023 s | 0,061 s |
-| Simplification | 3,122 s | 8,968 s |
+| Simplification | 3,035 s | 9,403 s |
 
-Initialisation WASM hors réseau : 5,83 s. Runtime à télécharger : environ 32,4 Mo
+Initialisation WASM hors réseau : 5,95 s. Runtime à télécharger : environ 32,4 Mo
 avant compression HTTP éventuelle. **WASM est plus lent que Python natif sur cette
 machine**. Le bénéfice proposé est de décharger la petite VM et sa file ; aucun gain
 face à la VM n'est démontré sans mesures de production. L'absence de transaction
@@ -176,7 +176,7 @@ longue et l'isolation du thread UI préservent la réactivité, sans prouver un 
 
 Tolérances fixées avant comparaison : onde maximum/RMS <=1e-7, différence du coût
 <=1e-8 ; même architecture exigée. Écarts maximums mesurés : génération 8,85e-11,
-optimisation 3,11e-15, simplification 1,03e-15. Les trois tests passent, sans modifier
+optimisation 3,11e-15, simplification 1,03e-15. Les neuf comparaisons (trois répétitions par opération) passent, sans modifier
 les tolérances ni paramètres DSP. Ces quelques cas ne garantissent pas toutes les entrées.
 
 ## Tests et compatibilité
@@ -262,3 +262,16 @@ la qualité. Garder la sauvegarde pour une restauration séparée, contrôlée e
 Accès SSH ou rapport `check_jobs`, identifiant du job bloqué, service consommateur et
 base réellement utilisés ; caractère volontaire de la réinitialisation ; sauvegardes ;
 configuration et état Drive/Gemini sur VM. La révocation et la réinitialisation volontaire sont maintenant confirmées par l’opérateur.
+
+## Revalidation du 10 octobre 2026
+
+Le benchmark vérifie désormais chaque répétition et conserve ses écarts, plutôt que
+de valider uniquement la dernière. Référence synthétique et critères inchangés.
+Les 14 tests ciblés `test_compute_health.py` et les 24 tests frontend ont été
+réexécutés et passent. Cette session utilise Pyodide sous Node ; elle ne constitue
+pas un nouveau test sur navigateur ou appareil mobile.
+
+Le workflow local `.github/workflows/deploy.yml` est non versionné à cette inspection.
+Il vise `~/resonant-lab` et redémarre `resonant-lab`, sans préparation du runtime
+Pyodide ni redémarrage explicite du worker distinct. Il a été préservé sans modification.
+La cohérence de ces choix avec la VM et le succès du déploiement restent non vérifiés.
