@@ -1,4 +1,4 @@
-"""Local-only API. Audio remains in RAM, with bounded session caches."""
+"""Private API with bounded caches and temporary, owner-scoped WAV references."""
 from collections import OrderedDict
 from io import StringIO
 from pathlib import Path
@@ -49,6 +49,7 @@ async def private_api_cache(request,call_next):
     return response
 
 from . import job_store
+from . import audio_store
 
 @app.get('/api/dev/status')
 def developer_status(user:dict=Depends(require_api_user)):
@@ -63,15 +64,21 @@ async def invalid(_,exc): return JSONResponse(status_code=422,content={'detail':
 
 def get_recording(key,owner):
     with lock:
-        if key not in recordings or recordings[key][0]!=owner: raise HTTPException(404,'Audio absent de la session ; réimporter le WAV.')
-        return recordings[key][1]
+        if key in recordings and recordings[key][0]==owner:return recordings[key][1]
+    record=audio_store.load(key,owner)
+    if record is None:raise HTTPException(404,'Référence audio absente ou expirée ; réimporter le WAV.')
+    cache_audio(key,record,owner)
+    return record
 
 def store_audio(record,owner):
-    key=uuid4().hex
+    key=audio_store.save(record,owner)
+    cache_audio(key,record,owner)
+    return key
+
+def cache_audio(key,record,owner):
     with lock:
         recordings[key]=(owner,record)
         while len(recordings)>4 or (len(recordings)>1 and sum(r.samples.nbytes+len(r.original) for _,r in recordings.values())>400_000_000): recordings.popitem(last=False)
-    return key
 
 def target_audio(req,owner):
     n=round(req.patch.duration*req.patch.sample_rate)
