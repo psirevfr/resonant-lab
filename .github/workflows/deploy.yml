@@ -16,8 +16,9 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/resonant-lab
-            git pull origin main
-            source .venv/bin/activate
-            pip install -r requirements.txt
-            sudo systemctl restart resonant-lab
+              cd ~/resonant-lab
+              git pull origin main
+              source .venv/bin/activate
+              pip install -r requirements.txt
+              python scripts/prepare_local_runtime.py --download
+              sudo systemctl restart resonant-lab
