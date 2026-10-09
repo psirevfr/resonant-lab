@@ -17,4 +17,8 @@ test -s frontend/dist/index.html || { printf 'Build Vite incomplet.\n' >&2; exit
 if [ "${RESONANT_SETUP_FIXTURES:-0}" = '1' ]; then
   PYTHONPATH=backend .venv/bin/python scripts/make_fixtures.py
 fi
+# Explicit opt-in: self-hosted numerical runtime (~33 MB), never required for server mode.
+if [ "${RESONANT_SETUP_LOCAL_COMPUTE:-0}" = '1' ]; then
+  .venv/bin/python scripts/prepare_local_runtime.py --download
+fi
 printf '\nInstallation terminée. Production : run-web.sh et worker.sh via leurs services. Local : ./run.sh\n'

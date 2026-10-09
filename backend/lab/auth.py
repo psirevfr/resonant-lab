@@ -16,8 +16,15 @@ ALGORITHM='HS256'
 TOKEN_EXPIRE_HOURS=24
 
 
+def database_path():
+    path=Path(os.environ.get('RESONANT_DB_PATH',str(ROOT/'users.db'))).expanduser()
+    if not path.is_absolute():
+        raise RuntimeError('RESONANT_DB_PATH doit être absolu et identique pour le web et le worker.')
+    return path.resolve()
+
+
 def get_db():
-    conn=sqlite3.connect(os.environ.get('RESONANT_DB_PATH',str(ROOT/'users.db')),timeout=5)
+    conn=sqlite3.connect(database_path(),timeout=5)
     conn.row_factory=sqlite3.Row
     conn.execute('PRAGMA busy_timeout=5000')
     return conn
@@ -46,6 +53,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL, hashed_password TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+        conn.execute('BEGIN IMMEDIATE')
         if 'api_key' not in {row['name'] for row in conn.execute('PRAGMA table_info(users)')}:
             conn.execute('ALTER TABLE users ADD COLUMN api_key TEXT')
         conn.execute('CREATE TABLE IF NOT EXISTS revoked_sessions (digest TEXT PRIMARY KEY, expires REAL NOT NULL)')

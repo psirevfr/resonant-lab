@@ -4,6 +4,8 @@ Application locale fonctionnelle pour passer d’une **note WAV isolée** à un 
 
 Cette version 0.1 couvre le parcours import → analyse → choix d’un modèle → synthèse → comparaison → modification → optimisation → export. C’est une base scientifique expérimentale, **pas un inverseur universel d’instruments** : le modèle physique réel n’est généralement pas identifiable de façon unique à partir d’un enregistrement.
 
+Voir [le diagnostic des jobs et le calcul Python/WebAssembly](docs/CALCUL_LOCAL_ET_JOBS.md) pour la disponibilité du worker, le mode appareil, les mesures et la procédure de déploiement.
+
 ## Démarrage
 
 Les dépendances sont déjà installées dans ce dossier. Dans un terminal :

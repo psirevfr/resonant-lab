@@ -18,22 +18,12 @@ log=logging.getLogger('resonant.worker')
 
 
 def compute(kind,payload,x,progress,cancel):
-    from .schema import GenerateRequest,OptimizeRequest,CompactRequest
-    if kind=='generate':
-        from .identify import generate
-        r=GenerateRequest.model_validate(payload['request'])
-        return generate(x,payload['sample_rate'],r.max_partials,r.complexity_penalty,r.weights,r.refine_modes,r.include_impact,r.detailed)
-    if kind=='optimize':
-        from .optimization import run_optimization
-        return run_optimization(OptimizeRequest.model_validate(payload['request']),x,progress,cancel)
-    if kind=='compact':
-        from .compact import simplify
-        r=CompactRequest.model_validate(payload['request'])
-        return simplify(r.patch,x,r.weights,r.tolerance,r.test_shaping,r.protect_texture)
-    raise ValueError('Unknown job kind')
+    from .compute import compute as numerical_compute
+    return numerical_compute(kind,payload['request'],x,payload['sample_rate'],progress,cancel)
 
 
 def execute(key,worker,cancel):
+    logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)s %(name)s %(message)s')
     # Advisory OS slots also bound orphan children while their lease expires.
     # SQLite remains the authority for claiming and publishing job results.
     parent=mp.parent_process()
@@ -56,12 +46,15 @@ def execute(key,worker,cancel):
             try:fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB);slot=f;break
             except BlockingIOError:f.close()
     try:
-        kind,payload,x=store.load(key,worker);last=[0.]
+        begun=time.perf_counter();kind,payload,x=store.load(key,worker);loaded=time.perf_counter();last=[0.]
+        log.info('job=%s kind=%s event=compute_started',key,kind)
         def progress(value):
             if time.monotonic()-last[0]>=1:
                 store.progress(key,worker,value);last[0]=time.monotonic()
         result=compute(kind,payload,x,progress,cancel)
-        store.finish(key,worker,'succeeded',result=result)
+        elapsed=(time.perf_counter()-loaded)*1000
+        log.info('job=%s kind=%s algorithm_ms=%.6f event=compute_finished',key,kind,elapsed)
+        store.finish(key,worker,'succeeded',result=result,timings={'input_load_ms':(loaded-begun)*1000,'algorithm_ms':elapsed})
     except Exception as exc:
         # No exception text/locals: those can contain filenames or uploaded data.
         log.error('job=%s exception=%s',key,type(exc).__name__)
@@ -78,10 +71,11 @@ def stop_process(process):
 
 def run(concurrency=1,timeout=600,stop=None):
     init_db();store.init_jobs();store.configure(concurrency)
-    stop=stop or threading.Event();context=mp.get_context('spawn');worker=uuid4().hex;running={};last_cleanup=0
+    stop=stop or threading.Event();context=mp.get_context('spawn');worker=uuid4().hex;running={};last_cleanup=0;last_presence=0
     try:
         while not stop.is_set():
             now=time.monotonic()
+            if now-last_presence>=2:store.worker_seen(worker);last_presence=now
             if now-last_cleanup>=10:store.maintain();last_cleanup=now
             for key,(process,cancel,started,last_beat) in list(running.items()):
                 done=not process.is_alive();timed_out=now-started>=timeout
@@ -106,7 +100,10 @@ def run(concurrency=1,timeout=600,stop=None):
     finally:
         for key,(process,cancel,*_) in running.items():
             cancel.set();stop_process(process)
-            store.finish(key,worker,'failed',error='Calcul interrompu lors de l’arrêt du worker. Vous pouvez réessayer.')
+            try:store.finish(key,worker,'failed',error='Calcul interrompu lors de l’arrêt du worker. Vous pouvez réessayer.')
+            except Exception:log.error('job=%s event=shutdown_state_not_persisted',key)
+        try:store.worker_gone(worker)
+        except Exception:log.error('worker=%s event=shutdown_presence_not_persisted',worker)
 
 
 def main():

@@ -227,6 +227,34 @@ def download_export(key:str,user:dict=Depends(require_api_user)):
 def optimize(req:OptimizeRequest,request:Request,user:dict=Depends(require_api_user)):
     return submit('optimize',req,request,user)
 
+@api_router.post('/api/compute/input')
+def local_compute_input(body:dict,user:dict=Depends(require_api_user)):
+    from .compute import MODELS,validate_input
+    kind=body.get('kind');data=body.get('request')
+    if not isinstance(kind,str) or kind not in MODELS or not isinstance(data,dict):raise ValueError('Demande de calcul local invalide.')
+    r=MODELS[kind].model_validate(data)
+    if kind=='generate':
+        rec=get_recording(r.audio_id,user['id']);fs=rec.sample_rate if rec.sample_rate in (44100,48000,96000) else 44100
+        if r.start+r.duration>len(rec.samples)/rec.sample_rate+1/fs:raise ValueError('Sélection hors du WAV.')
+        x=excerpt(rec,r.start,r.duration,fs)
+    else:
+        fs=r.patch.sample_rate;x=target_audio(r,user['id'])
+        if x is None:raise ValueError('Référence requise.')
+    validate_input(kind,data,x,fs)
+    return Response(np.asarray(x,dtype='<f8').tobytes(),media_type='application/octet-stream',headers={'X-Sample-Rate':str(fs),'Cache-Control':'no-store'})
+
+@api_router.get('/api/compute/config')
+def local_compute_config(user:dict=Depends(require_api_user)):
+    manifest=COMPUTE_RUNTIME/'manifest.json'
+    if not manifest.is_file():return {'available':False}
+    import json
+    data=json.loads(manifest.read_text())
+    return {'available':data.get('ready',False),'runtime_version':data['runtime_version'],'algorithm_version':data['algorithm_version'],'source_sha256':data['source_sha256'],'download_bytes':data['download_bytes']}
+
+@api_router.get('/api/compute/status')
+def compute_status(user:dict=Depends(require_api_user)):
+    return job_store.worker_status()
+
 @api_router.get('/api/jobs')
 def recent_jobs(user:dict=Depends(require_api_user)):
     job_store.maintain();return job_store.recent(user['id'])
@@ -254,6 +282,20 @@ def me(request:Request,user:dict=Depends(require_api_user)):
 app.include_router(api_router)
 
 # Chargement du dossier statique (Frontend React/Vue)
+COMPUTE_RUNTIME=Path(__file__).resolve().parents[2]/'.local'/'compute-runtime'
+# Never mount the directory: an accidentally copied secret must not become public.
+@app.api_route('/compute-runtime/{filename}',methods=['GET','HEAD'],include_in_schema=False)
+def compute_runtime_file(filename:str):
+    import json
+    manifest=COMPUTE_RUNTIME/'manifest.json'
+    if not manifest.is_file():raise HTTPException(404,'Runtime absent.')
+    data=json.loads(manifest.read_text())
+    if filename!='manifest.json' and filename not in data.get('files',{}):raise HTTPException(404,'Ressource absente.')
+    if filename!='manifest.json' and filename not in ('numerical.zip','pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json') and not filename.endswith('.whl'):
+        raise HTTPException(404,'Ressource absente.')
+    path=COMPUTE_RUNTIME/filename
+    if path.name!=filename or not path.is_file():raise HTTPException(404,'Ressource absente.')
+    return FileResponse(path,headers={'Cache-Control':'no-cache'})
 DIST=Path(__file__).resolve().parents[2]/'frontend'/'dist'
 if DIST.exists():
     app.mount('/assets',StaticFiles(directory=DIST/'assets'),name='assets')

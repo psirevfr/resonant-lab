@@ -1,0 +1,62 @@
+{
+  "environment": "Navigateur intégré, données synthétiques",
+  "metrics": [
+    {
+      "timestamp": "2026-10-09T20:36:17.056Z",
+      "id": "e028822d-d7a4-4e69-8a8d-b65c21d3fe84",
+      "phase": "audio-ready",
+      "audio_ready_ms": 50.79999998211861,
+      "render_ms": 42.79999998211861,
+      "encode_ms": 1
+    },
+    {
+      "timestamp": "2026-10-09T20:36:17.104Z",
+      "id": "e028822d-d7a4-4e69-8a8d-b65c21d3fe84",
+      "phase": "analysis-ready",
+      "total_ms": 104.2999999821186,
+      "analysis_ms": 52.80000001192093
+    },
+    {
+      "timestamp": "2026-10-09T20:36:24.018Z",
+      "id": "8384509a-ec25-47e5-9f18-109a1a259185",
+      "phase": "audio-ready",
+      "audio_ready_ms": 47.400000005960464,
+      "render_ms": 41.80000001192093,
+      "encode_ms": 0.800000011920929
+    },
+    {
+      "timestamp": "2026-10-09T20:36:24.168Z",
+      "id": "8384509a-ec25-47e5-9f18-109a1a259185",
+      "phase": "analysis-ready",
+      "total_ms": 197.5,
+      "analysis_ms": 146.40000000596046
+    },
+    {
+      "timestamp": "2026-10-09T20:36:58.425Z",
+      "id": "ae1ee6e2-40ac-4806-ac4c-e3626a009018",
+      "kind": "generate",
+      "location": "browser",
+      "input_ms": 18.099999994039536,
+      "total_ms": 6155.699999988079,
+      "worker_compute_ms": 3231.0999999940395,
+      "initialization_ms": 2899.0999999940395,
+      "source_sha256": "8385e391698edea5c79eeef4cf8a9abdb48aacafaaac53df16c5b2d8c092bd35",
+      "runtime_version": "314.0.7"
+    },
+    {
+      "timestamp": "2026-10-09T20:36:58.959Z",
+      "id": "2515b900-23ac-4369-95b5-2d4f9f77c100",
+      "phase": "audio-ready",
+      "audio_ready_ms": 35.900000005960464,
+      "render_ms": 23.69999998807907,
+      "encode_ms": 0.5999999940395355
+    },
+    {
+      "timestamp": "2026-10-09T20:36:58.992Z",
+      "id": "2515b900-23ac-4369-95b5-2d4f9f77c100",
+      "phase": "analysis-ready",
+      "total_ms": 68.90000000596046,
+      "analysis_ms": 32.29999998211861
+    }
+  ]
+}

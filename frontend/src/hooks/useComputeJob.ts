@@ -1,7 +1,8 @@
 import {useEffect,useRef,useState} from 'react';
 import {api,ApiError} from '../api';
+import {withDeadline} from '../requestDeadline';
 export type JobKind='generate'|'optimize'|'compact';
-export interface ComputeJob{id:string;kind:JobKind;status:'queued'|'running'|'succeeded'|'failed'|'cancelled';created:number;started:number|null;finished:number|null;progress:Record<string,unknown>;error:string|null;cancel_requested:boolean}
+export interface ComputeJob{id:string;kind:JobKind;status:'queued'|'running'|'succeeded'|'failed'|'cancelled';created:number;started:number|null;finished:number|null;progress:Record<string,unknown>;error:string|null;cancel_requested:boolean;queue_warning?:string|null;worker?:{available:boolean}}
 interface Submission{id?:string;kind:JobKind;key:string;request:unknown}
 export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,result:unknown)=>Promise<void>){
  const [submission,setSubmission]=useState<Submission|null>(null),[job,setJob]=useState<ComputeJob|null>(null),[message,setMessage]=useState(''),[retry,setRetry]=useState(0),[trackingError,setTrackingError]=useState(false);
@@ -20,11 +21,11 @@ export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,resu
   async function follow(){
    try{
     setTrackingError(false);
-    if(!current.id){setMessage('Enregistrement de la demande…');const created=await api<ComputeJob>('/'+current.kind,current.request,controller.signal,{'Idempotency-Key':current.key});current={...current,id:created.id};persist(current);if(stopped)return;setJob(created)}
-    const status=await api<ComputeJob>('/jobs/'+current.id,undefined,controller.signal);if(stopped)return;setJob(status);failures=0;
+    if(!current.id){setMessage('Enregistrement de la demande…');const created=await withDeadline(controller.signal,signal=>api<ComputeJob>('/'+current.kind,current.request,signal,{'Idempotency-Key':current.key}));current={...current,id:created.id};persist(current);if(stopped)return;setJob(created)}
+    const status=await withDeadline(controller.signal,signal=>api<ComputeJob>('/jobs/'+current.id,undefined,signal));if(stopped)return;setJob(status);failures=0;
     if(status.status==='succeeded'){
      setMessage('Calcul terminé. Chargement du modèle…');
-     const result=await api<unknown>('/jobs/'+current.id+'/result',undefined,controller.signal);if(stopped)return;
+     const result=await withDeadline(controller.signal,signal=>api<unknown>('/jobs/'+current.id+'/result',undefined,signal));if(stopped)return;
      try{await callback.current(current.kind,result)}catch(e){
       if(e instanceof ApiError)throw e;
       setTrackingError(true);setMessage('Le calcul est terminé, mais le modèle ne peut pas être chargé. Réessayez le chargement depuis Mes calculs.');persist(null);setSubmission(null);locked.current=false;return;
@@ -34,7 +35,7 @@ export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,resu
     if(status.status==='failed'||status.status==='cancelled'){
      persist(null);setSubmission(null);locked.current=false;setMessage(status.error??'Calcul annulé. Vous pouvez lancer une nouvelle tentative.');return;
     }
-    setMessage(status.cancel_requested?'Annulation demandée…':status.status==='queued'?'Demande en file d’attente. Le worker la prendra en charge.':'Calcul en cours sur le serveur. Vous pouvez revenir plus tard.');
+    setMessage(status.cancel_requested?'Annulation demandée…':status.status==='queued'?(status.queue_warning??'Demande en file d’attente. Le worker la prendra en charge.'):'Calcul en cours sur le serveur. Vous pouvez revenir plus tard.');
     timer=setTimeout(follow,document.hidden?15000:3000);
    }catch(e){
     if(stopped||controller.signal.aborted)return;setTrackingError(true);

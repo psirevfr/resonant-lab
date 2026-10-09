@@ -1,0 +1,77 @@
+{
+  "measured_at": "2026-10-09T20:35:54.872Z",
+  "machine": "macOS-26.6.2-arm64-arm-64bit",
+  "repetitions": 3,
+  "native_versions": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1"
+  },
+  "source_sha256": "8385e391698edea5c79eeef4cf8a9abdb48aacafaaac53df16c5b2d8c092bd35",
+  "environment": "Node Python/WebAssembly (not browser)",
+  "node": "v22.15.0",
+  "initialization_ms": 5832.516500000001,
+  "download_bytes": 32404104,
+  "tolerances": {
+    "wave_max": 1e-7,
+    "wave_rms": 1e-7,
+    "objective_abs": 1e-8
+  },
+  "operations": {
+    "generate": {
+      "native_ms": [
+        481.11091600731015,
+        496.09579099342227,
+        478.01320799044333
+      ],
+      "wasm_ms": [
+        1301.7166659999993,
+        1166.077874999999,
+        1147.4907919999987
+      ],
+      "wave_max": 8.841530285685906e-11,
+      "wave_rms": 3.2093282102350214e-11,
+      "objective_abs": 8.283830175634388e-11,
+      "same_architecture": true,
+      "passed": true
+    },
+    "optimize": {
+      "native_ms": [
+        23.006957984762266,
+        22.523249994264916,
+        22.530125017510727
+      ],
+      "wasm_ms": [
+        62.846457999999984,
+        60.29762499999924,
+        61.31525000000147
+      ],
+      "wave_max": 3.1086244689504383e-15,
+      "wave_rms": 1.869011076368163e-15,
+      "objective_abs": 9.71445146547012e-17,
+      "same_architecture": true,
+      "passed": true
+    },
+    "compact": {
+      "native_ms": [
+        3102.0919579896145,
+        3122.3731670179404,
+        3189.2324590007775
+      ],
+      "wasm_ms": [
+        8839.485583000001,
+        9095.270957999997,
+        8967.955333000005
+      ],
+      "wave_max": 1.0269562977782698e-15,
+      "wave_rms": 1.0545722690131636e-16,
+      "objective_abs": 2.2854981795994433e-16,
+      "same_architecture": true,
+      "passed": true
+    }
+  },
+  "versions": {
+    "python": "3.14.2",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  }
+}

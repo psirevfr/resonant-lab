@@ -3,7 +3,6 @@ from io import BytesIO
 from dataclasses import dataclass
 from math import gcd
 import numpy as np
-import soundfile as sf
 from scipy import signal, ndimage
 
 @dataclass
@@ -19,6 +18,7 @@ class Recording:
         return {'name':self.name,'sample_rate':self.sample_rate,'channels':self.samples.shape[1],'duration':len(self.samples)/self.sample_rate,'subtype':self.subtype,'peak':float(np.max(abs(self.samples))),'rms':float(np.sqrt(np.mean(self.samples**2))),'frames':len(self.samples)}
 
 def read_wav(data: bytes, name: str) -> Recording:
+    import soundfile as sf
     if len(data)>128*1024*1024: raise ValueError('Fichier limité à 128 Mo.')
     try:
         with sf.SoundFile(BytesIO(data)) as f:
@@ -32,6 +32,7 @@ def read_wav(data: bytes, name: str) -> Recording:
     return Recording(name,x,fs,subtype,data)
 
 def wav_bytes(x,fs):
+    import soundfile as sf
     file=BytesIO(); sf.write(file,x,fs,format='WAV',subtype='FLOAT'); return file.getvalue()
 
 def resample(x,source,target):
