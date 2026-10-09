@@ -4,6 +4,7 @@ from io import StringIO
 from pathlib import Path
 from threading import RLock
 from uuid import uuid4
+import math
 import csv
 import numpy as np
 
@@ -38,6 +39,14 @@ from .auth import (
 )
 
 app=FastAPI(title='Résonant Lab',version='0.1.0')
+
+@app.middleware('http')
+async def private_api_cache(request,call_next):
+    response=await call_next(request)
+    if request.url.path.startswith('/api/'):
+        response.headers['Cache-Control']='no-store'
+        response.headers['X-Content-Type-Options']='nosniff'
+    return response
 
 from . import job_store
 
@@ -95,7 +104,7 @@ def original(key:str,request:Request,user:dict=Depends(require_api_user)): retur
 
 @api_router.get('/api/audio/{key}/segment')
 def segment(key:str,request:Request,start:float=0,duration:float=3,user:dict=Depends(require_api_user)):
-    if start<0 or duration<=0 or duration>60: raise ValueError('Sélection invalide.')
+    if not math.isfinite(start) or not math.isfinite(duration) or start<0 or duration<=0 or duration>60: raise ValueError('Sélection invalide.')
     rec=get_recording(key,user["id"]); x=excerpt(rec,start,duration)
     return wav_response(wav_bytes(x,rec.sample_rate),request.headers.get('range'))
 
@@ -196,7 +205,7 @@ def csv_export(patch:Patch):
     validate(patch); out=StringIO(); writer=csv.writer(out); writer.writerow(['block_id','type','parameter','value','unit'])
     definitions=catalog()
     for node in patch.nodes:
-        for k,v in parameters(node.type,node.parameters,patch.sample_rate).items(): writer.writerow([node.id,node.type,k,v,definitions[node.type]['parameters'][k]['unit']])
+        for k,v in parameters(node.type,node.parameters,patch.sample_rate).items(): writer.writerow([csv_cell(node.id),csv_cell(node.type),csv_cell(k),v,csv_cell(definitions[node.type]['parameters'][k]['unit'])])
     return Response(out.getvalue(),media_type='text/csv')
 
 @api_router.post('/api/exports')
@@ -245,10 +254,14 @@ def local_compute_input(body:dict,user:dict=Depends(require_api_user)):
 
 @api_router.get('/api/compute/config')
 def local_compute_config(user:dict=Depends(require_api_user)):
-    manifest=COMPUTE_RUNTIME/'manifest.json'
-    if not manifest.is_file():return {'available':False}
-    import json
-    data=json.loads(manifest.read_text())
+    data=runtime_manifest()
+    if not data or not data.get('ready'):return {'available':False}
+    required={'numerical.zip','pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json'}
+    if not required<=set(data['files']):return {'available':False}
+    for name,metadata in data.get('files',{}).items():
+        path=runtime_path(name)
+        if path is None or path.stat().st_size!=metadata.get('bytes'):return {'available':False}
+    if not all(k in data for k in ('runtime_version','algorithm_version','source_sha256','download_bytes')):return {'available':False}
     return {'available':data.get('ready',False),'runtime_version':data['runtime_version'],'algorithm_version':data['algorithm_version'],'source_sha256':data['source_sha256'],'download_bytes':data['download_bytes']}
 
 @api_router.get('/api/compute/status')
@@ -283,19 +296,39 @@ app.include_router(api_router)
 
 # Chargement du dossier statique (Frontend React/Vue)
 COMPUTE_RUNTIME=Path(__file__).resolve().parents[2]/'.local'/'compute-runtime'
+def csv_cell(value):
+    text=str(value)
+    return "'"+text if text.lstrip().startswith(('=','+','-','@')) or text.startswith(('\t','\r','\n')) else text
+
+def runtime_path(filename):
+    if not isinstance(filename,str) or '/' in filename or '\\' in filename:return None
+    if filename not in ('manifest.json','numerical.zip','pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json') and not filename.endswith('.whl'):return None
+    path=COMPUTE_RUNTIME/filename
+    if path.is_symlink() or not path.is_file() or path.resolve().parent!=COMPUTE_RUNTIME.resolve():return None
+    return path
+
+def runtime_manifest():
+    import json
+    path=runtime_path('manifest.json')
+    if path is None:return None
+    try:
+        data=json.loads(path.read_text())
+        if not isinstance(data,dict) or not isinstance(data.get('files'),dict):return None
+        if not all(isinstance(v,dict) for v in data['files'].values()):return None
+        return data
+    except (OSError,ValueError):return None
+
 # Never mount the directory: an accidentally copied secret must not become public.
 @app.api_route('/compute-runtime/{filename}',methods=['GET','HEAD'],include_in_schema=False)
 def compute_runtime_file(filename:str):
-    import json
-    manifest=COMPUTE_RUNTIME/'manifest.json'
-    if not manifest.is_file():raise HTTPException(404,'Runtime absent.')
-    data=json.loads(manifest.read_text())
+    data=runtime_manifest()
+    if data is None:raise HTTPException(404,'Runtime absent.')
     if filename!='manifest.json' and filename not in data.get('files',{}):raise HTTPException(404,'Ressource absente.')
     if filename!='manifest.json' and filename not in ('numerical.zip','pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json') and not filename.endswith('.whl'):
         raise HTTPException(404,'Ressource absente.')
-    path=COMPUTE_RUNTIME/filename
-    if path.name!=filename or not path.is_file():raise HTTPException(404,'Ressource absente.')
-    return FileResponse(path,headers={'Cache-Control':'no-cache'})
+    path=runtime_path(filename)
+    if path is None:raise HTTPException(404,'Ressource absente.')
+    return FileResponse(path,headers={'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'})
 DIST=Path(__file__).resolve().parents[2]/'frontend'/'dist'
 if DIST.exists():
     app.mount('/assets',StaticFiles(directory=DIST/'assets'),name='assets')

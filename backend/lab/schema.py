@@ -42,11 +42,11 @@ class RenderRequest(BaseModel):
     patch: Patch
     audio_id: str | None = None
     weights: Weights = Field(default_factory=Weights)
-    start: float = Field(default=0, ge=0)
+    start: float = Field(default=0, ge=0, allow_inf_nan=False)
 
 class AnalyzeRequest(BaseModel):
     audio_id: str
-    start: float = Field(default=0, ge=0)
+    start: float = Field(default=0, ge=0, allow_inf_nan=False)
     duration: float = Field(default=3, ge=0.05, le=12)
     max_partials: int = Field(default=24, ge=1, le=24)
 

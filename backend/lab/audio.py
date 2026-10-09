@@ -42,7 +42,8 @@ def resample(x,source,target):
 def excerpt(recording,start,duration,fs=None):
     first=round(start*recording.sample_rate); last=min(len(recording.samples),first+round(duration*recording.sample_rate))
     if first>=len(recording.samples) or last-first<32: raise ValueError('La sélection est hors du fichier ou trop courte.')
-    x=recording.mono[first:last]
+    # Select first: avoid allocating a mono copy of the entire imported recording.
+    x=recording.samples[first:last].mean(axis=1)
     return resample(x,recording.sample_rate,fs) if fs else x.copy()
 
 def envelope(x,fs):
