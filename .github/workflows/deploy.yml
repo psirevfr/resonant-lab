@@ -23,6 +23,7 @@ jobs:
           script: |
               set -eu
               cd ~/resonant-lab
+              .venv/bin/python -c 'import sys; sys.exit("Déploiement arrêté : .venv utilise Python " + sys.version.split()[0] + ". Python 3.12+ requis ; recréer la .venv sans toucher à SQLite.") if sys.version_info < (3,12) else None'
               git pull --ff-only origin main
               .venv/bin/python -m pip install --disable-pip-version-check pip==26.2.1
               .venv/bin/python -m pip install -r requirements.lock.txt
