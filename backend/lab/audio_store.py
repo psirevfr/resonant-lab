@@ -23,11 +23,12 @@ def connection():
 
 def cleanup():
     cutoff=time.time()-int(os.environ.get('RESONANT_AUDIO_TTL_SECONDS','604800'))
+    visitor_cutoff=time.time()-86400
     c=connection()
     try:
         c.execute('BEGIN IMMEDIATE')
-        old=c.execute('SELECT id FROM audio_references WHERE created<?',(cutoff,)).fetchall()
-        c.execute('DELETE FROM audio_references WHERE created<?',(cutoff,));c.commit()
+        old=c.execute('SELECT id FROM audio_references WHERE created<? OR (owner<0 AND created<?)',(cutoff,visitor_cutoff)).fetchall()
+        c.execute('DELETE FROM audio_references WHERE created<? OR (owner<0 AND created<?)',(cutoff,visitor_cutoff));c.commit()
     finally:c.close()
     root=directory()
     for row in old:

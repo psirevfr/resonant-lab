@@ -2,7 +2,7 @@
 from collections import OrderedDict
 from io import StringIO
 from pathlib import Path
-from threading import RLock
+from threading import RLock,BoundedSemaphore
 from uuid import uuid4
 import math
 import csv
@@ -35,7 +35,8 @@ from .media import wav_response
 # Imports de l'authentification
 from .auth import (
     init_db, get_db, hash_password, verify_password,
-    create_access_token, get_current_user, require_user, require_api_user, check_origin, csrf_token, revoke_session
+    create_access_token, get_current_user, require_user, require_api_user, check_origin, csrf_token, revoke_session,
+    get_visitor,create_visitor,claim_visitor,require_account
 )
 
 app=FastAPI(title='Résonant Lab',version='0.1.0')
@@ -43,6 +44,8 @@ app=FastAPI(title='Résonant Lab',version='0.1.0')
 @app.middleware('http')
 async def private_api_cache(request,call_next):
     response=await call_next(request)
+    response.headers['X-Frame-Options']='SAMEORIGIN'
+    response.headers['Content-Security-Policy']="frame-ancestors 'self'"
     if request.url.path.startswith('/api/'):
         response.headers['Cache-Control']='no-store'
         response.headers['X-Content-Type-Options']='nosniff'
@@ -50,6 +53,8 @@ async def private_api_cache(request,call_next):
 
 from . import job_store
 from . import audio_store
+from .request_limits import RequestLimits
+app.add_middleware(RequestLimits)
 
 @app.get('/api/dev/status')
 def developer_status(user:dict=Depends(require_api_user)):
@@ -58,6 +63,7 @@ def developer_status(user:dict=Depends(require_api_user)):
 api_router=APIRouter(dependencies=[Depends(require_api_user)])
 
 recordings=OrderedDict(); renders=OrderedDict(); downloads=OrderedDict(); lock=RLock()
+upload_guard=BoundedSemaphore(1)
 
 @app.exception_handler(ValueError)
 async def invalid(_,exc): return JSONResponse(status_code=422,content={'detail':str(exc)})
@@ -96,8 +102,14 @@ def blocks(): return catalog()
 
 @api_router.post('/api/audio')
 def upload(file: UploadFile=File(...),user:dict=Depends(require_api_user)):
-    data=file.file.read(128*1024*1024+1); rec=read_wav(data,Path(file.filename or 'audio.wav').name); key=store_audio(rec,user["id"])
-    return {'id':key,'metadata':rec.metadata(),'view':view(rec.mono,rec.sample_rate)}
+    if not upload_guard.acquire(blocking=False):raise HTTPException(429,'Un import audio est en cours. Réessayez dans quelques secondes.',headers={'Retry-After':'3'})
+    try:
+        limit=32_000_000 if user.get('guest') else 128*1024*1024
+        data=file.file.read(limit+1)
+        if len(data)>limit:raise HTTPException(413,'WAV visiteur limité à 32 Mo.' if user.get('guest') else 'WAV limité à 128 Mo.')
+        rec=read_wav(data,Path(file.filename or 'audio.wav').name,4_000_000 if user.get('guest') else 30_000_000);key=store_audio(rec,user['id'])
+        return {'id':key,'metadata':rec.metadata(),'view':view(rec.mono,rec.sample_rate)}
+    finally:upload_guard.release()
 
 @api_router.post('/api/demo')
 def demo(user:dict=Depends(require_api_user)):
@@ -106,7 +118,7 @@ def demo(user:dict=Depends(require_api_user)):
     rec=read_wav(wav_bytes(x,fs),'Note modale de démonstration.wav'); key=store_audio(rec,user["id"])
     return {'id':key,'metadata':rec.metadata(),'view':view(x,fs)}
 
-@api_router.get('/api/audio/{key}/wav')
+@api_router.get('/api/audio/{key}/wav',dependencies=[Depends(require_account)])
 def original(key:str,request:Request,user:dict=Depends(require_api_user)): return wav_response(get_recording(key,user["id"]).original,request.headers.get('range'))
 
 @api_router.get('/api/audio/{key}/segment')
@@ -151,7 +163,7 @@ def expand(req:Patch):return expand_modes(req).model_dump()
 @api_router.post('/api/instrument/prepare')
 def prepare_instrument(req:Patch):return prepare(req).model_dump()
 
-@api_router.post('/api/instrument/note')
+@api_router.post('/api/instrument/note',dependencies=[Depends(require_account)])
 def instrument_note(req:InstrumentRequest):
     if req.patch.duration>12:raise ValueError('Instrument limité à 12 secondes par note.')
     p,muted=transpose(req.patch,req.note,req.reference_note,req.velocity,req.gate,req.track_filters)
@@ -166,7 +178,7 @@ def instrument_patch(req:InstrumentRequest):
 def compact(req:CompactRequest,request:Request,user:dict=Depends(require_api_user)):
     return submit('compact',req,request,user)
 
-@api_router.post('/api/render')
+@api_router.post('/api/render',dependencies=[Depends(require_account)])
 def simulate(req:RenderRequest,user:dict=Depends(require_api_user)):
     x=target_audio(req,user["id"]); y=render(req.patch); key=uuid4().hex
     with lock:
@@ -174,7 +186,7 @@ def simulate(req:RenderRequest,user:dict=Depends(require_api_user)):
         while len(renders)>4: renders.popitem(last=False)
     return {'id':key,'view':view(y,req.patch.sample_rate),'reference':view(x,req.patch.sample_rate) if x is not None else None,'difference':view(x-y,req.patch.sample_rate) if x is not None else None,'errors':Objective(x,req.patch.sample_rate,req.weights).components(y) if x is not None else None,'clipping':bool(np.max(abs(y))>1),'sample_rate':req.patch.sample_rate}
 
-@api_router.get('/api/render/{key}/wav')
+@api_router.get('/api/render/{key}/wav',dependencies=[Depends(require_account)])
 def rendered(key:str,request:Request,user:dict=Depends(require_api_user)):
     with lock:
         if key not in renders or renders[key][0]!=user["id"]: raise HTTPException(404,'Rendu expiré ; générer à nouveau.')
@@ -203,11 +215,11 @@ def validate_patch(patch:Patch):
     for node in normalized.nodes: node.parameters=parameters(node.type,node.parameters,patch.sample_rate)
     return normalized.model_dump()
 
-@api_router.post('/api/export/svg')
+@api_router.post('/api/export/svg',dependencies=[Depends(require_account)])
 def svg(patch:Patch):
     validate(patch); return Response(graph_svg(patch),media_type='image/svg+xml')
 
-@api_router.post('/api/export/csv')
+@api_router.post('/api/export/csv',dependencies=[Depends(require_account)])
 def csv_export(patch:Patch):
     validate(patch); out=StringIO(); writer=csv.writer(out); writer.writerow(['block_id','type','parameter','value','unit'])
     definitions=catalog()
@@ -215,7 +227,7 @@ def csv_export(patch:Patch):
         for k,v in parameters(node.type,node.parameters,patch.sample_rate).items(): writer.writerow([csv_cell(node.id),csv_cell(node.type),csv_cell(k),v,csv_cell(definitions[node.type]['parameters'][k]['unit'])])
     return Response(out.getvalue(),media_type='text/csv')
 
-@api_router.post('/api/exports')
+@api_router.post('/api/exports',dependencies=[Depends(require_account)])
 def prepare_download(file: UploadFile=File(...),user:dict=Depends(require_api_user)):
     types={'.monpatch':'application/json','.json':'application/json','.wav':'audio/wav',
            '.svg':'image/svg+xml','.png':'image/png','.csv':'text/csv','.html':'text/html'}
@@ -230,7 +242,7 @@ def prepare_download(file: UploadFile=File(...),user:dict=Depends(require_api_us
             downloads.popitem(last=False)
     return {'url':f'/api/exports/{key}','name':name}
 
-@api_router.get('/api/exports/{key}')
+@api_router.get('/api/exports/{key}',dependencies=[Depends(require_account)])
 def download_export(key:str,user:dict=Depends(require_api_user)):
     with lock:
         if key not in downloads or downloads[key][3]!=user["id"]: raise HTTPException(404,'Export expiré ; préparez à nouveau le fichier.')
@@ -295,7 +307,7 @@ def cancel_job(key:str,user:dict=Depends(require_api_user)):
 
 @api_router.get('/api/me')
 def me(request:Request,user:dict=Depends(require_api_user)):
-    token=request.cookies.get('access_token','')
+    token=request.cookies.get('visitor_token','') if user.get('guest') else request.cookies.get('access_token','')
     return {**user,'csrf_token':csrf_token(token) if token else None}
 
 # Inclusion des routes protégées de l'API
@@ -370,7 +382,7 @@ def secure_cookie(request):
 
 def form_response(request,mode,error='',username='',email='',status=200):
     nonce=secrets.token_urlsafe(32)
-    response=HTMLResponse(auth_form(mode,nonce,error,username,email,bool(request.query_params.get('registered'))),status_code=status,headers={'Cache-Control':'no-store'})
+    response=HTMLResponse(auth_form(mode,nonce,error,username,email,bool(request.query_params.get('registered')),request.query_params.get('embed')=='1'),status_code=status,headers={'Cache-Control':'no-store'})
     response.set_cookie('resonant_form',nonce,httponly=True,secure=secure_cookie(request),samesite='strict',max_age=1800)
     return response
 
@@ -387,7 +399,7 @@ def home():return RedirectResponse('/mon-lab/',status_code=303)
 
 @app.get('/login',response_class=HTMLResponse)
 def login_page(request:Request):
-    if get_current_user(request):return RedirectResponse('/mon-lab/',status_code=303)
+    if get_current_user(request):return RedirectResponse('/auth/complete' if request.query_params.get('embed')=='1' else '/mon-lab/',status_code=303)
     return form_response(request,'login')
 
 @app.post('/login')
@@ -398,13 +410,22 @@ def login(request:Request,username:str=Form(...),password:str=Form(...),csrf:str
     finally:conn.close()
     if not user or not verify_password(password,user['hashed_password']):
         return form_response(request,'login','Pseudo ou mot de passe incorrect.',username=username,status=400)
-    response=RedirectResponse('/mon-lab/',status_code=303)
+    old_owner=claim_visitor(request,user['id'])
+    if old_owner is not None:
+        with lock:
+            for key,(owner,record) in list(recordings.items()):
+                if owner==old_owner:recordings[key]=(user['id'],record)
+            for key,(owner,data) in list(renders.items()):
+                if owner==old_owner:renders[key]=(user['id'],data)
+            for key,(name,media,data,owner) in list(downloads.items()):
+                if owner==old_owner:downloads[key]=(name,media,data,user['id'])
+    response=RedirectResponse('/auth/complete' if request.query_params.get('embed')=='1' else '/mon-lab/',status_code=303)
     response.set_cookie('access_token',create_access_token({'sub':user['username']}),httponly=True,secure=secure_cookie(request),samesite='lax',max_age=86400)
-    response.delete_cookie('resonant_form');return response
+    response.delete_cookie('resonant_form');response.delete_cookie('visitor_token');return response
 
 @app.get('/register',response_class=HTMLResponse)
 def register_page(request:Request):
-    if get_current_user(request):return RedirectResponse('/mon-lab/',status_code=303)
+    if get_current_user(request):return RedirectResponse('/auth/complete' if request.query_params.get('embed')=='1' else '/mon-lab/',status_code=303)
     return form_response(request,'register')
 
 @app.post('/register')
@@ -422,12 +443,16 @@ def register(request:Request,username:str=Form(...),email:str=Form(...),password
     except sqlite3.IntegrityError:
         return form_response(request,'register','Pseudo ou e-mail déjà utilisé.',username,email,400)
     finally:conn.close()
-    return RedirectResponse('/login?registered=true',status_code=303)
+    return RedirectResponse('/login?registered=true'+('&embed=1' if request.query_params.get('embed')=='1' else ''),status_code=303)
+
+@app.get('/auth/complete',response_class=HTMLResponse)
+def auth_complete(user:dict=Depends(require_user)):
+    return HTMLResponse('<!doctype html><html lang="fr"><meta charset="utf-8"><link rel="stylesheet" href="/auth.css"><body class="auth-embedded"><main class="auth-shell"><section class="auth-card"><h2>Connexion réussie</h2><p>Votre laboratoire va retrouver les options d’export.</p></section></main></body></html>',headers={'Cache-Control':'no-store'})
 
 @app.get('/logout')
 def logout_confirmation():return RedirectResponse('/mon-lab/',status_code=303)
 
-@app.post('/api/logout')
+@app.post('/api/logout',dependencies=[Depends(require_account)])
 def logout(request:Request,user:dict=Depends(require_api_user)):
     revoke_session(request);response=JSONResponse({'ok':True});response.delete_cookie('access_token');response.headers['Cache-Control']='no-store';return response
 
@@ -439,15 +464,18 @@ def mon_lab_redirect():return RedirectResponse('/mon-lab/',status_code=308)
 
 @app.get('/mon-lab/',response_class=HTMLResponse)
 def mon_lab(request:Request):
-    if not get_current_user(request):return HTMLResponse(signed_out(),headers={'Cache-Control':'no-store'})
-    if (DIST/'index.html').exists():return FileResponse(DIST/'index.html',headers={'Cache-Control':'no-store'})
+    if (DIST/'index.html').exists():
+        response=FileResponse(DIST/'index.html',headers={'Cache-Control':'no-store'})
+        if not get_current_user(request) and not get_visitor(request):
+            response.set_cookie('visitor_token',create_visitor(),httponly=True,secure=secure_cookie(request),samesite='lax',max_age=86400)
+        return response
     return HTMLResponse('Interface non compilée. Exécutez le build frontend.',status_code=503)
 
 class AccountUpdate(BaseModel):
     email:str
     current_password:str
 
-@app.post('/api/account')
+@app.post('/api/account',dependencies=[Depends(require_account)])
 def update_account(req:AccountUpdate,user:dict=Depends(require_api_user)):
     email=req.email.strip()
     if not valid_email(email):raise HTTPException(422,'Adresse e-mail invalide.')

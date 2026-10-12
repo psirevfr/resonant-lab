@@ -69,7 +69,7 @@ def test_audio_routes_coexist_with_account_routes_and_require_auth():
     app.dependency_overrides.pop(require_api_user)
     assert c.post('/api/instrument/prepare',json=p).status_code==401
     assert c.get('/mon-lab/').status_code==200
-    assert 'Connexion' in c.get('/mon-lab/').text
+    assert 'id="root"' in c.get('/mon-lab/').text
     assert c.get('/login').status_code==200
     assert c.get('/api/health').status_code==200
 

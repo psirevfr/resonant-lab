@@ -17,16 +17,16 @@ class Recording:
     def metadata(self):
         return {'name':self.name,'sample_rate':self.sample_rate,'channels':self.samples.shape[1],'duration':len(self.samples)/self.sample_rate,'subtype':self.subtype,'peak':float(np.max(abs(self.samples))),'rms':float(np.sqrt(np.mean(self.samples**2))),'frames':len(self.samples)}
 
-def read_wav(data: bytes, name: str) -> Recording:
+def read_wav(data: bytes, name: str, max_samples: int=30_000_000) -> Recording:
     import soundfile as sf
     if len(data)>128*1024*1024: raise ValueError('Fichier limité à 128 Mo.')
     try:
         with sf.SoundFile(BytesIO(data)) as f:
             if f.format not in ('WAV','WAVEX','RF64'): raise ValueError('Importer un fichier WAV.')
             if f.channels>2 or f.samplerate<8000 or f.samplerate>192000: raise ValueError('WAV mono/stéréo, de 8 à 192 kHz requis.')
-            if f.frames/f.samplerate>300 or f.frames*f.channels>30_000_000: raise ValueError('Import limité à 5 minutes et 30 millions d’échantillons.')
+            if f.frames/f.samplerate>300 or f.frames*f.channels>max_samples: raise ValueError('Import limité à 5 minutes et '+str(max_samples)+' échantillons ; choisissez un extrait plus court.')
             if f.frames<32: raise ValueError('Fichier trop court.')
-            x=f.read(dtype='float64',always_2d=True); fs=f.samplerate; subtype=f.subtype
+            x=f.read(frames=f.frames,dtype='float64',always_2d=True); fs=f.samplerate; subtype=f.subtype
     except (sf.LibsndfileError, RuntimeError) as exc: raise ValueError('WAV invalide ou non pris en charge.') from exc
     if not np.isfinite(x).all(): raise ValueError('Le fichier contient des valeurs non finies.')
     return Recording(name,x,fs,subtype,data)

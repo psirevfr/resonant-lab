@@ -28,15 +28,17 @@ def test_existing_user_login_csrf_logout_invalidates_copied_cookie():
     assert c.post('/api/logout',json={},headers={'X-CSRF-Token':csrf}).status_code==200
     c.cookies.set('access_token',copied)
     assert c.get('/api/me').status_code==401
-    assert 'Connexion' in c.get('/mon-lab/').text
+    assert c.get('/mon-lab/').status_code==200
+    assert c.get('/api/me').json()['guest']
 
 
 def test_api_key_is_user_scoped_and_not_a_browser_session():
     app.dependency_overrides.clear();user()
-    c=TestClient(app)
+    c=TestClient(app,base_url='https://testserver')
     assert c.get('/api/me',headers={'X-API-Key':'alice-test-key'}).json()['username']=='alice'
     assert c.get('/api/me',headers={'X-API-Key':'bad'}).status_code==403
-    assert 'Connexion' in c.get('/mon-lab/',headers={'X-API-Key':'alice-test-key'}).text
+    assert c.get('/mon-lab/',headers={'X-API-Key':'alice-test-key'}).status_code==200
+    assert c.get('/api/me').json()['guest']
     assert 'alice-test-key' not in c.get('/api/me',headers={'X-API-Key':'alice-test-key'}).text
 
 

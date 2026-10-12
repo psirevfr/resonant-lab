@@ -8,7 +8,7 @@ import secrets
 import sqlite3
 import time
 import bcrypt
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Depends
 from jose import jwt, JWTError
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -57,6 +57,7 @@ def init_db():
         if 'api_key' not in {row['name'] for row in conn.execute('PRAGMA table_info(users)')}:
             conn.execute('ALTER TABLE users ADD COLUMN api_key TEXT')
         conn.execute('CREATE TABLE IF NOT EXISTS revoked_sessions (digest TEXT PRIMARY KEY, expires REAL NOT NULL)')
+        conn.execute('CREATE TABLE IF NOT EXISTS visitor_sessions (owner INTEGER PRIMARY KEY, expires REAL NOT NULL, claimed INTEGER NOT NULL DEFAULT 0)')
         conn.commit()
     finally:conn.close()
 
@@ -80,6 +81,7 @@ def get_current_user(request):
     if not token:return None
     try:payload=jwt.decode(token,session_secret(),algorithms=[ALGORITHM])
     except JWTError:return None
+    if payload.get('purpose') is not None:return None
     if not isinstance(payload.get('sub'),str):return None
     conn=get_db()
     try:
@@ -125,10 +127,69 @@ def require_api_user(request:Request):
                 raise HTTPException(403,'Session à actualiser avant cette action.')
         return user
     key=request.headers.get('x-api-key')
-    if not key:raise HTTPException(401,'Session expirée. Reconnectez-vous pour continuer.')
+    if not key:
+        visitor=get_visitor(request)
+        if visitor:
+            if request.method not in ('GET','HEAD','OPTIONS'):
+                check_origin(request)
+                if not hmac.compare_digest(request.headers.get('x-csrf-token',''),csrf_token(request.cookies['visitor_token'])):
+                    raise HTTPException(403,'Session visiteur à actualiser avant cette action.')
+            return visitor
+        raise HTTPException(401,'Session expirée. Rechargez le laboratoire pour continuer.')
     conn=get_db()
     try:
         users=conn.execute('SELECT id,username,email FROM users WHERE api_key=?',(key,)).fetchall()
     finally:conn.close()
     if len(users)!=1:raise HTTPException(403,'Clé API invalide.')
     return dict(users[0])
+
+
+def get_visitor(request):
+    token=request.cookies.get('visitor_token')
+    if not token:return None
+    try:payload=jwt.decode(token,session_secret(),algorithms=[ALGORITHM])
+    except JWTError:return None
+    owner=payload.get('owner')
+    if payload.get('purpose')!='visitor' or type(owner) is not int or owner>=0:return None
+    c=get_db()
+    try:row=c.execute('SELECT expires,claimed FROM visitor_sessions WHERE owner=?',(owner,)).fetchone()
+    finally:c.close()
+    if not row or row['claimed'] or row['expires']<=time.time():return None
+    return {'id':owner,'username':'Visiteur','email':'','guest':True}
+
+
+def create_visitor():
+    owner=-(secrets.randbits(52)+1);expires=time.time()+86400
+    c=get_db()
+    try:
+        c.execute('DELETE FROM visitor_sessions WHERE expires<?',(time.time(),))
+        c.execute('INSERT INTO visitor_sessions(owner,expires) VALUES (?,?)',(owner,expires));c.commit()
+    finally:c.close()
+    return jwt.encode({'sub':'visitor','purpose':'visitor','owner':owner,'exp':expires},session_secret(),algorithm=ALGORITHM)
+
+
+def claim_visitor(request,owner):
+    visitor=get_visitor(request)
+    if not visitor:return None
+    c=get_db()
+    try:
+        c.execute('BEGIN IMMEDIATE')
+        changed=c.execute('UPDATE visitor_sessions SET claimed=1 WHERE owner=? AND claimed=0 AND expires>?',(visitor['id'],time.time())).rowcount
+        if not changed:c.rollback();return None
+        tables={r['name'] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        if 'compute_jobs' in tables:
+            collisions=c.execute('SELECT id FROM compute_jobs g WHERE g.owner=? AND EXISTS (SELECT 1 FROM compute_jobs a WHERE a.owner=? AND a.idem=g.idem)',(visitor['id'],owner)).fetchall()
+            for row in collisions:
+                new_key='claimed:'+secrets.token_urlsafe(32)
+                while c.execute('SELECT 1 FROM compute_jobs WHERE owner=? AND idem=?',(owner,new_key)).fetchone():new_key='claimed:'+secrets.token_urlsafe(32)
+                c.execute('UPDATE compute_jobs SET idem=? WHERE id=?',(new_key,row['id']))
+        for table in ('compute_jobs','audio_references'):
+            if table in tables:c.execute(f'UPDATE {table} SET owner=? WHERE owner=?',(owner,visitor['id']))
+        c.commit()
+    finally:c.close()
+    return visitor['id']
+
+
+def require_account(user:dict=Depends(require_api_user)):
+    if user.get('guest'):raise HTTPException(401,'Connectez-vous ou créez un compte pour cette action.')
+    return user

@@ -1,5 +1,6 @@
 export class ApiError extends Error{constructor(message:string,public status:number){super(message)}}
 let csrfPromise:Promise<string>|null=null;
+export function resetSession(){csrfPromise=null}
 async function readResponse(response:Response){
  if(!response.ok){let error;try{error=await response.json()}catch{throw new ApiError(`Serveur : ${response.status}`,response.status)}throw new ApiError(typeof error.detail==='string'?error.detail:'Demande invalide. Vérifiez les paramètres.',response.status)}
  return response;

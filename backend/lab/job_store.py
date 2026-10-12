@@ -69,6 +69,8 @@ def enqueue(owner,kind,request,x,fs,idem):
             if old['fingerprint']!=fingerprint:raise HTTPException(409,'Cette clé de soumission correspond à une autre demande.')
             return public(old)
         active=c.execute("SELECT owner FROM compute_jobs WHERE status IN ('queued','running')").fetchall()
+        if owner<0 and sum(r['owner']<0 for r in active)>=2:
+            raise HTTPException(429,'Les calculs visiteurs sont momentanément occupés. Réessayez plus tard.',headers={'Retry-After':'15'})
         if len(active)>=int(os.environ.get('RESONANT_MAX_JOBS','6')) or sum(r['owner']==owner for r in active)>=2:
             raise HTTPException(429,'File de calcul pleine. Réessayez plus tard.',headers={'Retry-After':'15'})
         key=uuid4().hex
