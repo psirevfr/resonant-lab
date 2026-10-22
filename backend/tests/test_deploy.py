@@ -59,3 +59,15 @@ def test_rotation_refuses_to_write_a_secret_into_versioned_example():
     before=example.read_text()
     with pytest.raises(ValueError):rotation.rotate(example,'owner')
     assert example.read_text()==before
+
+
+def test_verified_vm_templates_share_working_directory_environment_and_private_umask():
+    from configparser import ConfigParser
+    root=Path(__file__).resolve().parents[2]
+    for name in ('resonant-lab','resonant-worker'):
+        config=ConfigParser();config.read(root/'deploy'/f'{name}.service')
+        service=config['Service']
+        assert service['WorkingDirectory']=='/home/romadem17/resonant-lab'
+        assert service['EnvironmentFile']=='/etc/resonant-lab.env'
+        assert service['User']=='romadem17' and service['UMask']=='0077'
+        assert service['ExecStart'].startswith(service['WorkingDirectory']+'/')

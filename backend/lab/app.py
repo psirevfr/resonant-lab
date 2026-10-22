@@ -36,25 +36,17 @@ from .media import wav_response
 from .auth import (
     init_db, get_db, hash_password, verify_password,
     create_access_token, get_current_user, require_user, require_api_user, check_origin, csrf_token, revoke_session,
-    get_visitor,create_visitor,claim_visitor,require_account
+    get_visitor,create_visitor,claim_visitor,require_account,rate_limit,valid_csrf
 )
 
 app=FastAPI(title='Résonant Lab',version='0.1.0')
 
-@app.middleware('http')
-async def private_api_cache(request,call_next):
-    response=await call_next(request)
-    response.headers['X-Frame-Options']='SAMEORIGIN'
-    response.headers['Content-Security-Policy']="frame-ancestors 'self'"
-    if request.url.path.startswith('/api/'):
-        response.headers['Cache-Control']='no-store'
-        response.headers['X-Content-Type-Options']='nosniff'
-    return response
-
 from . import job_store
 from . import audio_store
 from .request_limits import RequestLimits
+from .security_headers import SecurityHeaders
 app.add_middleware(RequestLimits)
+app.add_middleware(SecurityHeaders)
 
 @app.get('/api/dev/status')
 def developer_status(user:dict=Depends(require_api_user)):
@@ -67,6 +59,15 @@ upload_guard=BoundedSemaphore(1)
 
 @app.exception_handler(ValueError)
 async def invalid(_,exc): return JSONResponse(status_code=422,content={'detail':str(exc)})
+
+# Validation errors must not echo submitted passwords, audio or non-JSON NaN.
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
+@app.exception_handler(RequestValidationError)
+@app.exception_handler(ValidationError)
+async def invalid_fields(_,exc):
+    errors=[{k:e[k] for k in ('type','loc','msg') if k in e} for e in exc.errors()]
+    return JSONResponse(status_code=422,content={'detail':errors})
 
 def get_recording(key,owner):
     with lock:
@@ -389,7 +390,7 @@ def form_response(request,mode,error='',username='',email='',status=200):
 def check_form(request,csrf):
     check_origin(request)
     nonce=request.cookies.get('resonant_form','')
-    if not nonce or not hmac.compare_digest(csrf,csrf_token(nonce)):raise HTTPException(403,'Formulaire expiré. Rechargez la page.')
+    if not nonce or not valid_csrf(csrf,nonce):raise HTTPException(403,'Formulaire expiré. Rechargez la page.')
 
 def valid_email(email):
     return len(email)<=254 and re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+',email) is not None
@@ -405,11 +406,15 @@ def login_page(request:Request):
 @app.post('/login')
 def login(request:Request,username:str=Form(...),password:str=Form(...),csrf:str=Form(...)):
     check_form(request,csrf)
+    rate_limit(request,'login-ip',limit=40)
+    rate_limit(request,'login-user',subject=username[:64].casefold(),limit=10)
     conn=get_db()
     try:user=conn.execute('SELECT * FROM users WHERE username=?',(username,)).fetchone()
     finally:conn.close()
-    if not user or not verify_password(password,user['hashed_password']):
-        return form_response(request,'login','Pseudo ou mot de passe incorrect.',username=username,status=400)
+    from .auth import dummy_password_hash
+    matched=verify_password(password,user['hashed_password'] if user else dummy_password_hash())
+    if not user or not matched:
+        return form_response(request,'login','Pseudo ou mot de passe incorrect.',username=username[:64],status=400)
     old_owner=claim_visitor(request,user['id'])
     if old_owner is not None:
         with lock:
@@ -431,6 +436,7 @@ def register_page(request:Request):
 @app.post('/register')
 def register(request:Request,username:str=Form(...),email:str=Form(...),password:str=Form(...),csrf:str=Form(...)):
     check_form(request,csrf);username=username.strip();email=email.strip()
+    rate_limit(request,'register-ip',limit=5,window=3600)
     error=None
     if not re.fullmatch(r'[\w .-]{3,64}',username):error='Pseudo : 3 à 64 lettres, chiffres, espaces, points ou tirets.'
     elif not valid_email(email):error='Adresse e-mail invalide.'
@@ -467,6 +473,7 @@ def mon_lab(request:Request):
     if (DIST/'index.html').exists():
         response=FileResponse(DIST/'index.html',headers={'Cache-Control':'no-store'})
         if not get_current_user(request) and not get_visitor(request):
+            rate_limit(request,'visitor-ip',limit=40,window=3600)
             response.set_cookie('visitor_token',create_visitor(),httponly=True,secure=secure_cookie(request),samesite='lax',max_age=86400)
         return response
     return HTMLResponse('Interface non compilée. Exécutez le build frontend.',status_code=503)
@@ -476,7 +483,8 @@ class AccountUpdate(BaseModel):
     current_password:str
 
 @app.post('/api/account',dependencies=[Depends(require_account)])
-def update_account(req:AccountUpdate,user:dict=Depends(require_api_user)):
+def update_account(req:AccountUpdate,request:Request,user:dict=Depends(require_api_user)):
+    rate_limit(request,'account-password',subject=str(user['id']),limit=10)
     email=req.email.strip()
     if not valid_email(email):raise HTTPException(422,'Adresse e-mail invalide.')
     conn=get_db()

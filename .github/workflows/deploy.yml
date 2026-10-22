@@ -1,5 +1,8 @@
 name: Déploiement Automatique Production
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -14,11 +17,12 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Déploiement via SSH
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262 # v1.0.3
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
           command_timeout: 20m
           script: |
               set -eu
@@ -27,6 +31,7 @@ jobs:
               git pull --ff-only origin main
               .venv/bin/python -m pip install --disable-pip-version-check pip==26.2.1
               .venv/bin/python -m pip install -r requirements.lock.txt
+              .venv/bin/python -m pip uninstall -y python-jose ecdsa
               .venv/bin/python -m pip check
               .venv/bin/python scripts/prepare_local_runtime.py --download
               .venv/bin/python -c 'import json; from pathlib import Path; assert json.loads(Path(".local/compute-runtime/manifest.json").read_text())["ready"], "Runtime incomplet"'

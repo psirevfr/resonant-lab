@@ -5,7 +5,9 @@ from fastapi.responses import Response
 
 def wav_response(data: bytes, range_header: str | None = None) -> Response:
     headers = {'Accept-Ranges': 'bytes', 'Cache-Control': 'private, no-store'}
-    if range_header:
+    # Python intentionally limits conversion of enormous decimal strings.
+    # Ignore oversized/malformed Range instead of causing a server exception.
+    if range_header and len(range_header)<=128:
         match = re.fullmatch(r'bytes=(\d*)-(\d*)', range_header.strip())
         if match and any(match.groups()):
             first, last = match.groups()

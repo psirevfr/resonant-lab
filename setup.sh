@@ -10,6 +10,8 @@ if [ ! -x .venv/bin/python ]; then "$PYTHON_BIN" -m venv .venv; fi
 .venv/bin/python -c 'import sys; assert sys.version_info >= (3,12), "Ancienne .venv : recréer cet environnement avec Python 3.12+."; assert sys.prefix != sys.base_prefix, "Python doit être isolé dans .venv."'
 .venv/bin/python -m pip install --disable-pip-version-check pip==26.2.1
 .venv/bin/python -m pip install --disable-pip-version-check -r requirements.lock.txt
+# Retired JWT implementation; pip install alone does not remove old packages.
+.venv/bin/python -m pip uninstall -y python-jose ecdsa
 .venv/bin/python -m pip check
 # TypeScript/Vite are build dependencies, required even when NODE_ENV=production.
 (cd frontend && npm ci --include=dev --no-audit --no-fund && npm run build)

@@ -160,6 +160,7 @@ def maintain(now=None):
         c.execute("UPDATE compute_jobs SET status='failed',finished=?,input=NULL,error='Attente expirée. Le worker est peut-être indisponible.' WHERE status='queued' AND created<?",(now,now-queued_ttl))
         c.execute("DELETE FROM compute_jobs WHERE status IN ('succeeded','failed','cancelled') AND finished<?",(now-retention,))
         c.execute('DELETE FROM revoked_sessions WHERE expires<?',(now,))
+        c.execute('DELETE FROM auth_rate_limits WHERE expires<?',(now,))
         c.execute('DELETE FROM compute_workers WHERE heartbeat<?',(now-86400,))
 
 

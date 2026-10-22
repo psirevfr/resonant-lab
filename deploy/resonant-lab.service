@@ -1,0 +1,20 @@
+[Unit]
+Description=Resonant Lab HTTP (single web process)
+After=network.target
+
+[Service]
+Type=simple
+User=romadem17
+WorkingDirectory=/home/romadem17/resonant-lab
+EnvironmentFile=/etc/resonant-lab.env
+ExecStart=/home/romadem17/resonant-lab/run-web.sh
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=15
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,7 +1,7 @@
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
-certifi==2026.7.22
+certifi==2026.10.19
 cffi==2.1.1
 click==8.5.0
 fastapi==0.141.1
@@ -26,8 +26,7 @@ typing-inspection==0.4.4
 typing_extensions==4.16.0
 uvicorn==0.54.0
 bcrypt==5.0.0
-python-jose==3.5.0
+PyJWT==2.15.1
 cryptography==50.0.2
-ecdsa==0.19.2
 rsa==4.9.1
 pyasn1==0.6.4

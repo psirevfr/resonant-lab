@@ -116,7 +116,7 @@ def test_embedded_authentication_is_same_origin_and_returns_completion_page():
     client,_,_=visitor();create_user('embedded')
     page=client.get('/login?embed=1')
     assert page.headers['x-frame-options']=='SAMEORIGIN'
-    assert page.headers['content-security-policy']=="frame-ancestors 'self'"
+    assert "frame-ancestors 'self'" in page.headers['content-security-policy']
     assert 'action="/login?embed=1"' in page.text and 'auth-embedded' in page.text
     csrf=re.search(r'name="csrf" value="([^"]+)"',page.text).group(1)
     response=client.post('/login?embed=1',data={'username':'embedded','password':'test password','csrf':csrf},follow_redirects=False)
