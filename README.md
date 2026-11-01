@@ -127,7 +127,7 @@ La génération, l’optimisation et la simplification passent par une file SQLi
 - Les blocs disjoints de la sortie n’affectent pas l’audio. Pas de rétroaction dans les graphes v1.
 - La saturation tanh simple n’est pas suréchantillonnée ; la saturation asymétrique propose un suréchantillonnage ×4. Les exports WAV float préservent les dépassements de ±1 ; l’interface les signale pour l’écoute.
 - Les originaux et téléchargements temporaires restent en mémoire, mais les jobs et modèles calculés sont persistants en SQLite. Un redémarrage peut exiger de réimporter le WAV pour comparer. Le JSON contient le modèle, pas le WAV source.
-- Les curseurs sont interactifs et un clavier MIDI est disponible ; il n’y a pas encore de montage multipiste, export de circuit électronique, modèle de corde couplée, table d’harmonie ou simulation FEM.
+- Les curseurs sont interactifs et un clavier MIDI est disponible. L’onglet **Montage physique** présente un atelier de conception matériel avec maquette 3D, schéma, nomenclature et génération d’un sketch Arduino pour Teensy depuis les partiels analysés. Le sketch est encore un prototype : il ne porte pas tout le DSP, n’a pas encore été compilé ni testé sur une carte et ne promet pas une identité sonore. Le brief et le sketch peuvent être importés manuellement dans Tinkered; aucune transmission automatique n’est faite. Voir `docs/ATELIER_ELECTRONIQUE.md`. Il n’y a pas encore de montage multipiste, de circuit analogique exact, de modèle de corde couplée, de table d’harmonie ou de simulation FEM.
 
 ## Validation
 
