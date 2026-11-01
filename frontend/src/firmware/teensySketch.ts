@@ -42,7 +42,7 @@ export function buildTeensySketch(patch:Patch,analysis:Analysis|null):FirmwareMo
  const code=[
  '// Resonant Lab — esquisse Arduino pour Teensy 4.1',
  '// Une banque logicielle additive remplace les générateurs matériels séparés.',
- '// Cible : Arduino IDE + Teensyduino, Teensy 4.1, USB MIDI Host, DAC I2S externe.',
+ '// Cible : Arduino IDE + Teensyduino, Teensy 4.1, Audio Shield Rev D/D2, USB MIDI Host.',
  '// Ce prototype ne porte pas encore les filtres, saturations ni le bruit du patch.',
  '#include <Audio.h>',
  '#include <USBHost_t36.h>',
@@ -107,6 +107,7 @@ export function buildTeensySketch(patch:Patch,analysis:Analysis|null):FirmwareMo
  '};',
  '',
  'ResonantAdditiveBank synth;',
+ 'AudioControlSGTL5000 audioControl;',
  'AudioOutputI2S i2sOut;',
  'AudioConnection leftLink(synth,0,i2sOut,0);',
  'AudioConnection rightLink(synth,0,i2sOut,1);',
@@ -119,6 +120,8 @@ export function buildTeensySketch(patch:Patch,analysis:Analysis|null):FirmwareMo
  'void setup(){',
  '  AudioMemory(16);',
  '  synth.begin();',
+ '  audioControl.enable();',
+ '  audioControl.volume(0.30f); // niveau casque prudent au premier branchement',
  '  usbHost.begin();',
  '  usbMidi.setHandleNoteOn(onNoteOn);',
  '  usbMidi.setHandleNoteOff(onNoteOff);',
@@ -127,6 +130,6 @@ export function buildTeensySketch(patch:Patch,analysis:Analysis|null):FirmwareMo
  ''
  ].join('\n');
  const measured=analysis?.partials.length?analysis.partials.slice(0,safeModes.length).map((p,i)=>`${i+1}. ${p.frequency.toFixed(2)} Hz · A ${p.amplitude.toFixed(4)} · τ ${p.tau.toFixed(3)} s`).join('\n'):'Aucune mesure disponible; le sketch reprend les oscillateurs présents dans le patch.';
- const prompt='Construis un synthétiseur mono à partir de ce firmware Arduino existant. Garde le matériel minimal : Teensy 4.1 programmable avec Arduino IDE, un DAC PCM5102A I2S, une breadboard, les fils indispensables, et un clavier MIDI USB sur le port USB Host. N’ajoute pas un générateur matériel par partiel : les sinusoïdes sont additionnées dans le firmware. Relie I2S BCLK 21, LRCLK 20, TX 7 au DAC; sépare clairement USB Host et USB programmation. Montre le circuit 3D et le schéma, donne le brochage et la nomenclature. Ne prétends pas que la simulation valide le son tant que ce sketch n’est pas compilé et testé sur le matériel.\n\nPatch : '+patch.name+'\nNote de référence MIDI estimée : '+referenceMidi+'\nÉchantillonnage du patch d’origine : '+patch.sample_rate+' Hz\nPartiels employés : '+safeModes.length+'\n'+measured+'\n\nGarde en évidence les limites suivantes : Audio Library Teensy à 16 bits/44,1 kHz, filtres/saturations/bruit du patch non encore portés et transposition égale des fréquences des partiels.';
+ const prompt='Construis un synthétiseur mono à partir de ce firmware Arduino existant. Garde le matériel minimal : Teensy 4.1 programmée avec Arduino IDE/Teensyduino, Audio Shield Rev D ou D2 (SGTL5000) empilé sur la Teensy, une breadboard, les connexions indispensables et un clavier MIDI USB sur le port Host. Le shield regroupe codec audio et prise casque/ligne : ne rajoute pas de DAC ni de breakout jack séparé. N’ajoute pas de générateur matériel par partiel : les sinusoïdes sont additionnées dans le firmware. L’I²S et le contrôle I²C passent par les headers empilés (DIN 7, BCLK 21, LRCLK 20, MCLK 23, SDA/SCL 18/19); sépare clairement le câble USB Host et le câble USB de programmation. Montre le montage 3D, le schéma, le brochage et la nomenclature. Ne prétends pas que la simulation valide le son tant que ce sketch n’est pas compilé et testé sur le matériel.\n\nPatch : '+patch.name+'\nNote de référence MIDI estimée : '+referenceMidi+'\nÉchantillonnage du patch d’origine : '+patch.sample_rate+' Hz\nPartiels employés : '+safeModes.length+'\n'+measured+'\n\nGarde en évidence les limites suivantes : Audio Library Teensy à 16 bits/44,1 kHz, filtres/saturations/bruit du patch non encore portés et transposition égale des fréquences des partiels.';
  return {code,prompt,partialCount:modes.length,referenceMidi,limitations};
 }

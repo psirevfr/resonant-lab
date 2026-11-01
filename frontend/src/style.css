@@ -81,4 +81,31 @@
 .electronics-bom,.electronics-wiring{border-color:#343b40;background:#191c1e}.electronics-bom th,.electronics-bom td{border-color:#303639}.electronics-bom td:nth-child(2){color:#e0e5e5}.electronics-bom td:nth-child(3){color:#aeb7ba}.electronics-bom td a{color:#bfd9a6}.electronics-wiring li{color:#bbc4c6}.electronics-safety{background:#27241d;color:#d1c29d}
 @media(max-width:1160px){.electronics-workspace{grid-template-columns:195px minmax(0,1fr)}.electronics-assistant{grid-column:1/-1;border-top:1px solid #343b40;border-left:0}.assistant-content{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.assistant-section-title{grid-column:1/-1}.assistant-callout{margin-top:0}.assistant-input-note{grid-column:1/-1}}
 @media(max-width:740px){.electronics-studio{padding:7px}.electronics-workspace-top{grid-template-columns:1fr auto;gap:7px}.electronics-project-title{grid-row:2;grid-column:1/-1}.electronics-workspace-switch button{padding:6px}.electronics-workspace-actions button{padding:6px;font-size:8px}.electronics-workspace{display:flex;flex-direction:column}.electronics-palette{min-height:0;max-height:285px;border-right:0;border-bottom:1px solid #343b40}.electronics-editor{min-height:500px}.electronics-editor-toolbar{align-items:flex-start;flex-wrap:wrap}.editor-view-tabs{width:100%;overflow:auto}.editor-view-tabs button{white-space:nowrap}.electronics-editor .breadboard-viewport{height:340px;min-height:300px;justify-content:flex-start}.electronics-editor .breadboard-viewport svg{width:760px;min-width:760px}.schematic-viewport{min-height:360px;justify-content:flex-start;padding:12px}.electrical-schematic{min-width:680px}.firmware-editor{min-height:430px}.firmware-filebar{flex-wrap:wrap}.firmware-filebar>span:nth-child(2){margin-right:0}.assistant-content{display:flex;flex-direction:column}.assistant-section-title{margin-top:8px}.electronics-canvas-caption{align-items:flex-start;flex-direction:column}.electronics-bom{padding:10px}}
+
+/* Scène 3D manipulable du montage physique */
+.circuit-scene-shell{position:relative;flex:1;height:465px;min-height:360px;overflow:hidden;background:#111416}
+.circuit-scene-host{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 43%,#202628,#111416 72%)}
+.circuit-webgl-canvas{display:block;width:100%;height:100%;outline:none;touch-action:none;cursor:grab}
+.circuit-webgl-canvas:active{cursor:grabbing}
+.circuit-scene-hint{position:absolute;top:14px;left:16px;padding:7px 9px;border:1px solid #353a3d;border-radius:5px;background:#171a1cdd;color:#aeb6b8;font-size:9px;pointer-events:none}
+.circuit-scene-controls{position:absolute;left:50%;bottom:15px;display:flex;align-items:center;gap:3px;padding:6px;border:1px solid #383e40;border-radius:10px;background:#17191beF;box-shadow:0 8px 24px #0008;transform:translateX(-50%)}
+.circuit-scene-controls button{display:flex;align-items:center;justify-content:center;gap:6px;min-width:32px;height:30px;padding:0 8px;border:0;border-radius:5px;background:transparent;color:#b5bbbd;font-size:9px;cursor:pointer}
+.circuit-scene-controls button:hover,.circuit-scene-controls button.is-active{background:#2a3031;color:#e0e6e4}
+.circuit-scene-controls button span{font-size:8px;letter-spacing:.04em}
+.circuit-scene-status{position:absolute;top:14px;right:15px;display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid #363d3d;border-radius:5px;background:#171a1cdd;color:#b1bfaf;font-size:8px}
+.circuit-scene-status i{width:6px;height:6px;border-radius:50%;background:#9fd083;box-shadow:0 0 7px #9fd08380}
+.circuit-scene-description{position:absolute;bottom:22px;left:16px;max-width:250px;margin:0;color:#8d9799;font-size:8px;line-height:1.45;pointer-events:none}
+.circuit-scene-error,.circuit-webgl-error,.circuit-scene-loading{display:grid;place-items:center;min-height:360px;padding:24px;background:#151819;color:#c4ccca;text-align:center;font-size:12px;line-height:1.6}
+.circuit-webgl-error{position:absolute;inset:0;min-height:0;background:#151819ee}
+.electronics-serial-panel{border-top:1px solid #303639;background:#171a1c;color:#cdd2d2}
+.electronics-serial-panel summary{display:flex;align-items:center;gap:9px;padding:9px 12px;cursor:pointer;list-style:none}
+.electronics-serial-panel summary::-webkit-details-marker{display:none}
+.electronics-serial-panel summary span{font-size:9px;font-weight:700}
+.electronics-serial-panel summary small{color:#8f999b;font-size:8px}
+.electronics-serial-panel summary b{margin-left:auto;color:#aeb9b4;font-size:8px;font-weight:500}
+.serial-log{display:grid;gap:0;max-height:106px;overflow:auto;padding:4px 12px 10px;border-top:1px solid #292e30;background:#121516}
+.serial-log code{padding:4px 0;color:#b8c1bf;font:9px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.serial-log i{display:inline-block;width:46px;color:#9ec28c;font-style:normal}
+.electronics-editor .breadboard-legend{margin-top:0}
+@media(max-width:740px){.circuit-scene-shell{height:355px;min-height:315px}.circuit-scene-hint{top:9px;left:8px;max-width:48%;font-size:8px}.circuit-scene-status{top:9px;right:8px;font-size:7px}.circuit-scene-controls{bottom:9px;gap:0;padding:4px}.circuit-scene-controls button{min-width:29px;height:28px;padding:0 6px}.circuit-scene-description{bottom:48px;left:9px;max-width:190px;font-size:7px}.electronics-serial-panel summary{gap:6px;padding:8px}.electronics-serial-panel summary small{max-width:48%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 .assistant-selected-part{margin:8px 0;padding:9px;border:1px solid #343b3f;border-radius:5px;background:#1d2123}.assistant-selected-part>div{display:flex;align-items:center;gap:6px;color:#c5dda9}.assistant-selected-part b{color:#e2e6e6;font-size:8px}.assistant-selected-part p{margin:7px 0;color:#9fa9ac;font-size:8px;line-height:1.5}.assistant-selected-part a{display:inline-flex;align-items:center;gap:4px;color:#bad59f;font-size:8px;text-decoration:none}
