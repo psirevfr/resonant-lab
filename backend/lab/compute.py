@@ -2,10 +2,10 @@
 import time
 from threading import Event
 import numpy as np
-from .schema import GenerateRequest,OptimizeRequest,CompactRequest
+from .schema import GenerateRequest,OptimizeRequest,CompactRequest,AnalyzeRequest
 
 ALGORITHM_VERSION='shared-python-v1'
-MODELS={'generate':GenerateRequest,'optimize':OptimizeRequest,'compact':CompactRequest}
+MODELS={'analyze':AnalyzeRequest,'generate':GenerateRequest,'optimize':OptimizeRequest,'compact':CompactRequest}
 
 
 def validate_input(kind,request,x,fs):
@@ -14,12 +14,12 @@ def validate_input(kind,request,x,fs):
     x=np.asarray(x,dtype=np.float64)
     if fs not in (44100,48000,96000) or x.ndim!=1 or len(x)<32 or x.nbytes>10_000_000 or not np.isfinite(x).all():
         raise ValueError('Sélection mono finie requise, taille maximale 10 Mo.')
-    duration=r.duration if kind=='generate' else r.patch.duration
+    duration=r.duration if kind in ('generate','analyze') else r.patch.duration
     # Generation historically uses the actual excerpt length after source-frame
     # rounding and resample_poly. Do not pad/crop it to a different waveform.
-    compatible=(abs(len(x)/fs-duration)<=1/8000+1/fs) if kind=='generate' else len(x)==round(duration*fs)
+    compatible=(abs(len(x)/fs-duration)<=1/8000+1/fs) if kind in ('generate','analyze') else len(x)==round(duration*fs)
     if duration>12 or not compatible:raise ValueError('Durée ou fréquence de la référence incompatible.')
-    if kind!='generate' and r.patch.sample_rate!=fs:raise ValueError('Fréquence du modèle incompatible.')
+    if kind not in ('generate','analyze') and r.patch.sample_rate!=fs:raise ValueError('Fréquence du modèle incompatible.')
     if kind=='optimize':
         from .optimization import validate_request
         validate_request(r)
@@ -31,7 +31,10 @@ def validate_input(kind,request,x,fs):
 
 def compute(kind,request,x,fs,progress=lambda _:None,cancel=None):
     begun=time.perf_counter();r,x=validate_input(kind,request,x,fs);validated=time.perf_counter()
-    if kind=='generate':
+    if kind=='analyze':
+        from .analysis import analyze
+        result=analyze(x,fs,r.max_partials)
+    elif kind=='generate':
         from .identify import generate
         result=generate(x,fs,r.max_partials,r.complexity_penalty,r.weights,r.refine_modes,r.include_impact,r.detailed)
     elif kind=='optimize':

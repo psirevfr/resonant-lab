@@ -4,7 +4,7 @@ export interface LocalUpdate {id:string;phase:'initializing'|'computing'|'progre
 let worker:Worker|null=null,active:string|null=null;
 export function disposeCompute(){worker?.terminate();worker=null;active=null}
 if(typeof window!=='undefined')window.addEventListener('pagehide',disposeCompute);
-export async function computeLocally(kind:JobKind,request:unknown,signal:AbortSignal,onUpdate:(value:LocalUpdate)=>void):Promise<unknown>{
+export async function computeLocally(kind:JobKind|'analyze',request:unknown,signal:AbortSignal,onUpdate:(value:LocalUpdate)=>void):Promise<unknown>{
  if(active)throw Error('Un calcul local est déjà actif.');
  const id=crypto.randomUUID();active=id;const begun=performance.now();
  try{
@@ -19,7 +19,7 @@ export async function computeLocally(kind:JobKind,request:unknown,signal:AbortSi
    function clear(){signal.removeEventListener('abort',abort);current.onmessage=null;current.onerror=null;active=null}
    const abort=()=>{clear();disposeCompute();reject(new DOMException('Calcul annulé','AbortError'))};
    signal.addEventListener('abort',abort,{once:true});
-   current.onerror=()=>{clear();disposeCompute();reject(Error('Le worker local a été interrompu. Relancez sur le serveur si nécessaire.'))};
+   current.onerror=()=>{clear();disposeCompute();reject(Error('Le worker local a été interrompu. Vérifiez le moteur local puis relancez.'))};
    current.onmessage=event=>{
     const message=event.data as LocalUpdate;if(message.id!==id)return;
     onUpdate(message);

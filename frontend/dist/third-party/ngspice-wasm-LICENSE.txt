@@ -1,0 +1,10 @@
+BSD-3-Clause License
+   
+   Copyright (c) 2026  Zero Red<github.com/zero-red-dev>  
+   [Full BSD-3 text...]
+   
+   ---
+   
+   This package includes a WebAssembly build of ngspice.
+   ngspice is licensed under multiple licenses (BSD-3-Clause, LGPL-2.1).
+   See COPYING for full license details and attribution requirements.

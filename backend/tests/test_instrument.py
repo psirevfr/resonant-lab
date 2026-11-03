@@ -64,7 +64,7 @@ def test_audio_routes_coexist_with_account_routes_and_require_auth():
     assert c.post('/api/instrument/prepare',json=p).status_code==200
     r=c.post('/api/instrument/note',json={'patch':p,'note':69,'reference_note':69})
     assert r.status_code==200 and r.content[:4]==b'RIFF'
-    assert c.post('/api/instrument/note',json={'patch':p,'note':109}).status_code==422
+    assert c.post('/api/instrument/note',json={'patch':p,'note':128}).status_code==422
     app.dependency_overrides.pop(require_user)
     app.dependency_overrides.pop(require_api_user)
     assert c.post('/api/instrument/prepare',json=p).status_code==401

@@ -16,4 +16,10 @@ for kind,params in [('output',{}),('modal',{'frequency':371,'phase':.7,'amplitud
  nodes.append(Block(id='out',type='output'));edges.append(link(parent,'out'))
  p=Patch(nodes=nodes,edges=edges,duration=.05)
  patches.append({'name':kind,'patch':p.model_dump(),'samples':render(p).tolist()})
-path=Path('frontend/tests/fixtures/dsp.json');path.parent.mkdir(exist_ok=True);path.write_text(json.dumps({'catalog':catalog(),'patches':patches}))
+from lab.instrument import transpose
+instrument_source=Patch(nodes=[Block(id='mode',type='modal',parameters={'frequency':440,'amplitude':.3,'phase':.1,'onset':.003,'attack':.002,'tau':.2}),Block(id='out',type='output')],edges=[link('mode','out')],duration=.05)
+instruments=[]
+for note in (0,69,81,127):
+    shifted,muted=transpose(instrument_source,note,69,100)
+    instruments.append({'source':instrument_source.model_dump(),'note':note,'samples':render(shifted).tolist(),'muted':muted})
+path=Path('frontend/tests/fixtures/dsp.json');path.parent.mkdir(exist_ok=True);path.write_text(json.dumps({'catalog':catalog(),'patches':patches,'instruments':instruments}))

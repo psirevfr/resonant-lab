@@ -1,6 +1,10 @@
-# Résonant — laboratoire de synthèse physique
+# Résonant — atelier Arduino et analyse du son
 
-Application locale fonctionnelle pour passer d’une **note WAV isolée** à un graphe de synthèse explicite, modifiable et exportable. Python identifie et optimise les modèles ; le navigateur exécute les blocs affichés dans un Web Worker et exporte le WAV localement. Aucune reconstruction neuronale, aucun échantillon original stocké dans les blocs, aucun score de confiance inventé.
+Deux espaces : **`/atelier`**, l’entrée principale pour créer un circuit sans WAV, et **`/analyse`**, pour passer d’une note isolée à un graphe de synthèse explicite, modifiable et exportable. Le menu ☰ permet de passer de l’un à l’autre en conservant les documents. L’atelier fournit des vues 2D/3D, des composants R/C/LED, le câblage et une simulation ngspice WebAssembly locale ; la compilation et l’exécution Arduino restent à implémenter.
+
+L’analyse, la génération, l’optimisation et la simplification utilisent Python/SciPy dans un Worker navigateur ; le choix de calcul serveur a été retiré. Le DSP et le WAV restent locaux. Sessions, import et préparation des références, validation et téléchargements protégés conservent leurs API : ce n’est pas une application entièrement hors ligne. Aucun LLM n’est requis.
+
+Voir [la livraison P0/P1 et le point de reprise](docs/REFONTE_ATELIER_2026-11-03.md) pour les tests, les limites et le contrôle de provenance/licences du moteur WASM à terminer avant publication.
 
 Cette version 0.1 couvre le parcours import → analyse → choix d’un modèle → synthèse → comparaison → modification → optimisation → export. C’est une base scientifique expérimentale, **pas un inverseur universel d’instruments** : le modèle physique réel n’est généralement pas identifiable de façon unique à partir d’un enregistrement.
 
@@ -28,13 +32,15 @@ Si `python3` désigne un ancien Python : `PYTHON_BIN=/chemin/vers/python3.12 ./s
 
 ## Parcours conseillé
 
+L’atelier s’ouvre par défaut : créer un montage vide, ouvrir un JSON ou essayer le diviseur et le RC. Les outils sont fermés au départ ; « Composants » ouvre la bibliothèque et « Simuler » lance le solveur local. Pour le parcours audio ci-dessous, choisir **Analyse du son** dans le menu ☰.
+
 1. Cliquer **Importer WAV** et choisir `../piano2.wav`, ou essayer la note modale intégrée.
 2. Définir le début et la durée de la note à analyser (maximum 12 secondes).
 3. **Analyser** : fondamentale estimée, partiels, enveloppe RMS, constante de décroissance de chaque mode, inharmonicité lorsque les critères sont satisfaits.
 4. **Générer le modèle** : le moteur compare plusieurs architectures et sélectionne le meilleur score erreur + complexité. Les autres candidats restent accessibles dans **Analyse & modèles**. Les réglages permettent de désactiver la recherche détaillée, l’affinage des modes ou le bruit d’impact pour comparer leur apport. La recherche détaillée est plus lente et peut créer plusieurs modes voisins pour un seul pic spectral.
 5. Le signal se calcule automatiquement. Écouter **A · Original** puis **B · Synthèse** ; les deux écoutent la même sélection mono et gardent la position lors du basculement. Le WAV d’origine stéréo reste intact côté serveur. Le mode **Aveugle** tire au sort l’identité de A et B ; ce n’est pas un protocole ABX statistique.
-6. Cliquer un bloc et changer ses paramètres. Le signal, le spectre et le spectrogramme sont recalculés localement après une courte temporisation. Les coûts scientifiques restent ceux de la dernière analyse ou optimisation serveur. Pour un filtre, le Bode et les coefficients affichés proviennent du même calcul que le traitement audio.
-7. Cocher les paramètres à optimiser dans l’inspecteur, ou laisser le choix par défaut, puis **Optimiser**. La progression rapporte les évaluations réelles. Une annulation arrête le calcul sans publier de résultat ; les résultats réussis sont retrouvables dans **Mon Lab → Mes calculs**.
+6. Cliquer un bloc et ouvrir **Propriétés** pour changer ses paramètres. Le signal, le spectre et le spectrogramme sont recalculés localement après une courte temporisation. Les coûts scientifiques restent ceux de la dernière analyse ou optimisation. Pour un filtre, le Bode et les coefficients affichés proviennent du même calcul que le traitement audio.
+7. Cocher les paramètres à optimiser dans l’inspecteur, ou laisser le choix par défaut, puis **Optimiser**. La progression rapporte les évaluations réelles. Une annulation termine le Worker local sans publier son résultat. Le document audio possède un brouillon navigateur ; les anciens résultats serveur réussis restent consultables dans **Mon Lab → Mes calculs**.
 8. Exporter le modèle en **JSON / `.monpatch`**, le son en **WAV float**, le schéma en **SVG/PNG**, les paramètres en **CSV**, ou le **rapport HTML autonome**. Un lien de téléchargement reste visible après chaque export ; les huit derniers exports sont conservés dans un cache local en mémoire de 64 Mo au maximum (32 Mo par fichier). Ouvrir le rapport et utiliser son bouton d’impression pour enregistrer un PDF.
 
 Le modèle automatique peut ne contenir aucun filtre : c’est normal. Une banque de modes suffit parfois et ajouter un filtre n’est alors pas justifié. Pour étudier un filtre, utiliser le patch manuel de départ, sélectionner un candidat filtré, ou ouvrir `examples/banc-lti.monpatch`.

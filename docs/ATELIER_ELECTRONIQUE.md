@@ -53,3 +53,24 @@ porter et à mesurer.
   le secteur ou une sortie d’amplificateur à la breadboard.
 - La scène 3D aide à comprendre l’agencement ; elle n’est pas un modèle CAO
   certifié et ne vérifie pas les collisions ni les tolérances mécaniques.
+
+## Simulateur RC expérimental
+
+Le sous-onglet **Simuler** fournit une première tranche séparée de l’instrument :
+un circuit RC à topologie fixe, avec source échelon de 5 V, R et C réglables.
+Le même projet versionné alimente son schéma 2D, sa représentation 3D sur
+breadboard, la netlist générée côté serveur et la trace d’oscilloscope.
+L’enregistrement/rechargement de cette maquette se fait dans `localStorage`.
+
+Le solveur est ngspice natif. La première validation utilise ngspice 47 local,
+et le point de terminaison reste fermé : le navigateur ne peut pas envoyer une
+netlist ou une commande SPICE arbitraire. La réponse du solveur affiche les
+tensions réellement calculées. Si ngspice n’est pas installé sur le serveur,
+l’API renvoie une indisponibilité ; elle ne substitue pas une courbe simulée.
+Cette dépendance n’est pas encore provisionnée par le déploiement.
+
+Ce circuit de démonstration ne correspond pas au patch audio ni à la breadboard
+de la Teensy. La topologie, les fils, la position des composants et la sonde
+restent fixes. La connexion entre un graphe Résonant complet et un circuit
+électrique fait partie d’un lot ultérieur. Les mesures du simulateur ne valident
+pas un montage physique.

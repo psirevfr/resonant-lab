@@ -29,6 +29,7 @@ from .graph import render,validate
 from .metrics import Objective
 from .transfer import describe,global_response
 from .optimization import run_optimization
+from .circuit_sim import RcProject,EngineUnavailable,simulate_rc
 from .export import graph_svg
 from .media import wav_response
 
@@ -56,6 +57,7 @@ api_router=APIRouter(dependencies=[Depends(require_api_user)])
 
 recordings=OrderedDict(); renders=OrderedDict(); downloads=OrderedDict(); lock=RLock()
 upload_guard=BoundedSemaphore(1)
+circuit_sim_guard=BoundedSemaphore(1)
 
 @app.exception_handler(ValueError)
 async def invalid(_,exc): return JSONResponse(status_code=422,content={'detail':str(exc)})
@@ -132,6 +134,18 @@ def segment(key:str,request:Request,start:float=0,duration:float=3,user:dict=Dep
 def analysis(req:AnalyzeRequest,user:dict=Depends(require_api_user)):
     rec=get_recording(req.audio_id,user["id"]); x=excerpt(rec,req.start,req.duration)
     return analyze(x,rec.sample_rate,req.max_partials)
+
+@api_router.post('/api/circuit/simulate')
+def simulate_electronics(req:RcProject,request:Request,user:dict=Depends(require_api_user)):
+    rate_limit(request,'circuit-simulation',subject=str(user['id']),limit=30,window=60)
+    if not circuit_sim_guard.acquire(blocking=False):
+        raise HTTPException(429,'Une simulation électronique est déjà en cours.',headers={'Retry-After':'2'})
+    try:
+        try:return simulate_rc(req)
+        except EngineUnavailable as exc:raise HTTPException(503,str(exc)) from exc
+        except RuntimeError as exc:raise HTTPException(422,str(exc)) from exc
+    finally:circuit_sim_guard.release()
+
 
 def submit(kind,req,request,user):
     data=req.model_dump();idem=request.headers.get('idempotency-key')
@@ -262,7 +276,7 @@ def local_compute_input(body:dict,user:dict=Depends(require_api_user)):
     kind=body.get('kind');data=body.get('request')
     if not isinstance(kind,str) or kind not in MODELS or not isinstance(data,dict):raise ValueError('Demande de calcul local invalide.')
     r=MODELS[kind].model_validate(data)
-    if kind=='generate':
+    if kind in ('generate','analyze'):
         rec=get_recording(r.audio_id,user['id']);fs=rec.sample_rate if rec.sample_rate in (44100,48000,96000) else 44100
         if r.start+r.duration>len(rec.samples)/rec.sample_rate+1/fs:raise ValueError('Sélection hors du WAV.')
         x=excerpt(rec,r.start,r.duration,fs)
@@ -468,6 +482,8 @@ def dashboard():return RedirectResponse('/mon-lab/',status_code=303)
 @app.get('/mon-lab')
 def mon_lab_redirect():return RedirectResponse('/mon-lab/',status_code=308)
 
+@app.get('/atelier',response_class=HTMLResponse)
+@app.get('/analyse',response_class=HTMLResponse)
 @app.get('/mon-lab/',response_class=HTMLResponse)
 def mon_lab(request:Request):
     if (DIST/'index.html').exists():

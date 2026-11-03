@@ -2,10 +2,11 @@ import {lazy,Suspense,useMemo,useState} from 'react';
 import {Activity,AlertTriangle,AudioWaveform,Box,Cable,Check,ChevronDown,Clipboard,Code2,Component,Cpu,Download,ExternalLink,FileCode2,Info,Plus,Search,Usb,Volume2} from 'lucide-react';
 import type {Analysis,Patch} from '../types';
 import {buildTeensySketch} from '../firmware/teensySketch';
+import {CircuitWorkbench} from './CircuitWorkbench';
 import type {CircuitPartId} from './CircuitScene3D';
 
 type PartId=CircuitPartId;
-type StudioView='circuit'|'schematic'|'firmware';
+type StudioView='circuit'|'schematic'|'firmware'|'simulation';
 type HardwarePart={id:PartId;category:string;qty:string;name:string;role:string;detail:string;link?:string};
 
 const CircuitScene3D=lazy(()=>import('./CircuitScene3D'));
@@ -53,7 +54,7 @@ export function ElectronicsStudio({patch,analysis,onExportFirmware,onExportBrief
 
  return <section className="electronics-studio" aria-label="Atelier matériel dérivé du patch">
   <div className="electronics-workspace-top">
-   <div className="electronics-workspace-switch"><span className="electronics-workspace-mark"><Activity size={15}/></span><button className="active">CONSTRUIRE</button><button onClick={()=>setView('firmware')}>FIRMWARE</button></div>
+   <div className="electronics-workspace-switch"><span className="electronics-workspace-mark"><Activity size={15}/></span><button className={view!=='firmware'?'active':''} onClick={()=>setView('circuit')}>CONSTRUIRE</button><button className={view==='simulation'?'active':''} onClick={()=>setView('simulation')}>SIMULER</button><button className={view==='firmware'?'active':''} onClick={()=>setView('firmware')}>FIRMWARE</button></div>
    <div className="electronics-project-title"><Box size={15}/><span>{patchName}</span><small>PATCH SYNCHRONISÉ</small></div>
    <div className="electronics-workspace-actions"><button onClick={onExportBrief}><Clipboard size={14}/> Brief</button><button className="firmware-download" onClick={onExportFirmware}><Download size={14}/> Code .ino</button></div>
   </div>
@@ -76,6 +77,7 @@ export function ElectronicsStudio({patch,analysis,onExportFirmware,onExportBrief
      <div className="editor-view-tabs" role="tablist" aria-label="Vues du montage">
       <button role="tab" aria-selected={view==='circuit'} className={view==='circuit'?'active':''} onClick={()=>setView('circuit')}><Box size={14}/> 3D Circuit</button>
       <button role="tab" aria-selected={view==='schematic'} className={view==='schematic'?'active':''} onClick={()=>setView('schematic')}><Cable size={14}/> Schéma</button>
+      <button role="tab" aria-selected={view==='simulation'} className={view==='simulation'?'active':''} onClick={()=>setView('simulation')}><Activity size={14}/> Simulation</button>
       <button role="tab" aria-selected={view==='firmware'} className={view==='firmware'?'active':''} onClick={()=>setView('firmware')}><Code2 size={14}/> Code Arduino</button>
      </div>
     </div>
@@ -87,6 +89,7 @@ export function ElectronicsStudio({patch,analysis,onExportFirmware,onExportBrief
      <details className="electronics-serial-panel"><summary><span>Console de conception</span><small>aperçu du câblage · aucune carte connectée</small><b>Ouvrir</b></summary><div className="serial-log"><code><i>USB MIDI</i> Clavier → USB Host Teensy 4.1</code><code><i>I²S / I²C</i> Teensy → Audio Shield Rev D2 · connexion empilée</code><code><i>AUDIO</i> Jack casque/ligne intégré · {firmware.partialCount} partiels dans le firmware</code></div></details>
     </>}
     {view==='schematic'&&<div className="schematic-viewport"><SchematicDrawing/></div>}
+    {view==='simulation'&&<CircuitWorkbench/>}
     {view==='firmware'&&<div className="firmware-editor">
      <div className="firmware-filebar"><span><FileCode2 size={15}/> resonant_teensy.ino</span><span>Teensy 4.1 · Audio · USBHost_t36</span><div><button onClick={()=>void navigator.clipboard?.writeText(firmware.code)}><Clipboard size={13}/> Copier</button><button className="firmware-download" onClick={onExportFirmware}><Download size={13}/> Télécharger</button></div></div>
      <pre aria-label="Sketch Arduino généré"><code>{firmware.code}</code></pre>

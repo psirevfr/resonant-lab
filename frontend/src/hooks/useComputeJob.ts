@@ -4,16 +4,16 @@ import {withDeadline} from '../requestDeadline';
 export type JobKind='generate'|'optimize'|'compact';
 export interface ComputeJob{id:string;kind:JobKind;status:'queued'|'running'|'succeeded'|'failed'|'cancelled';created:number;started:number|null;finished:number|null;progress:Record<string,unknown>;error:string|null;cancel_requested:boolean;queue_warning?:string|null;worker?:{available:boolean}}
 interface Submission{id?:string;kind:JobKind;key:string;request:unknown}
-export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,result:unknown)=>Promise<void>){
+export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,result:unknown)=>Promise<void>,readOnly=false){
  const [submission,setSubmission]=useState<Submission|null>(null),[job,setJob]=useState<ComputeJob|null>(null),[message,setMessage]=useState(''),[retry,setRetry]=useState(0),[trackingError,setTrackingError]=useState(false);
  const locked=useRef(false),callback=useRef(onResult);callback.current=onResult;
  const storage=owner===undefined?null:`resonant-job:${owner}`;
  function persist(value:Submission|null){if(!storage)return;try{if(value)localStorage.setItem(storage,JSON.stringify(value));else localStorage.removeItem(storage)}catch{/* Tracking still works in memory when storage is unavailable. */}}
  useEffect(()=>{
   setSubmission(null);setJob(null);setMessage('');setTrackingError(false);locked.current=false;
-  if(!storage)return;
+  if(!storage||readOnly)return;
   try{const saved=JSON.parse(localStorage.getItem(storage)||'null');if(saved&&['generate','optimize','compact'].includes(saved.kind)&&typeof saved.key==='string'){setSubmission(saved);locked.current=true}}catch{localStorage.removeItem(storage)}
- },[storage]);
+ },[storage,readOnly]);
  useEffect(()=>{
   if(!submission||!storage)return;
   let stopped=false,timer:ReturnType<typeof setTimeout>|undefined,failures=0;
@@ -52,10 +52,10 @@ export function useComputeJob(owner:number|undefined,onResult:(kind:JobKind,resu
   void follow();return()=>{stopped=true;controller.abort();if(timer)clearTimeout(timer)};
  },[submission,storage,retry]);
  function submit(kind:JobKind,request:unknown){
-  if(locked.current||!storage)return;locked.current=true;
+  if(readOnly||locked.current||!storage)return;locked.current=true;
   const value={kind,request,key:crypto.randomUUID()};persist(value);setJob(null);setMessage('Envoi de la demande…');setSubmission(value);
  }
- function resume(value:ComputeJob){if(locked.current)return;locked.current=true;const next={id:value.id,kind:value.kind,key:'resume',request:{}};persist(next);setSubmission(next);setJob(value)}
+ function resume(value:ComputeJob){if(locked.current||(readOnly&&value.status!=='succeeded'))return;locked.current=true;const next={id:value.id,kind:value.kind,key:'resume',request:{}};persist(next);setSubmission(next);setJob(value)}
  async function cancel(){if(job)await api('/jobs/'+job.id+'/cancel',{});setRetry(v=>v+1)}
  return {job,message,busy:!!submission,trackingError,submit,resume,cancel,retry:()=>setRetry(v=>v+1)};
 }

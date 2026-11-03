@@ -29,6 +29,6 @@ scope.onmessage=async event=>{
    const result=JSON.parse(await py.runPythonAsync('json.dumps(compute(__kind,json.loads(__request),np.asarray(__samples.to_py(),dtype=np.float64),__fs,lambda value: __progress(json.dumps(value))),allow_nan=False)'));
    scope.postMessage({id,phase:'result',result,metrics:{worker_compute_ms:performance.now()-begun,initialization_ms:cold?initialization_ms:0,source_sha256:manifest.source_sha256,runtime_version:manifest.runtime_version}});
   }finally{for(const key of ['__kind','__request','__samples','__fs','__progress'])py.globals.delete(key)}
- }catch{scope.postMessage({id,phase:'error',error:'Calcul local indisponible ou entrée incompatible. Vous pouvez relancer explicitement sur le serveur.'})}
+ }catch{scope.postMessage({id,phase:'error',error:'Calcul local indisponible ou entrée incompatible. Vérifiez le moteur local puis relancez.'})}
 };
 export {};

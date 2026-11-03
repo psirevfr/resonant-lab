@@ -69,8 +69,8 @@ class CompactRequest(RenderRequest):
 
 class InstrumentRequest(BaseModel):
     patch: Patch
-    note: int = Field(default=69,ge=21,le=108)
-    reference_note: int = Field(default=69,ge=21,le=108)
+    note: int = Field(default=69,ge=0,le=127)
+    reference_note: int = Field(default=69,ge=0,le=127)
     velocity: int = Field(default=127,ge=0,le=127)
     gate: float = Field(default=60,ge=0,le=60,allow_inf_nan=False)
     track_filters: bool = True
