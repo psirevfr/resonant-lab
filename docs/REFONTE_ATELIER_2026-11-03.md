@@ -1,5 +1,7 @@
 # Atelier principal et calcul sur l’appareil — livraison P0 et fondations P1
 
+> Mise à jour : la [livraison maquette et catalogue du 4 novembre](MAQUETTE_ET_CATALOGUE_2026-11-04.md) ajoute la platine 830, le déplacement direct, les propriétés compactes, le catalogue de 29 familles et le câblage par double-clic. Les descriptions de la breadboard 10 colonnes et du déplacement avec Maj ci-dessous décrivent la version initiale.
+
 Date : 3 novembre 2026. Travail local, sans déploiement ni modification de données de production. La mission globale P0–P3 reste en cours : cette livraison ne fournit pas encore un émulateur Arduino.
 
 ## État initial vérifié

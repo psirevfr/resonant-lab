@@ -1,6 +1,6 @@
 # Résonant — atelier Arduino et analyse du son
 
-Deux espaces : **`/atelier`**, l’entrée principale pour créer un circuit sans WAV, et **`/analyse`**, pour passer d’une note isolée à un graphe de synthèse explicite, modifiable et exportable. Le menu ☰ permet de passer de l’un à l’autre en conservant les documents. L’atelier fournit des vues 2D/3D, des composants R/C/LED, le câblage et une simulation ngspice WebAssembly locale ; la compilation et l’exécution Arduino restent à implémenter.
+Deux espaces : **`/atelier`**, l’entrée principale pour créer un circuit sans WAV, et **`/analyse`**, pour passer d’une note isolée à un graphe de synthèse explicite, modifiable et exportable. Le menu ☰ permet de passer de l’un à l’autre en conservant les documents. L’atelier fournit des vues 2D/3D, 29 familles de composants identifiés, le câblage par double-clic et une simulation ngspice WebAssembly locale ; la compilation et l’exécution Arduino restent à implémenter.
 
 L’analyse, la génération, l’optimisation et la simplification utilisent Python/SciPy dans un Worker navigateur ; le choix de calcul serveur a été retiré. Le DSP et le WAV restent locaux. Sessions, import et préparation des références, validation et téléchargements protégés conservent leurs API : ce n’est pas une application entièrement hors ligne. Aucun LLM n’est requis.
 
@@ -9,6 +9,8 @@ Voir [la livraison P0/P1 et le point de reprise](docs/REFONTE_ATELIER_2026-11-03
 Cette version 0.1 couvre le parcours import → analyse → choix d’un modèle → synthèse → comparaison → modification → optimisation → export. C’est une base scientifique expérimentale, **pas un inverseur universel d’instruments** : le modèle physique réel n’est généralement pas identifiable de façon unique à partir d’un enregistrement.
 
 Voir [le diagnostic des jobs et le calcul Python/WebAssembly](docs/CALCUL_LOCAL_ET_JOBS.md) pour la disponibilité du worker, le mode appareil, les mesures et la procédure de déploiement.
+
+La [livraison maquette et catalogue du 4 novembre](docs/MAQUETTE_ET_CATALOGUE_2026-11-04.md) détaille les composants réellement simulés, les limites, les tests et les références de matériel.
 
 ## Démarrage
 
@@ -32,7 +34,7 @@ Si `python3` désigne un ancien Python : `PYTHON_BIN=/chemin/vers/python3.12 ./s
 
 ## Parcours conseillé
 
-L’atelier s’ouvre par défaut : créer un montage vide, ouvrir un JSON ou essayer le diviseur et le RC. Les outils sont fermés au départ ; « Composants » ouvre la bibliothèque et « Simuler » lance le solveur local. Pour le parcours audio ci-dessous, choisir **Analyse du son** dans le menu ☰.
+L’atelier s’ouvre par défaut : créer un montage vide, ouvrir un JSON ou essayer le diviseur et le RC. Double-cliquer une broche amorce un câble ; cliquer la seconde le termine et Échap annule. Les outils sont fermés au départ ; « Composants » ouvre la bibliothèque et « Simuler » lance le solveur local. Pour le parcours audio ci-dessous, choisir **Analyse du son** dans le menu ☰.
 
 1. Cliquer **Importer WAV** et choisir `../piano2.wav`, ou essayer la note modale intégrée.
 2. Définir le début et la durée de la note à analyser (maximum 12 secondes).
@@ -133,7 +135,7 @@ La génération, l’optimisation et la simplification passent par une file SQLi
 - Les blocs disjoints de la sortie n’affectent pas l’audio. Pas de rétroaction dans les graphes v1.
 - La saturation tanh simple n’est pas suréchantillonnée ; la saturation asymétrique propose un suréchantillonnage ×4. Les exports WAV float préservent les dépassements de ±1 ; l’interface les signale pour l’écoute.
 - Les originaux et téléchargements temporaires restent en mémoire, mais les jobs et modèles calculés sont persistants en SQLite. Un redémarrage peut exiger de réimporter le WAV pour comparer. Le JSON contient le modèle, pas le WAV source.
-- Les curseurs sont interactifs et un clavier MIDI est disponible. L’onglet **Montage physique** présente un atelier de conception matériel avec maquette 3D, schéma, nomenclature et génération d’un sketch Arduino pour Teensy depuis les partiels analysés. Le sketch est encore un prototype : il ne porte pas tout le DSP, n’a pas encore été compilé ni testé sur une carte et ne promet pas une identité sonore. Le brief et le sketch peuvent être importés manuellement dans Tinkered; aucune transmission automatique n’est faite. Voir `docs/ATELIER_ELECTRONIQUE.md`. Il n’y a pas encore de montage multipiste, de circuit analogique exact, de modèle de corde couplée, de table d’harmonie ou de simulation FEM.
+- Les curseurs sont interactifs et un clavier MIDI est disponible. **Atelier Arduino** est un espace distinct, accessible sans WAV. L’action audio « Créer un montage à partir de ce modèle » conserve le graphe sélectionné complet et ouvre une proposition matérielle avec dossier de couverture. Le sketch Teensy reste un prototype : il ne porte pas tout le DSP, n’a pas encore été compilé ni testé sur une carte et ne promet pas une identité sonore. Le catalogue distingue les modèles réellement simulés des pièces visuelles ; aucun émulateur Arduino n’est encore intégré. Voir `docs/MAQUETTE_ET_CATALOGUE_2026-11-04.md`. Il n’y a pas encore de circuit analogique exact du piano, de modèle de corde couplée, de table d’harmonie ou de simulation FEM.
 
 ## Validation
 
