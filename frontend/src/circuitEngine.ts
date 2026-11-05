@@ -1,8 +1,9 @@
 import {contactGroup,pins,validateProject,type CircuitProject,type Pin} from './circuitProject';
 import {extraDefinition,setting} from './componentExtras';
+import {designators,displayReference} from './componentReference';
 export type CircuitTrace={engine:string;revision:number;time:number[];signals:Record<string,number[]>;labels:Record<string,string>;raw_points:number};
 export function compileCircuit(input:CircuitProject,excitation:'dc'|'step'='dc',duration=.005){
- const p=validateProject(input);if(!Number.isFinite(duration)||duration<1e-6||duration>.1)throw Error('Durée : 1 µs à 100 ms.');
+ const p=validateProject(input),references=designators(p);if(!Number.isFinite(duration)||duration<1e-6||duration>.1)throw Error('Durée : 1 µs à 100 ms.');
  const parent=new Map<string,string>();
  function root(k:string):string{if(!parent.has(k))parent.set(k,k);const r=parent.get(k)!;if(r!==k)parent.set(k,root(r));return parent.get(k)!}
  const union=(a:string,b:string)=>parent.set(root(a),root(b)),key=(e:Pin)=>e.component+':'+e.pin;
@@ -13,10 +14,10 @@ export function compileCircuit(input:CircuitProject,excitation:'dc'|'step'='dc',
  const touchedRoots=new Set([...touched].map(root)),nodes=new Map<string,string>([[root('ground'),'0']]),labels:Record<string,string>={},links=new Map<string,Set<string>>(),elements:string[]=[];let hasSource=false;
  const node=(id:string,pin:string,label:string)=>{const r=root(id+':'+pin);if(!nodes.has(r))nodes.set(r,'n'+nodes.size);const n=nodes.get(r)!;labels[n]=(labels[n]?labels[n]+' / ':'')+label+' · '+pin;return n};
  p.parts.forEach((part,index)=>{
-  if(['ground','breadboard','breadboard830','header'].includes(part.type))return;
+  if(['ground','breadboard','breadboard830','header','junction'].includes(part.type))return;
   const endpoints=pins(part),required=endpoints.filter(pin=>!(part.type==='potentiometer'&&pin==='W')&&!(part.type==='tmp36'&&pin==='OUT')&&!(part.type==='button'&&['1b','2b'].includes(pin))&&!(part.type==='opamp'&&['1','7'].includes(pin)));
   if(required.some(pin=>!touchedRoots.has(root(part.id+':'+pin))))throw Error('Raccordez toutes les broches de '+part.label+'.');
-  const ns=endpoints.map(pin=>node(part.id,pin,part.label)),n=Object.fromEntries(endpoints.map((pin,i)=>[pin,ns[i]])),[a,b]=ns;
+  const ns=endpoints.map(pin=>node(part.id,pin,displayReference(part,references))),n=Object.fromEntries(endpoints.map((pin,i)=>[pin,ns[i]])),[a,b]=ns;
   // Ground reachability is a structural diagnostic, not a claim that every
   // active-device input is a conducting resistor.
   for(const x of ns){if(!links.has(x))links.set(x,new Set());for(const y of ns)links.get(x)!.add(y)}

@@ -2,6 +2,8 @@
 
 Livraison locale des 3–4 novembre 2026. Complète la [refonte des espaces](REFONTE_ATELIER_2026-11-03.md). Aucun déploiement, push, changement de service, secret, compte ou base de production. La mission générale atelier/Arduino reste en cours.
 
+> La [livraison du 5 novembre](SCHEMA_LIE_2026-11-05.md) remplace les cartes 2D par des symboles électriques et ajoute le parcours schéma → implantation liée. Les capacités numériques et limites de composants décrites ci-dessous restent applicables.
+
 ## Résultat utilisable
 
 L’atelier propose maintenant **29 familles de composants**, une recherche et un filtre par catégorie. Le montage reste indépendant d’un import audio. Les composants possèdent des broches identifiées, un symbole, une géométrie originale et une indication explicite des capacités de simulation.

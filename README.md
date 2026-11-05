@@ -12,6 +12,8 @@ Voir [le diagnostic des jobs et le calcul Python/WebAssembly](docs/CALCUL_LOCAL_
 
 La [livraison maquette et catalogue du 4 novembre](docs/MAQUETTE_ET_CATALOGUE_2026-11-04.md) détaille les composants réellement simulés, les limites, les tests et les références de matériel.
 
+La [livraison schéma 2D et montage lié du 5 novembre](docs/SCHEMA_LIE_2026-11-05.md) décrit le câblage orthogonal, les jonctions, la conversion, les tests et les limites.
+
 ## Démarrage
 
 Les dépendances sont déjà installées dans ce dossier. Dans un terminal :
@@ -34,7 +36,7 @@ Si `python3` désigne un ancien Python : `PYTHON_BIN=/chemin/vers/python3.12 ./s
 
 ## Parcours conseillé
 
-L’atelier s’ouvre par défaut : créer un montage vide, ouvrir un JSON ou essayer le diviseur et le RC. Double-cliquer une broche amorce un câble ; cliquer la seconde le termine et Échap annule. Les outils sont fermés au départ ; « Composants » ouvre la bibliothèque et « Simuler » lance le solveur local. Pour le parcours audio ci-dessous, choisir **Analyse du son** dans le menu ☰.
+L’atelier s’ouvre en **Schéma 2D** : créer un circuit, ouvrir un JSON ou essayer le diviseur et le RC. Après simulation, **Créer le montage 3D** propose une implantation sur breadboard et vérifie les mêmes réseaux électriques. Les valeurs et composants restent liés entre les deux vues. Double-cliquer une broche amorce un câble ; cliquer la seconde le termine et Échap annule. Les outils sont fermés au départ ; « Composants » ouvre la bibliothèque et « Simuler » lance le solveur local. Pour le parcours audio ci-dessous, choisir **Analyse du son** dans le menu ☰.
 
 1. Cliquer **Importer WAV** et choisir `../piano2.wav`, ou essayer la note modale intégrée.
 2. Définir le début et la durée de la note à analyser (maximum 12 secondes).

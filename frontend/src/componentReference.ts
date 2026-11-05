@@ -1,0 +1,3 @@
+import {definitions,type CircuitProject,type Part} from './circuitProject';
+export function designators(p:CircuitProject){const counts=new Map<string,number>();return Object.fromEntries(p.parts.map(part=>{const prefix=({resistor:'R',potentiometer:'RV',capacitor:'C',electrolytic:'C',inductor:'L',voltage:'V',ground:'GND',led:'D',diode:'D',npn:'Q',nmos:'Q',opamp:'U',junction:'J',button:'SW',switch:'SW',header:'J',ldr:'R',ntc:'RT',tmp36:'U'} as Record<string,string>)[part.type]??'U';const n=(counts.get(prefix)??0)+1;counts.set(prefix,n);return [part.id,prefix==='GND'?'GND':prefix+n]}))}
+export function displayReference(part:Part,references:Record<string,string>){return part.label===definitions[part.type].name?(references[part.id]+' · '+part.label):part.label}
