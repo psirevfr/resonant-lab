@@ -13,6 +13,29 @@ from .identify import link
 def phase_wrap(value):return float((value+np.pi)%(2*np.pi)-np.pi)
 
 
+def first_envelope(patch,source):
+    """First exponential envelope on every downstream path, if unambiguous.
+
+    Transparent here means a known signal-processing stage, not a bypass:
+    its DSP still executes. Delays and other time controls have no inferred onset.
+    """
+    nodes={n.id:n for n in patch.nodes};memo={};visiting=set()
+    traversable={'sum','gain','lowpass','lowpass1','highpass','bandpass','notch','peak_eq','resonator','saturation','asymmetric_saturation'}
+    def walk(key):
+        if key in memo:return memo[key]
+        if key in visiting or key not in nodes:return {None}
+        node=nodes[key]
+        if node.type=='envelope':return {key}
+        if node.type not in traversable:return {None}
+        visiting.add(key)
+        children=[e.target for e in patch.edges if e.source==key]
+        found=set().union(*(walk(k) for k in children)) if children else {None}
+        visiting.remove(key);memo[key]=found;return found
+    children=[e.target for e in patch.edges if e.source==source]
+    found=set().union(*(walk(k) for k in children)) if children else {None}
+    return nodes[next(iter(found))] if len(found)==1 and None not in found else None
+
+
 def expand_modes(patch):
     validate(patch)
     if physical_count(patch)>128:raise ValueError("Dépliage limité à 128 modules ; simplifiez le modèle avant.")
@@ -103,15 +126,10 @@ def transpose(patch,note,reference_note,velocity=127,gate=60,track_filters=True)
             if new>=min(47000,p.sample_rate*.49):
                 if n.type=='oscillator':v['amplitude']=0;muted.append(n.id)
                 new=min(47000,p.sample_rate*.49)
+            new=max(1,new)
             if n.type=='oscillator':
-                targets={e.target for e in p.edges if e.source==n.id}
-                for _ in p.nodes:
-                    sums={a.id for a in p.nodes if a.type=='sum' and a.id in targets}
-                    more={e.target for e in p.edges if e.source in sums}
-                    if more<=targets:break
-                    targets|=more
-                envs=[a for a in p.nodes if a.type=='envelope' and a.id in targets]
-                onset=parameters('envelope',envs[0].parameters,p.sample_rate)['onset'] if len(envs)==1 else 0
+                env=first_envelope(p,n.id)
+                onset=parameters('envelope',env.parameters,p.sample_rate)['onset'] if env else 0
                 v['phase']=phase_wrap(v['phase']-2*np.pi*(new-old)*onset)
             v['frequency']=float(max(1,new))
         if track_filters and 'fc' in v and n.id not in noise_path:

@@ -13,7 +13,7 @@ from .metrics import Objective
 from .identify import modal_patch, link, complexity
 from .attack_fit import calibrate_attack
 from .instrument import collapse_modes,physical_count
-from .texture import band_errors,fit_texture
+from .texture import band_errors
 
 
 def tidy(patch):
@@ -127,14 +127,26 @@ def validate_simplification(patch,tolerance=.2):
     if patch.duration>12:raise ValueError('Simplification limitée à 12 secondes.')
     folded=collapse_modes(patch)
     modes=[n.model_copy(deep=True) for n in folded.nodes if n.type=='modal']
-    if not modes:raise ValueError('Générez un modèle modal avant de le simplifier.')
+    if not modes:
+        # A saved shared-excitation candidate is still simplifiable. Derive
+        # search seeds only; never replace its actual graph/baseline by these.
+        from .instrument import first_envelope,phase_wrap
+        active=set(validate(folded)[3])
+        for node in folded.nodes:
+            if node.type!='oscillator' or node.id not in active:continue
+            env=first_envelope(folded,node.id)
+            if env is None:continue
+            v=parameters('oscillator',node.parameters,patch.sample_rate)
+            w=parameters('envelope',env.parameters,patch.sample_rate)
+            modes.append(Block(id=node.id,type='modal',parameters={**v,**w,'phase':phase_wrap(v['phase']+2*np.pi*v['frequency']*w['onset'])}))
+    if not modes:raise ValueError('La simplification nécessite des oscillateurs avec une enveloppe exponentielle identifiable, ou un modèle modal.')
     for n in modes:n.parameters=parameters(n.type,n.parameters,patch.sample_rate)
     if any(n.parameters['onset']!=modes[0].parameters['onset'] or n.parameters['attack']!=modes[0].parameters['attack'] for n in modes):
         raise ValueError('Cette simplification exige un début et une attaque communs aux modes.')
     return folded,modes
 
 
-def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=False):
+def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=False,test_noise=True):
     folded,modes=validate_simplification(patch,tolerance)
     if len(x)!=round(patch.duration*patch.sample_rate):raise ValueError("Longueur de référence incompatible avec le modèle.")
     original=patch.model_copy(deep=True);objective=Objective(x,patch.sample_rate,weights)
@@ -192,11 +204,16 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
         for p in shortlist:
             shaped=shaping(p,objective)
             if shaped is not None:add(shaped)
-    if protect_texture:
-        texture_sources=shortlist+[p for p in global_candidates if sum(n.type=='modal' for n in p.nodes)<=3] if test_shaping else shortlist
-        for p in sorted(texture_sources,key=lambda q:objective(render(q)))[:4]:
-            textured=fit_texture(p,x,objective)
-            if textured is not None:add(textured)
+    texture_diagnostics=[]
+    if test_noise:
+        from .texture import search_texture
+        # Protecting bands is an acceptance rule, independent of trying noise.
+        seeds=sorted(proposals,key=lambda q:objective(render(q)))[:1]
+        nonlinear=sorted(global_candidates,key=lambda q:objective(render(q)))[:1] if test_shaping else []
+        for p in seeds+nonlinear:
+            textured,info=search_texture(p,x,objective)
+            texture_diagnostics.extend(info)
+            for q in textured:add(q)
     # Test a residual impact only when the reference actually has that branch.
     if any(n.type=='noise' for n in original.nodes):
         from .impact import fit_impact
@@ -257,4 +274,4 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
         else:continue
         delta=objective(render(ablated))-chosen['errors']['total']
         utilities.append({'block_id':node.id,'label':node.label or node.type,'error_increase_without':float(delta)})
-    return {'patch':chosen_patch.model_dump(),'original':original.model_dump(),'candidates':candidates,'baseline':baseline,'limit':limit,'tolerance':tolerance,'final':chosen['errors']['total'],'original_blocks':physical_count(original),'final_blocks':physical_count(chosen_patch),'original_generators':sum(REGISTRY[n.type].inputs==0 for n in original.nodes),'final_generators':chosen['generators'],'reverted':chosen['reference'],'utilities':utilities,'shaping_tested':test_shaping,'processing_diagnostics':processing_diagnostics,'reference_bands':reference_bands,'final_bands':chosen['bands'],'protect_texture':protect_texture,'selection':'Minimum de blocs sous la limite d’erreur acceptée ; à égalité, moins de paramètres puis erreur minimale. Version initiale conservée. Utilité : hausse de coût en coupant une source, sans réajuster les autres.'}
+    return {'patch':chosen_patch.model_dump(),'original':original.model_dump(),'candidates':candidates,'baseline':baseline,'limit':limit,'tolerance':tolerance,'final':chosen['errors']['total'],'original_blocks':physical_count(original),'final_blocks':physical_count(chosen_patch),'original_generators':sum(REGISTRY[n.type].inputs==0 for n in original.nodes),'final_generators':chosen['generators'],'reverted':chosen['reference'],'utilities':utilities,'shaping_tested':test_shaping,'processing_diagnostics':processing_diagnostics,'texture_diagnostics':texture_diagnostics,'noise_tested':test_noise,'reference_bands':reference_bands,'final_bands':chosen['bands'],'protect_texture':protect_texture,'selection':'Minimum de blocs sous la limite d’erreur acceptée ; à égalité, moins de paramètres puis erreur minimale. Version initiale conservée. Utilité : hausse de coût en coupant une source, sans réajuster les autres.'}

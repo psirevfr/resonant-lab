@@ -4,7 +4,7 @@ from threading import Event
 import numpy as np
 from .schema import GenerateRequest,OptimizeRequest,CompactRequest,AnalyzeRequest
 
-ALGORITHM_VERSION='shared-python-v1'
+ALGORITHM_VERSION='shared-python-v2-sobriety'
 MODELS={'analyze':AnalyzeRequest,'generate':GenerateRequest,'optimize':OptimizeRequest,'compact':CompactRequest}
 
 
@@ -42,7 +42,7 @@ def compute(kind,request,x,fs,progress=lambda _:None,cancel=None):
         result=run_optimization(r,x,progress,cancel or Event())
     else:
         from .compact import simplify
-        result=simplify(r.patch,x,r.weights,r.tolerance,r.test_shaping,r.protect_texture)
+        result=simplify(r.patch,x,r.weights,r.tolerance,r.test_shaping,r.protect_texture,test_noise=r.test_noise)
     # Same JSON contract; additional performance metadata is independent of objective.
     result['compute_metrics']={'algorithm_version':ALGORITHM_VERSION,'validation_ms':(validated-begun)*1000,'algorithm_ms':(time.perf_counter()-validated)*1000}
     return result

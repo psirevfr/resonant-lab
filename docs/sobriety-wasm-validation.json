@@ -1,0 +1,50 @@
+{
+  "environment": "Node + Pyodide, pas un appareil physique",
+  "initialization_ms": 5823.372833,
+  "tolerances": {
+    "wave_max": 1e-7,
+    "wave_rms": 1e-7,
+    "objective_abs": 1e-8
+  },
+  "cases": {
+    "nonlinear-bank": {
+      "wave_max": 5.270228697895618e-13,
+      "wave_rms": 3.290435909387513e-13,
+      "objective_abs": 8.633375025977236e-13,
+      "types": [
+        "oscillator",
+        "output",
+        "asymmetric_saturation",
+        "lowpass1",
+        "envelope"
+      ],
+      "blocks": 5,
+      "generators": 1,
+      "algorithm_version": "shared-python-v2-sobriety",
+      "compute_ms": 26084.220917,
+      "passed": true
+    },
+    "reloaded-shared": {
+      "wave_max": 1.6653345369377348e-16,
+      "wave_rms": 6.006595978214674e-17,
+      "objective_abs": 4.030322713543978e-16,
+      "types": [
+        "oscillator",
+        "output",
+        "asymmetric_saturation",
+        "lowpass1",
+        "envelope"
+      ],
+      "blocks": 5,
+      "generators": 1,
+      "algorithm_version": "shared-python-v2-sobriety",
+      "compute_ms": 169.7044590000005,
+      "passed": true
+    }
+  },
+  "versions": {
+    "python": "3.14.2",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  }
+}

@@ -36,7 +36,7 @@ export function Rack({patch,catalog,onSelect,selected,disabled,onParameter}:{pat
   update();const observer=new ResizeObserver(update);observer.observe(element);
   return()=>observer.disconnect();
  },[patch,activeFocus,allCables]);
- const names=Object.fromEntries(patch.nodes.map(n=>[n.id,n.label||catalog[n.type]?.label||n.type]));
+ const names=Object.fromEntries(patch.nodes.map(n=>[n.id,(catalog[n.type]?.label||n.type)+' · '+n.id]));
  function port(e:Patch['edges'][number],direction:'in'|'out'){
   const other=direction==='in'?e.source:e.target,i=patch.edges.indexOf(e);
   return <button key={e.id} ref={el=>{if(el)ports.current.set(e.id+':'+direction,el);else ports.current.delete(e.id+':'+direction)}} title={`Câble ${i+1} : ${e.source} → ${e.target}`} onClick={ev=>{ev.stopPropagation();setFocus(other);onSelect(other)}}><i style={{borderColor:cableColors[i%cableColors.length]}}/><span><small>#{i+1}</small> {names[other]}</span></button>;
@@ -45,7 +45,7 @@ export function Rack({patch,catalog,onSelect,selected,disabled,onParameter}:{pat
  <svg className="rack-wires" aria-hidden="true">{wires.map(w=><g key={w.id}><path d={w.path} stroke="#0b121a" strokeWidth="5"/><path d={w.path} stroke={w.color} strokeWidth="2.2"/></g>)}</svg>
  {ordered.map((b,i)=>{const d=catalog[b.type];if(!d)return null;const related=allCables||!activeFocus||b.id===activeFocus||patch.edges.some(e=>e.source===activeFocus&&e.target===b.id||e.target===activeFocus&&e.source===b.id);
  return <article key={b.id} className={`rack-module ${b.id===selected?'selected':''} ${related?'':'dimmed'} kind-${d.category}`} onClick={()=>{setFocus(b.id);onSelect(b.id)}}>
- <div className="rack-screws"><i/><small>{String(i+1).padStart(2,'0')} · {d.category}</small><i/></div><h3>{b.label||d.label}</h3><div className="rack-model">{d.label} <code>{b.id}</code></div>
+ <div className="rack-screws"><i/><small>{String(i+1).padStart(2,'0')} · {d.category}</small><i/></div><h3>{d.label}</h3><div className="rack-model">{b.label&&b.label!==d.label?b.label:''} <code>{b.id}</code></div>
  <div className="rack-parameters">{Object.entries(d.parameters).map(([key,p])=>{
  const value=b.parameters[key]??p.default,max=['frequency','fc'].includes(key)?Math.min(p.maximum,patch.sample_rate*.499):p.maximum;
  const ratio=p.minimum>0&&max/p.minimum>100?Math.log(Math.max(p.minimum,value)/p.minimum)/Math.log(max/p.minimum):(value-p.minimum)/(max-p.minimum);

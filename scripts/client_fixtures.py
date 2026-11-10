@@ -22,4 +22,11 @@ instruments=[]
 for note in (0,69,81,127):
     shifted,muted=transpose(instrument_source,note,69,100)
     instruments.append({'source':instrument_source.model_dump(),'note':note,'samples':render(shifted).tolist(),'muted':muted})
+# A shared envelope behind saturation/filtering must anchor the same onset
+# in Python and browser transposition, including after saving/reloading.
+from lab.nonlinear_fit import architecture
+shared_source=architecture(instrument_source,'excitation-partagee')
+for note in (0,69,81,127):
+    shifted,muted=transpose(shared_source,note,69,100)
+    instruments.append({'source':shared_source.model_dump(),'note':note,'samples':render(shifted).tolist(),'muted':muted})
 path=Path('frontend/tests/fixtures/dsp.json');path.parent.mkdir(exist_ok=True);path.write_text(json.dumps({'catalog':catalog(),'patches':patches,'instruments':instruments}))

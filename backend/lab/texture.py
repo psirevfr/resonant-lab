@@ -50,3 +50,61 @@ def fit_texture(base,x,objective):
     p.nodes.append(Block(id='texture-mix',type='sum',label='Tonal + texture'))
     p.edges.extend([link(parent,'texture-mix'),link(chain[-1][0],'texture-mix'),link('texture-mix',out)])
     p.name+=' · texture filtrée';return p
+
+
+def search_texture(base,x,objective):
+    """Try explicit noise branches without a redundant fixed-gain block.
+
+    Source amplitude is its standard deviation, not a hidden amplifier. A real
+    noise generator/amplifier still needs a separate electrical design.
+    """
+    fs=base.sample_rate;n=len(x);tonal=render(base);residual=x-tonal
+    if np.linalg.norm(residual)<=max(np.linalg.norm(x),1e-12)*1e-9:return [],[]
+    onset=min((b.parameters.get('onset',0) for b in base.nodes if b.type in ('modal','envelope')),default=0)
+    noise=process('noise',{'amplitude':1,'seed':42},[],fs,n)
+    baseline=objective(tonal)+.08*sum(band_errors(x,tonal,fs).values())
+    families={}
+    def trial(name,filters):
+        filtered=noise;target=residual
+        for kind,params in filters:
+            filtered=process(kind,params,[filtered],fs,n)
+            target=process(kind,params,[target],fs,n)
+        for tau in (.025,.12,.5):
+            burst=process('envelope',{'attack':.001,'tau':tau,'onset':onset},[filtered],fs,n)
+            scale=min(4,float(np.linalg.norm(target)/max(np.linalg.norm(burst),1e-12)))
+            for fraction in (.35,.7,1):
+                amp=scale*fraction
+                if amp<1e-9:continue
+                y=tonal+amp*burst
+                score=objective(y)+.08*sum(band_errors(x,y,fs).values())
+                if score<baseline and (name not in families or score<families[name][0]):
+                    families[name]=(score,filters,tau,amp)
+    for hp in (600,2200,6000):
+        if hp>=fs*.45:continue
+        trial('Bruit blanc → passe-haut → enveloppe',[('highpass',{'fc':hp,'q':.707})])
+        for lp in (6000,min(18000,fs*.45)):
+            if lp<=hp:continue
+            fc=float(np.sqrt(hp*lp));q=max(.1,fc/(lp-hp))
+            trial('Bruit blanc → passe-bande → enveloppe',[('bandpass',{'fc':fc,'q':q})])
+            trial('Bruit blanc → passe-haut → passe-bas → enveloppe',[('highpass',{'fc':hp,'q':.707}),('lowpass',{'fc':lp,'q':.707})])
+    candidates=[];diagnostics=[]
+    for name,(_,filters,tau,amp) in families.items():
+        p=base.model_copy(deep=True);used={b.id for b in p.nodes};stem='residual'
+        while any(k.startswith(stem+'-') for k in used):stem+='x'
+        chain=[(stem+'-noise','noise',{'amplitude':amp,'seed':42},'Bruit blanc')]
+        chain.extend((f'{stem}-filter-{i}',kind,params,{'highpass':'Passe-haut','lowpass':'Passe-bas','bandpass':'Passe-bande'}[kind]) for i,(kind,params) in enumerate(filters))
+        chain.append((stem+'-envelope','envelope',{'attack':.001,'tau':tau,'onset':onset},'Enveloppe exponentielle / VCA'))
+        for i,(nid,kind,params,label) in enumerate(chain):
+            p.nodes.append(Block(id=nid,type=kind,parameters=params,label=label,position={'x':i*240,'y':800},reason='Branche de bruit résiduel réellement exécutée. Le niveau est réglé par l’amplitude explicite de la source ; aucun gain ni oscillateur dissimulé. Ne remplace pas des partiels stables sans validation du coût et des bandes.'))
+            if i:p.edges.append(link(chain[i-1][0],nid))
+        out=next(b.id for b in p.nodes if b.type=='output');parent=next(e.source for e in p.edges if e.target==out)
+        if next(b.type for b in p.nodes if b.id==parent)=='sum':
+            p.edges.append(link(chain[-1][0],parent))
+        else:
+            mix=stem+'-sum';p.nodes.append(Block(id=mix,type='sum',label='Somme : tonal + bruit filtré',position={'x':1200,'y':350}))
+            p.edges=[e for e in p.edges if e.target!=out]
+            p.edges.extend([link(parent,mix),link(chain[-1][0],mix),link(mix,out)])
+        p.name=(base.name+' · bruit filtré')[:200]
+        from .instrument import physical_count
+        candidates.append(p);diagnostics.append({'architecture':name,'sources':sum(b.type in ('modal','oscillator','noise') for b in p.nodes),'blocks':physical_count(p),'full_rate_error':objective(render(p)),'analysis_rate':fs,'noise_seed':42})
+    return candidates,diagnostics

@@ -50,7 +50,7 @@ def test_architectures_execute_serialize_and_fit_jointly():
     fitted,info=fit_architecture(p,target,Weights(),budget=35)
     assert np.isfinite(Objective(target,p.sample_rate,Weights())(render(fitted)))
     candidates,diagnostics=search([base],target,Weights(),Objective(target,p.sample_rate,Weights()),budget=35)
-    assert len(candidates)==3
+    assert len(candidates)==5
     for q,d in zip(candidates,diagnostics):
         assert d['full_rate_error']==pytest.approx(Objective(target,p.sample_rate,Weights())(render(q)))
         assert d['full_rate_error']<=d['seed_error']+1e-12

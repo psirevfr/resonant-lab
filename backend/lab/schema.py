@@ -66,6 +66,7 @@ class CompactRequest(RenderRequest):
     tolerance: float = Field(default=.2, ge=0, le=1, allow_inf_nan=False)
     test_shaping: bool = True
     protect_texture: bool = False
+    test_noise: bool = True
 
 class InstrumentRequest(BaseModel):
     patch: Patch

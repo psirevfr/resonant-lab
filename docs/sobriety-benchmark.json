@@ -1,0 +1,379 @@
+{
+  "measurement_date": "2026-11-05",
+  "baseline_commit": "1785be9",
+  "before": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "repetitions": 3,
+    "weights": {
+      "time": 0.1,
+      "spectral": 0.25,
+      "spectrogram": 0.5,
+      "envelope": 0.15,
+      "attack": 0.25
+    },
+    "tolerance": 0.2,
+    "protect_texture": true,
+    "test_shaping": true,
+    "test_noise": true,
+    "cases": {
+      "saturation-enveloppe-connue": {
+        "duration": 0.25,
+        "sample_rate": 44100,
+        "input_sha256": "dbba2016bda69024dabce40459c0f0cf7ec0bf96d39831e5b17778aff615f6d2",
+        "model_sha256": "806909cd04ed459c39d2b51c90d4e54475b8b96d2b9466129462e58db1ef7500",
+        "seconds": [
+          6.337855916994158,
+          6.622424083005171,
+          6.1352317910059355
+        ],
+        "render_seconds": [
+          0.0005140420398674905,
+          0.000502374954521656,
+          0.0004997090436518192,
+          0.0005078749964013696,
+          0.0005192090175114572
+        ],
+        "initial_blocks": 18,
+        "final_blocks": 8,
+        "generators": 4,
+        "baseline": 0.00038356822062731116,
+        "error": 0.00038356842219326536,
+        "limit": 0.0004602818657527734,
+        "bands": {
+          "grave": 1.7918788929571654e-08,
+          "medium": 3.6958286893823386e-07,
+          "presence": 0.1548033754301296,
+          "aigu": 1.6754156290653555e-06
+        },
+        "patch_types": [
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "sum",
+          "output",
+          "sum",
+          "envelope"
+        ],
+        "accepted": true
+      },
+      "banque-harmonique-exacte": {
+        "duration": 0.25,
+        "sample_rate": 44100,
+        "input_sha256": "5aa83a92cf1a746c07f2b40f697d968913fb9acfea2b80672f31419c10eead24",
+        "model_sha256": "d95532894e0ed74cfd97743d8f294331d417c8d6547c0558ba48964cda89b5c2",
+        "seconds": [
+          6.085965749982279,
+          6.126936666027177,
+          6.179556875023991
+        ],
+        "render_seconds": [
+          0.000807874952442944,
+          0.00078037497587502,
+          0.0007780420128256083,
+          0.000782207993324846,
+          0.0007994589977897704
+        ],
+        "initial_blocks": 18,
+        "final_blocks": 12,
+        "generators": 8,
+        "baseline": 0.0,
+        "error": 2.8257144630330226e-16,
+        "limit": 1e-12,
+        "bands": {
+          "grave": 1.6178805067541624e-16,
+          "medium": 2.1319970758919667e-16,
+          "presence": 6.263069698551914e-16,
+          "aigu": 6.145921008226779e-14
+        },
+        "patch_types": [
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "sum",
+          "output",
+          "sum",
+          "envelope"
+        ],
+        "accepted": true
+      },
+      "piano": {
+        "duration": 0.35,
+        "sample_rate": 48000,
+        "input_sha256": "368c6027897c8896d7f841f5980a7381bb0bd4f36be473915cbbc24d2f0242ae",
+        "model_sha256": "f13bbab15fe037be87bb905fccd93d2542cc7c2e2566a81f2335a8ae33f44c9a",
+        "seconds": [
+          7.409807834017556,
+          7.422454832994845,
+          7.733745333040133
+        ],
+        "render_seconds": [
+          0.0012931670062243938,
+          0.0012774579809047282,
+          0.0012808329774998128,
+          0.001286083017475903,
+          0.0012687499984167516
+        ],
+        "initial_blocks": 18,
+        "final_blocks": 12,
+        "generators": 5,
+        "baseline": 0.35754134521463693,
+        "error": 0.3591039930172105,
+        "limit": 0.4290496142585643,
+        "bands": {
+          "grave": 0.4505488107369181,
+          "medium": 0.12480214713500426,
+          "presence": 0.998449709738579,
+          "aigu": 0.32655052338180696
+        },
+        "patch_types": [
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "sum",
+          "output"
+        ],
+        "accepted": true
+      },
+      "piano2": {
+        "duration": 0.35,
+        "sample_rate": 48000,
+        "input_sha256": "9af0a1378a72c2de697a0833bed363177520ff639af3253790dbf847f495c3c4",
+        "model_sha256": "67139815329d0c92cfd801ac2f8b59f3fd98966d6daf4687c9aa2b4ef4dc45c1",
+        "seconds": [
+          8.549857750011142,
+          8.358273207966704,
+          8.426510290999431
+        ],
+        "render_seconds": [
+          0.0017477499786764383,
+          0.001745999965351075,
+          0.001814124989323318,
+          0.0017416669870726764,
+          0.0017792920116335154
+        ],
+        "initial_blocks": 26,
+        "final_blocks": 16,
+        "generators": 7,
+        "baseline": 0.12835575112180955,
+        "error": 0.13446667297449483,
+        "limit": 0.15402690134717145,
+        "bands": {
+          "grave": 0.13904005620525134,
+          "medium": 0.09779402916245936,
+          "presence": 0.7721246925242381,
+          "aigu": 0.15438587138706641
+        },
+        "patch_types": [
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "sum",
+          "output"
+        ],
+        "accepted": true
+      }
+    }
+  },
+  "after": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "repetitions": 3,
+    "weights": {
+      "time": 0.1,
+      "spectral": 0.25,
+      "spectrogram": 0.5,
+      "envelope": 0.15,
+      "attack": 0.25
+    },
+    "tolerance": 0.2,
+    "protect_texture": true,
+    "test_shaping": true,
+    "test_noise": true,
+    "cases": {
+      "saturation-enveloppe-connue": {
+        "duration": 0.25,
+        "sample_rate": 44100,
+        "input_sha256": "dbba2016bda69024dabce40459c0f0cf7ec0bf96d39831e5b17778aff615f6d2",
+        "model_sha256": "806909cd04ed459c39d2b51c90d4e54475b8b96d2b9466129462e58db1ef7500",
+        "seconds": [
+          11.673386915994342,
+          10.560493875003885,
+          10.435704042029101
+        ],
+        "render_seconds": [
+          0.0023473749752156436,
+          0.002184125012718141,
+          0.002663708000909537,
+          0.002651875023730099,
+          0.0022205000277608633
+        ],
+        "initial_blocks": 18,
+        "final_blocks": 5,
+        "generators": 1,
+        "baseline": 0.00038356822062731116,
+        "error": 1.0036291729174078e-07,
+        "limit": 0.0004602818657527734,
+        "bands": {
+          "grave": 6.799000246028395e-08,
+          "medium": 4.660199149145286e-07,
+          "presence": 1.288941654072905e-06,
+          "aigu": 1.7011129333567235e-11
+        },
+        "patch_types": [
+          "oscillator",
+          "output",
+          "asymmetric_saturation",
+          "lowpass1",
+          "envelope"
+        ],
+        "accepted": true
+      },
+      "banque-harmonique-exacte": {
+        "duration": 0.25,
+        "sample_rate": 44100,
+        "input_sha256": "5aa83a92cf1a746c07f2b40f697d968913fb9acfea2b80672f31419c10eead24",
+        "model_sha256": "d95532894e0ed74cfd97743d8f294331d417c8d6547c0558ba48964cda89b5c2",
+        "seconds": [
+          11.525545125012286,
+          12.550048291974235,
+          11.94985583302332
+        ],
+        "render_seconds": [
+          0.0008765830425545573,
+          0.0008931669872254133,
+          0.0011210829834453762,
+          0.0009507090435363352,
+          0.0008345840033143759
+        ],
+        "initial_blocks": 18,
+        "final_blocks": 12,
+        "generators": 8,
+        "baseline": 0.0,
+        "error": 2.8257144630330226e-16,
+        "limit": 1e-12,
+        "bands": {
+          "grave": 1.6178805067541624e-16,
+          "medium": 2.1319970758919667e-16,
+          "presence": 6.263069698551914e-16,
+          "aigu": 6.145921008226779e-14
+        },
+        "patch_types": [
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "oscillator",
+          "sum",
+          "output",
+          "sum",
+          "envelope"
+        ],
+        "accepted": true
+      },
+      "piano": {
+        "duration": 0.35,
+        "sample_rate": 48000,
+        "input_sha256": "368c6027897c8896d7f841f5980a7381bb0bd4f36be473915cbbc24d2f0242ae",
+        "model_sha256": "f13bbab15fe037be87bb905fccd93d2542cc7c2e2566a81f2335a8ae33f44c9a",
+        "seconds": [
+          15.03532979101874,
+          15.006028625008184,
+          14.62391020799987
+        ],
+        "render_seconds": [
+          0.0013589170412160456,
+          0.0013059169868938625,
+          0.0012958330335095525,
+          0.0013243330176919699,
+          0.0012846249737776816
+        ],
+        "initial_blocks": 18,
+        "final_blocks": 12,
+        "generators": 5,
+        "baseline": 0.35754134521463693,
+        "error": 0.3591039930172105,
+        "limit": 0.4290496142585643,
+        "bands": {
+          "grave": 0.4505488107369181,
+          "medium": 0.12480214713500426,
+          "presence": 0.998449709738579,
+          "aigu": 0.32655052338180696
+        },
+        "patch_types": [
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "sum",
+          "output"
+        ],
+        "accepted": true
+      },
+      "piano2": {
+        "duration": 0.35,
+        "sample_rate": 48000,
+        "input_sha256": "9af0a1378a72c2de697a0833bed363177520ff639af3253790dbf847f495c3c4",
+        "model_sha256": "67139815329d0c92cfd801ac2f8b59f3fd98966d6daf4687c9aa2b4ef4dc45c1",
+        "seconds": [
+          16.752429166983347,
+          16.339931583032012,
+          16.68134154099971
+        ],
+        "render_seconds": [
+          0.0017354169976897538,
+          0.0017277920269407332,
+          0.0017227909993380308,
+          0.001719333988148719,
+          0.001722124987281859
+        ],
+        "initial_blocks": 26,
+        "final_blocks": 16,
+        "generators": 7,
+        "baseline": 0.12835575112180955,
+        "error": 0.13446667297449483,
+        "limit": 0.15402690134717145,
+        "bands": {
+          "grave": 0.13904005620525134,
+          "medium": 0.09779402916245936,
+          "presence": 0.7721246925242381,
+          "aigu": 0.15438587138706641
+        },
+        "patch_types": [
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "modal",
+          "sum",
+          "output"
+        ],
+        "accepted": true
+      }
+    }
+  }
+}

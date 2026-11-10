@@ -45,7 +45,7 @@ def prepare(destination,network=False):
     allowed=set(CORE)|{'numerical.zip'}|{lock['packages'][name]['file_name'] for name in selected}
     files={name:{'bytes':(destination/name).stat().st_size,'sha256':hashlib.sha256((destination/name).read_bytes()).hexdigest()} for name in sorted(allowed) if (destination/name).is_file()}
     ready=lock is not None and allowed<=set(files) and all(files[lock['packages'][n]['file_name']]['sha256']==lock['packages'][n]['sha256'] for n in selected)
-    manifest={'runtime_version':VERSION,'algorithm_version':'shared-python-v1','source_sha256':files['numerical.zip']['sha256'],'files':files,'download_bytes':sum(f['bytes'] for f in files.values()),'ready':ready}
+    manifest={'runtime_version':VERSION,'algorithm_version':'shared-python-v2-sobriety','source_sha256':files['numerical.zip']['sha256'],'files':files,'download_bytes':sum(f['bytes'] for f in files.values()),'ready':ready}
     temp=destination/'manifest.json.tmp';temp.write_text(json.dumps(manifest,sort_keys=True));temp.replace(destination/'manifest.json')
     return manifest
 

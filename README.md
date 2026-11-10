@@ -183,3 +183,7 @@ Le panneau **Recherche globale** détaille les essais et leurs coûts ; **Compar
 ### Ouvrir le site sur Mac
 
 Dans le Finder, double-cliquer sur **Ouvrir Résonant.command**. Le lanceur démarre le serveur, attend qu’il soit prêt et ouvre `http://127.0.0.1:8000/` dans le navigateur. Garder la fenêtre Terminal ouverte pendant l’utilisation ; Ctrl+C arrête le serveur. Si Résonant est déjà actif, le lanceur réutilise cette instance. En cas d’échec, le diagnostic est affiché et conservé dans `.local/server.log`.
+
+### Sources partagées et bruit filtré
+
+La simplification peut tester une excitation sinusoïdale partagée, une saturation, des filtres et une enveloppe commune, ainsi que des branches de bruit filtré. Chaque bloc garde son nom réel dans le rack et l’inventaire. Les essais restent soumis au budget de qualité ; moins de blocs ne garantit pas moins de CPU ou moins de composants physiques. Voir [les mesures et limites du 10 novembre](docs/SOBRIETE_AUDIO_2026-11-10.md).
