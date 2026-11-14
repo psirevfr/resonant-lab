@@ -52,6 +52,7 @@ export function renderGraph(patch:Patch,catalog:Catalog):Float64Array{
      case 'envelope':y[i]=ins[0][i]*envelope(t);break;
      case 'adsr':y[i]=ins[0][i]*(t<p.gate?held(t):held(p.gate)*clamp(1-(t-p.gate)/p.release,0,1));break;
      case 'saturation':y[i]=Math.tanh(p.drive*ins[0][i]);break;
+     case 'comb':{const delay=fs/p.frequency,d=Math.floor(delay),a=delay-d;y[i]=(1-p.feedback)*ins[0][i]+p.feedback*((i>=d?(1-a)*y[i-d]:0)+(i>d?a*y[i-d-1]:0));break}
      case 'delay':{const at=i-roundEven(fs*p.seconds);y[i]=at>=0?ins[0][at]:0;break}
      default:throw Error('Module non pris en charge : '+kind);
     }

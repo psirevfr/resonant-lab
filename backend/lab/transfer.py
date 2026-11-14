@@ -1,11 +1,14 @@
 """Exact digital responses for executable LTI blocks and compatible DAGs."""
 import numpy as np
 from scipy import signal
-from .blocks import REGISTRY, parameters, coefficients
+from .blocks import REGISTRY, parameters, coefficients, comb_filter
 from .graph import validate
 from .schema import Patch, Block
 
 def response(kind,p,fs,f):
+    if kind=='comb':
+        delay=fs/p['frequency'];d=int(np.floor(delay));alpha=delay-d;z=np.exp(-2j*np.pi*f/fs)
+        return (1-p['feedback'])/(1-p['feedback']*((1-alpha)*z**d+alpha*z**(d+1)))
     if kind=='delay': return np.exp(-2j*np.pi*f*round(fs*p['seconds'])/fs)
     b,a=coefficients(kind,p,fs)
     return signal.freqz(b,a,worN=f,fs=fs)[1]
@@ -19,6 +22,12 @@ def describe(node: Block, fs: int):
     p=parameters(node.type,node.parameters,fs)
     result={'lti':d.lti,'equation':d.equation,'description':d.description,'parameters':p}
     if not d.lti: return result
+    if node.type=='comb':
+        delay=fs/p['frequency'];d=int(np.floor(delay));alpha=delay-d
+        f=np.geomspace(1,fs*.499,600);impulse=comb_filter(np.r_[1.,np.zeros(4095)],p['frequency'],p['feedback'],fs)
+        result.update(pack(f,response(node.type,p,fs,f)))
+        result.update({'digital':f'H(z) = (1−g)/(1−g[(1−α)z^−D+αz^−(D+1)]), D={d}, α={alpha:.9g}, g={p["feedback"]:.9g}', 'b':[1-p['feedback']],'a':None,'order':d+(alpha>0),'poles':None,'zeros':None,'stable':True,'stability_reason':'Réinjection <1 et interpolation convexe ; pôles non développés pour éviter un calcul dense.', 'dc_gain':1.,'impulse_time':(np.arange(len(impulse))/fs).tolist(),'impulse':impulse.tolist()})
+        return result
     b,a=coefficients(node.type,p,fs)
     f=np.geomspace(1,fs*.499,600)
     result.update(pack(f,response(node.type,p,fs,f)))

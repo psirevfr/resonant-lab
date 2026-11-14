@@ -44,6 +44,7 @@ REGISTRY: dict[str, Definition] = {
  'bandpass': Definition('Passe-bande', 'Filtres', 1, FILTER, 'H(s) = (Ω/Q)s / (s² + Ωs/Q + Ω²)', 'Gain unité à fc. Transformation bilinéaire pré-gauchie.', True),
  'notch': Definition('Coupe-bande', 'Filtres', 1, FILTER, 'H(s) = (s²+Ω²) / (s² + Ωs/Q + Ω²)', 'Zéro à fc. Transformation bilinéaire pré-gauchie.', True),
  'resonator': Definition('Résonateur', 'Physique', 1, {'frequency': FREQ,'tau': TAU}, 'H(z) = (1−r) / (1−2r cos(θ)z⁻¹+r²z⁻²)', 'Pôles r exp(±jθ), r=exp(−1/(fsτ)), θ=2πf/fs. Résonateur numérique stable ; amplitude non normalisée à la résonance.', True),
+ 'comb': Definition('Filtre en peigne résonant', 'Filtres', 1, {'frequency':p(440,20,47000,'Hz','Espacement nominal'),'feedback':p(.95,0,.9999,'×','Réinjection')}, 'y[n]=(1−g)x[n]+g((1−α)y[n−D]+αy[n−D−1]), D+α=fs/f', 'Retard fractionnaire interpolé linéairement et réinjection stable 0≤g<1. État initial nul ; gain DC unité explicite. Espacement nominal f : l’interpolation amortit et décale les résonances aiguës. Réalisation numérique avec mémoire ; un AOP seul ne réalise pas ce retard.', True),
  'delay': Definition('Délai', 'Mathématiques', 1, {'seconds': p(0.01,0,2,'s','Retard')}, 'H(z) = z⁻ᴺ, N = round(fs T)', 'Retard entier, arrondi à l’échantillon le plus proche. Les boucles ne sont pas prises en charge.', True),
  'envelope': Definition('Enveloppe exponentielle', 'Dynamique', 1, {'attack': ATTACK,'tau': TAU,'onset': p(0,0,60,'s','Début')}, 'y(t) = x(t)(1−exp(−u/a))exp(−u/τ), u=t−t₀ ≥ 0', 'Multiplication temporelle. Linéaire mais non invariant dans le temps ; pas de Bode LTI.'),
  'adsr': Definition('ADSR', 'Dynamique', 1, {'attack': p(.01,0,5,'s','Attaque'),'decay': p(.2,.001,10,'s','Decay'),'sustain': p(.5,0,1,'×','Sustain'),'gate': p(1,0,60,'s','Durée de note'),'release': p(.4,.001,10,'s','Release')}, 'y(t) = x(t) A_ADSR(t)', 'Segments linéaires ; le relâchement part du niveau réellement atteint à la fin du gate. Le gate ne peut pas être déduit univoquement d’un WAV.'),
@@ -84,6 +85,10 @@ def coefficients(kind: str, p: dict[str, float], fs: int):
         if kind=='lowpass1':return signal.bilinear([w],[1,w],fs)
         a=10**(p['db']/40)
         return signal.bilinear([1,a*w/p['q'],w*w],[1,w/(a*p['q']),w*w],fs)
+    if kind == 'comb':
+        delay=fs/p['frequency'];d=int(np.floor(delay));alpha=delay-d
+        a=np.zeros(d+2);a[0]=1;a[d]=-p['feedback']*(1-alpha);a[d+1]=-p['feedback']*alpha
+        return np.array([1-p['feedback']]),a
     if kind == 'resonator':
         r = np.exp(-1 / (fs * p['tau']))
         return np.array([1-r]), np.array([1,-2*r*np.cos(2*np.pi*p['frequency']/fs),r*r])
@@ -97,7 +102,22 @@ def coefficients(kind: str, p: dict[str, float], fs: int):
 def exponential(t, attack, tau):
     return np.exp(-t/tau) * (-np.expm1(-t/attack) if attack > 0 else 1)
 
+def comb_filter(x,frequency,feedback,fs):
+    # Vector blocks end before any dependency within that block. O(N), with
+    # the same recurrence/order as the browser; no dense high-order lfilter.
+    delay=fs/frequency;d=int(np.floor(delay));alpha=delay-d
+    y=(1-feedback)*np.asarray(x,dtype=float)
+    for start in range(d,len(y),d):
+        end=min(start+d,len(y));size=end-start
+        previous=np.zeros(size)
+        offset=max(0,d+1-start)
+        previous[offset:]=y[start+offset-d-1:end-d-1]
+        y[start:end]+=feedback*((1-alpha)*y[start-d:end-d]+alpha*previous)
+    return y
+
+
 def process(kind: str, p: dict, inputs: list[np.ndarray], fs: int, n: int) -> np.ndarray:
+    if kind == 'comb':return comb_filter(inputs[0],p['frequency'],p['feedback'],fs)
     t = np.arange(n) / fs
     if kind == 'oscillator':
         return p['amplitude'] * np.sin(2*np.pi*p['frequency']*t+p['phase'])

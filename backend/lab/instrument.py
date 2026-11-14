@@ -121,12 +121,12 @@ def transpose(patch,note,reference_note,velocity=127,gate=60,track_filters=True)
         noise_path|=added
     for n in p.nodes:
         v=parameters(n.type,n.parameters,p.sample_rate);n.parameters=v
-        if n.type in ('oscillator','resonator'):
+        if n.type in ('oscillator','resonator','comb'):
             old=v['frequency'];new=old*ratio
             if new>=min(47000,p.sample_rate*.49):
                 if n.type=='oscillator':v['amplitude']=0;muted.append(n.id)
                 new=min(47000,p.sample_rate*.49)
-            new=max(1,new)
+            new=max(20 if n.type=='comb' else 1,new)
             if n.type=='oscillator':
                 env=first_envelope(p,n.id)
                 onset=parameters('envelope',env.parameters,p.sample_rate)['onset'] if env else 0

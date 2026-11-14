@@ -30,6 +30,7 @@ export function buildTeensySketch(patch:Patch,analysis:Analysis|null):FirmwareMo
  const releaseSeconds=Number.isFinite(release)&&release!>0?release!:.2;
  const patchTypes=new Set(patch.nodes.map(n=>n.type));
  const limitations:string[]=[];
+ if(patchTypes.has('comb'))limitations.push('Le filtre en peigne et sa mémoire de retard ne sont pas implémentés dans ce sketch. Ce firmware ne reproduit pas ce montage ; ne pas construire en supposant une équivalence.');
  limitations.push('Prototype issu du graphe sélectionné : '+modes.length+' modes conservés sans tronquage. Budgets CPU/mémoire et compilation sur Teensy non validés.');
  limitations.push('Les débuts, attaques propres à chaque branche, gains et routages ne sont pas reproduits intégralement.');
  if(patch.sample_rate!==44100)limitations.push('Le moteur Teensy Audio sort à 44,1 kHz; la fréquence d’échantillonnage du patch ('+patch.sample_rate+' Hz) n’est pas conservée.');

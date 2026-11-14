@@ -16,6 +16,7 @@ export const moduleHelp:Record<string,string>={
  highpass:'Il atténue les graves et laisse davantage passer les aigus. Il peut aider à isoler une attaque brillante ou un souffle.',
  bandpass:'Il laisse surtout passer une zone de fréquences, comme si vous choisissiez une couleur précise dans le son.',
  notch:'Il creuse une zone précise du son pour atténuer une fréquence gênante, tout en gardant les fréquences autour.',
+ comb:'Une boucle de retard renforce une série de fréquences espacées régulièrement. Le bruit fait résonner cette boucle ; cela ne garantit pas le timbre ni les battements d’un piano. Une mémoire numérique est nécessaire dans cette implémentation.',
  resonator:'Comme une caisse qui résonne après un choc : il renforce une vibration particulière et la laisse s’éteindre progressivement.',
  delay:'Il décale le son dans le temps. Seul, il ne répète pas le son ; mélangé à l’original, il peut produire une impression de double ou d’écho.',
  envelope:'Elle dessine le volume au fil du temps : le son apparaît, puis s’éteint. Ici, elle agit directement sur le son qui entre.',

@@ -1,0 +1,34 @@
+{
+  "environment": "Node + Pyodide, pas un navigateur ni un appareil mobile physique",
+  "initialization_ms": 5527.761666,
+  "tolerances": {
+    "wave_max": 1e-7,
+    "wave_rms": 1e-7,
+    "comb_max": 1e-7,
+    "objective_abs": 1e-8
+  },
+  "result": {
+    "wave_max": 4.2696662178043354e-12,
+    "wave_rms": 1.5399131392468336e-12,
+    "comb_max": 2.710505431213761e-20,
+    "objective_abs": 2.631228568361621e-14,
+    "types": [
+      "oscillator",
+      "oscillator",
+      "oscillator",
+      "oscillator",
+      "output",
+      "sum",
+      "envelope"
+    ],
+    "comb_candidates": 2,
+    "algorithm_version": "shared-python-v3-comb",
+    "compute_ms": 10779.206417000001,
+    "passed": true
+  },
+  "versions": {
+    "python": "3.14.2",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  }
+}

@@ -1,0 +1,3262 @@
+{
+  "baseline_commit": "d593876",
+  "input": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "input_sha256": "efd7a1dfa898d2de0eeb3b3bfb995fb912223c5c054c0c31fa2f66995afb4a39",
+    "duration": 3,
+    "sample_rate": 44100,
+    "max_partials": 24,
+    "detailed": true,
+    "include_impact": true,
+    "refine_modes": true,
+    "penalty": 0.0001,
+    "weights": {
+      "time": 0.1,
+      "spectral": 0.25,
+      "spectrogram": 0.5,
+      "envelope": 0.15,
+      "attack": 0.25
+    }
+  },
+  "scope": "Premières 3 secondes de piano.wav, mono 44100 Hz ; pas la note entière. Python natif, pas un benchmark navigateur.",
+  "before": [
+    {
+      "seconds": 8.132853624993004,
+      "blocks": 88,
+      "error": {
+        "time": 0.36209114005440346,
+        "spectral": 0.3006079261246304,
+        "spectrogram": 0.29965937764663453,
+        "envelope": 0.1068004563741683,
+        "attack": 0.3806383536118839,
+        "total": 0.2978963529752091
+      },
+      "types": [
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "sum",
+        "gain",
+        "output",
+        "noise",
+        "highpass",
+        "lowpass",
+        "envelope",
+        "sum"
+      ],
+      "name": "40 modes / résonances isolées · attaque ajustée + impact",
+      "candidates": [
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 88,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 63,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 39,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 63,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 39,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 41,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 11,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 5,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": []
+        }
+      ]
+    },
+    {
+      "seconds": 8.10774816700723,
+      "blocks": 88,
+      "error": {
+        "time": 0.36209114005440346,
+        "spectral": 0.3006079261246304,
+        "spectrogram": 0.29965937764663453,
+        "envelope": 0.1068004563741683,
+        "attack": 0.3806383536118839,
+        "total": 0.2978963529752091
+      },
+      "types": [
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "sum",
+        "gain",
+        "output",
+        "noise",
+        "highpass",
+        "lowpass",
+        "envelope",
+        "sum"
+      ],
+      "name": "40 modes / résonances isolées · attaque ajustée + impact",
+      "candidates": [
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 88,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 63,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 39,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 63,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 39,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 41,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 11,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 5,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": []
+        }
+      ]
+    },
+    {
+      "seconds": 8.204004583065398,
+      "blocks": 88,
+      "error": {
+        "time": 0.36209114005440346,
+        "spectral": 0.3006079261246304,
+        "spectrogram": 0.29965937764663453,
+        "envelope": 0.1068004563741683,
+        "attack": 0.3806383536118839,
+        "total": 0.2978963529752091
+      },
+      "types": [
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "sum",
+        "gain",
+        "output",
+        "noise",
+        "highpass",
+        "lowpass",
+        "envelope",
+        "sum"
+      ],
+      "name": "40 modes / résonances isolées · attaque ajustée + impact",
+      "candidates": [
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 88,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 63,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 39,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 63,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 39,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 41,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 11,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 5,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": []
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "seconds": 48.51601887505967,
+      "blocks": 87,
+      "error": {
+        "time": 0.36209114005440346,
+        "spectral": 0.3006079261246304,
+        "spectrogram": 0.29965937764663453,
+        "envelope": 0.1068004563741683,
+        "attack": 0.3806383536118839,
+        "total": 0.2978963529752091
+      },
+      "types": [
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "sum",
+        "output",
+        "noise",
+        "highpass",
+        "lowpass",
+        "envelope",
+        "sum"
+      ],
+      "name": "40 modes / résonances isolées · attaque ajustée + impact",
+      "candidates": [
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 87,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 88,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 82,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 82,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 62,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 63,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 38,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 39,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 62,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 63,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 38,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 39,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (4 groupes)",
+          "blocks": 55,
+          "errors": {
+            "time": 0.4681052697076517,
+            "spectral": 0.40409819297779,
+            "spectrogram": 0.34154201059353023,
+            "envelope": 0.1446142448913159,
+            "attack": 0.4006958867013074,
+            "total": 0.35237775113680164
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (2 groupes)",
+          "blocks": 51,
+          "errors": {
+            "time": 0.7178974582209495,
+            "spectral": 0.6397447587189538,
+            "spectrogram": 0.567978881342768,
+            "envelope": 0.2681689253584338,
+            "attack": 0.5457321054240096,
+            "total": 0.5538989930663879
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "2 sources · sinus → saturation ×4 → passe-haut → égaliseur → enveloppe",
+          "blocks": 8,
+          "errors": {
+            "time": 0.7571109316579259,
+            "spectral": 0.6176851689244403,
+            "spectrogram": 0.542014953030015,
+            "envelope": 0.3876838751960221,
+            "attack": 0.5686986778644683,
+            "total": 0.5611736901259444
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 40,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 41,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 41,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 41,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "2 sources · sinus → saturation ×4 → passe-bas → enveloppe",
+          "blocks": 7,
+          "errors": {
+            "time": 0.9829020262856645,
+            "spectral": 0.628910878012126,
+            "spectrogram": 0.5763709425557223,
+            "envelope": 0.36820754819764195,
+            "attack": 0.6766893200214911,
+            "total": 0.6144854845155825
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 10,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 11,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 sources · sinus → saturation ×4 → passe-haut → égaliseur → enveloppe",
+          "blocks": 6,
+          "errors": {
+            "time": 0.8322297941353112,
+            "spectral": 0.6524104721447047,
+            "spectrogram": 0.6540973702214168,
+            "envelope": 0.5438397259410971,
+            "attack": 0.7222010640184168,
+            "total": 0.6684004059649475
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 sources · sinus → saturation ×4 → passe-bas → enveloppe",
+          "blocks": 5,
+          "errors": {
+            "time": 0.9253675890900714,
+            "spectral": 0.6974754183495113,
+            "spectrogram": 0.6379771251234174,
+            "envelope": 0.41282544106506647,
+            "attack": 0.7740655777117462,
+            "total": 0.6730675093166322
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Fondamentale + bruit entretenu + peigne",
+          "blocks": 10,
+          "errors": {
+            "time": 0.8976847194759107,
+            "spectral": 0.7435308441261644,
+            "spectrogram": 0.6665690142657935,
+            "envelope": 0.551104081915201,
+            "attack": 0.8122343610237233,
+            "total": 0.7157279141241919
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Fondamentale + bruit pincé + peigne",
+          "blocks": 10,
+          "errors": {
+            "time": 0.9028336394855042,
+            "spectral": 0.766302185015771,
+            "spectrogram": 0.6688448735913938,
+            "envelope": 0.558392982019589,
+            "attack": 0.781987461669711,
+            "total": 0.7164297277748449
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 3,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 5,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (1 groupes)",
+          "blocks": 48,
+          "errors": {
+            "time": 0.9295973703166426,
+            "spectral": 0.8075647640273221,
+            "spectrogram": 0.8350804081588357,
+            "envelope": 0.6800059684510441,
+            "attack": 0.6097265166199994,
+            "total": 0.7734589252324553
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        }
+      ]
+    },
+    {
+      "seconds": 47.88240724999923,
+      "blocks": 87,
+      "error": {
+        "time": 0.36209114005440346,
+        "spectral": 0.3006079261246304,
+        "spectrogram": 0.29965937764663453,
+        "envelope": 0.1068004563741683,
+        "attack": 0.3806383536118839,
+        "total": 0.2978963529752091
+      },
+      "types": [
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "sum",
+        "output",
+        "noise",
+        "highpass",
+        "lowpass",
+        "envelope",
+        "sum"
+      ],
+      "name": "40 modes / résonances isolées · attaque ajustée + impact",
+      "candidates": [
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 87,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 88,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 82,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 82,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 62,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 63,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 38,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 39,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 62,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 63,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 38,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 39,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (4 groupes)",
+          "blocks": 55,
+          "errors": {
+            "time": 0.4681052697076517,
+            "spectral": 0.40409819297779,
+            "spectrogram": 0.34154201059353023,
+            "envelope": 0.1446142448913159,
+            "attack": 0.4006958867013074,
+            "total": 0.35237775113680164
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (2 groupes)",
+          "blocks": 51,
+          "errors": {
+            "time": 0.7178974582209495,
+            "spectral": 0.6397447587189538,
+            "spectrogram": 0.567978881342768,
+            "envelope": 0.2681689253584338,
+            "attack": 0.5457321054240096,
+            "total": 0.5538989930663879
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "2 sources · sinus → saturation ×4 → passe-haut → égaliseur → enveloppe",
+          "blocks": 8,
+          "errors": {
+            "time": 0.7571109316579259,
+            "spectral": 0.6176851689244403,
+            "spectrogram": 0.542014953030015,
+            "envelope": 0.3876838751960221,
+            "attack": 0.5686986778644683,
+            "total": 0.5611736901259444
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 40,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 41,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 41,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 41,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "2 sources · sinus → saturation ×4 → passe-bas → enveloppe",
+          "blocks": 7,
+          "errors": {
+            "time": 0.9829020262856645,
+            "spectral": 0.628910878012126,
+            "spectrogram": 0.5763709425557223,
+            "envelope": 0.36820754819764195,
+            "attack": 0.6766893200214911,
+            "total": 0.6144854845155825
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 10,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 11,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 sources · sinus → saturation ×4 → passe-haut → égaliseur → enveloppe",
+          "blocks": 6,
+          "errors": {
+            "time": 0.8322297941353112,
+            "spectral": 0.6524104721447047,
+            "spectrogram": 0.6540973702214168,
+            "envelope": 0.5438397259410971,
+            "attack": 0.7222010640184168,
+            "total": 0.6684004059649475
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 sources · sinus → saturation ×4 → passe-bas → enveloppe",
+          "blocks": 5,
+          "errors": {
+            "time": 0.9253675890900714,
+            "spectral": 0.6974754183495113,
+            "spectrogram": 0.6379771251234174,
+            "envelope": 0.41282544106506647,
+            "attack": 0.7740655777117462,
+            "total": 0.6730675093166322
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Fondamentale + bruit entretenu + peigne",
+          "blocks": 10,
+          "errors": {
+            "time": 0.8976847194759107,
+            "spectral": 0.7435308441261644,
+            "spectrogram": 0.6665690142657935,
+            "envelope": 0.551104081915201,
+            "attack": 0.8122343610237233,
+            "total": 0.7157279141241919
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Fondamentale + bruit pincé + peigne",
+          "blocks": 10,
+          "errors": {
+            "time": 0.9028336394855042,
+            "spectral": 0.766302185015771,
+            "spectrogram": 0.6688448735913938,
+            "envelope": 0.558392982019589,
+            "attack": 0.781987461669711,
+            "total": 0.7164297277748449
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 3,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 5,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (1 groupes)",
+          "blocks": 48,
+          "errors": {
+            "time": 0.9295973703166426,
+            "spectral": 0.8075647640273221,
+            "spectrogram": 0.8350804081588357,
+            "envelope": 0.6800059684510441,
+            "attack": 0.6097265166199994,
+            "total": 0.7734589252324553
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        }
+      ]
+    },
+    {
+      "seconds": 48.01083862490486,
+      "blocks": 87,
+      "error": {
+        "time": 0.36209114005440346,
+        "spectral": 0.3006079261246304,
+        "spectrogram": 0.29965937764663453,
+        "envelope": 0.1068004563741683,
+        "attack": 0.3806383536118839,
+        "total": 0.2978963529752091
+      },
+      "types": [
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "modal",
+        "sum",
+        "output",
+        "noise",
+        "highpass",
+        "lowpass",
+        "envelope",
+        "sum"
+      ],
+      "name": "40 modes / résonances isolées · attaque ajustée + impact",
+      "candidates": [
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 87,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée + impact",
+          "blocks": 88,
+          "errors": {
+            "time": 0.36209114005440346,
+            "spectral": 0.3006079261246304,
+            "spectrogram": 0.29965937764663453,
+            "envelope": 0.1068004563741683,
+            "attack": 0.3806383536118839,
+            "total": 0.2978963529752091
+          },
+          "rejection_reasons": []
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 82,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées · attaque ajustée",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3564749750609595,
+            "spectral": 0.31100502342882147,
+            "spectrogram": 0.3040844027150577,
+            "envelope": 0.10633074954332435,
+            "attack": 0.38599868102428686,
+            "total": 0.30231218992672043
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 82,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "40 modes / résonances isolées",
+          "blocks": 83,
+          "errors": {
+            "time": 0.3562627715071085,
+            "spectral": 0.313158361388335,
+            "spectrogram": 0.3075064191569592,
+            "envelope": 0.11699326862368589,
+            "attack": 0.38913795505035403,
+            "total": 0.30600204490593247
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 62,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés · attaque ajustée",
+          "blocks": 63,
+          "errors": {
+            "time": 0.3492726259979019,
+            "spectral": 0.3112040707997977,
+            "spectrogram": 0.3313420631955206,
+            "envelope": 0.10592409687175879,
+            "attack": 0.416666291889743,
+            "total": 0.3187635995205596
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 38,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements · attaque ajustée",
+          "blocks": 39,
+          "errors": {
+            "time": 0.36904663703602214,
+            "spectral": 0.3207707324814552,
+            "spectrogram": 0.33314576468365104,
+            "envelope": 0.11655763158028411,
+            "attack": 0.4104698859359441,
+            "total": 0.32301707630945614
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 62,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "30 modes / détaillés",
+          "blocks": 63,
+          "errors": {
+            "time": 0.35139173807387336,
+            "spectral": 0.32199816632790246,
+            "spectrogram": 0.3359005617426189,
+            "envelope": 0.1173117129765619,
+            "attack": 0.4218789782180432,
+            "total": 0.325324398209334
+          },
+          "rejection_reasons": [
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 38,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "18 modes / battements",
+          "blocks": 39,
+          "errors": {
+            "time": 0.37478756712204003,
+            "spectral": 0.3366746610388348,
+            "spectrogram": 0.34176902607980014,
+            "envelope": 0.14406274891145918,
+            "attack": 0.4298279145247039,
+            "total": 0.3372786607837661
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (4 groupes)",
+          "blocks": 55,
+          "errors": {
+            "time": 0.4681052697076517,
+            "spectral": 0.40409819297779,
+            "spectrogram": 0.34154201059353023,
+            "envelope": 0.1446142448913159,
+            "attack": 0.4006958867013074,
+            "total": 0.35237775113680164
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (2 groupes)",
+          "blocks": 51,
+          "errors": {
+            "time": 0.7178974582209495,
+            "spectral": 0.6397447587189538,
+            "spectrogram": 0.567978881342768,
+            "envelope": 0.2681689253584338,
+            "attack": 0.5457321054240096,
+            "total": 0.5538989930663879
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "2 sources · sinus → saturation ×4 → passe-haut → égaliseur → enveloppe",
+          "blocks": 8,
+          "errors": {
+            "time": 0.7571109316579259,
+            "spectral": 0.6176851689244403,
+            "spectrogram": 0.542014953030015,
+            "envelope": 0.3876838751960221,
+            "attack": 0.5686986778644683,
+            "total": 0.5611736901259444
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 40,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis",
+          "blocks": 41,
+          "errors": {
+            "time": 0.776945511762204,
+            "spectral": 0.6288425202770713,
+            "spectrogram": 0.5276373027754484,
+            "envelope": 0.4705542861315637,
+            "attack": 0.6365806979379913,
+            "total": 0.5827617200299559
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 41,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 6000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.7867956999024115,
+            "spectral": 0.6288841602714829,
+            "spectrogram": 0.5277323132035064,
+            "envelope": 0.47093918620562575,
+            "attack": 0.6369769863472727,
+            "total": 0.5837215129420217
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 41,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "19 modes amortis + LPF 2000 Hz",
+          "blocks": 42,
+          "errors": {
+            "time": 0.859178095521414,
+            "spectral": 0.6337936126531554,
+            "spectrogram": 0.5338901876870329,
+            "envelope": 0.48681349016016784,
+            "attack": 0.6535979108555032,
+            "total": 0.5981862462374782
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "2 sources · sinus → saturation ×4 → passe-bas → enveloppe",
+          "blocks": 7,
+          "errors": {
+            "time": 0.9829020262856645,
+            "spectral": 0.628910878012126,
+            "spectrogram": 0.5763709425557223,
+            "envelope": 0.36820754819764195,
+            "attack": 0.6766893200214911,
+            "total": 0.6144854845155825
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 10,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "4 modes amortis",
+          "blocks": 11,
+          "errors": {
+            "time": 0.7918806146471603,
+            "spectral": 0.6549028131248867,
+            "spectrogram": 0.5702844368058836,
+            "envelope": 0.4836670808933358,
+            "attack": 0.681803664900995,
+            "total": 0.6168455692065029
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 sources · sinus → saturation ×4 → passe-haut → égaliseur → enveloppe",
+          "blocks": 6,
+          "errors": {
+            "time": 0.8322297941353112,
+            "spectral": 0.6524104721447047,
+            "spectrogram": 0.6540973702214168,
+            "envelope": 0.5438397259410971,
+            "attack": 0.7222010640184168,
+            "total": 0.6684004059649475
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 sources · sinus → saturation ×4 → passe-bas → enveloppe",
+          "blocks": 5,
+          "errors": {
+            "time": 0.9253675890900714,
+            "spectral": 0.6974754183495113,
+            "spectrogram": 0.6379771251234174,
+            "envelope": 0.41282544106506647,
+            "attack": 0.7740655777117462,
+            "total": 0.6730675093166322
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Fondamentale + bruit entretenu + peigne",
+          "blocks": 10,
+          "errors": {
+            "time": 0.8976847194759107,
+            "spectral": 0.7435308441261644,
+            "spectrogram": 0.6665690142657935,
+            "envelope": 0.551104081915201,
+            "attack": 0.8122343610237233,
+            "total": 0.7157279141241919
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Fondamentale + bruit pincé + peigne",
+          "blocks": 10,
+          "errors": {
+            "time": 0.9028336394855042,
+            "spectral": 0.766302185015771,
+            "spectrogram": 0.6688448735913938,
+            "envelope": 0.558392982019589,
+            "attack": 0.781987461669711,
+            "total": 0.7164297277748449
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 3,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "1 modes amortis",
+          "blocks": 5,
+          "errors": {
+            "time": 0.8696204658565538,
+            "spectral": 0.773548995964482,
+            "spectrogram": 0.709187839968385,
+            "envelope": 0.5772800813162496,
+            "attack": 0.8485159344978227,
+            "total": 0.7469313691062892
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle"
+          ]
+        },
+        {
+          "name": "Compact · enveloppes partagées (1 groupes)",
+          "blocks": 48,
+          "errors": {
+            "time": 0.9295973703166426,
+            "spectral": 0.8075647640273221,
+            "spectrogram": 0.8350804081588357,
+            "envelope": 0.6800059684510441,
+            "attack": 0.6097265166199994,
+            "total": 0.7734589252324553
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        },
+        {
+          "name": "Bruit filtré amorti",
+          "blocks": 4,
+          "errors": {
+            "time": 1.0247120951876945,
+            "spectral": 0.9665116077743067,
+            "spectrogram": 0.9290821703482518,
+            "envelope": 0.810337435616305,
+            "attack": 0.9084672178551227,
+            "total": 0.9258460931541588
+          },
+          "rejection_reasons": [
+            "Erreur time supérieure à la référence",
+            "Erreur spectral supérieure à la référence",
+            "Erreur spectrogram supérieure à la référence",
+            "Erreur envelope supérieure à la référence",
+            "Erreur attack supérieure à la référence",
+            "Erreur total supérieure à la référence",
+            "Bande grave moins fidèle",
+            "Bande medium moins fidèle",
+            "Bande presence moins fidèle",
+            "Bande aigu moins fidèle"
+          ]
+        }
+      ]
+    }
+  ],
+  "before_timing": {
+    "first_seconds": 8.132853624993004,
+    "following_median_seconds": 8.155876375036314,
+    "median_seconds": 8.132853624993004,
+    "min_seconds": 8.10774816700723,
+    "max_seconds": 8.204004583065398
+  },
+  "after_timing": {
+    "first_seconds": 48.51601887505967,
+    "following_median_seconds": 47.94662293745205,
+    "median_seconds": 48.01083862490486,
+    "min_seconds": 47.88240724999923,
+    "max_seconds": 48.51601887505967
+  }
+}

@@ -19,6 +19,7 @@ const material:Record<string,string>={
  multiply:'VCA / multiplieur : circuit actif à choisir et dimensionner.',
  output:'Sortie audio : conversion si numérique, adaptation d’impédance et alimentation à définir.',
  resonator:'Résonateur : circuit actif à dimensionner ; ce modèle numérique ne fournit pas directement les composants.',
+ comb:'Filtre en peigne : mémoire de retard + interpolation + sommateur + réinjection. Réalisation microcontrôleur/DSP ; coût matériel et accordage à valider, pas un simple AOP.',
  delay:'Délai : mémoire et traitement numérique ; aucun circuit analogique équivalent fourni.',
 };
 export function audioModuleInventory(patch:Patch,catalog:Catalog):AudioModule[]{

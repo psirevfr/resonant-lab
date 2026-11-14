@@ -73,9 +73,6 @@ def generate(x,fs,max_partials=24,penalty=.0001,weights=None,refine_modes=True,i
         tonal=min((p for p in patches if any(n.type=='modal' for n in p.nodes)),key=lambda p:objective(render(p)))
         impact=fit_impact(tonal,x,features,objective)
         if impact is not None:patches.append(impact)
-    results=[]
-    for patch in patches:
-        errors=objective.components(render(patch)); c=complexity(patch)
-        results.append({'patch':patch.model_dump(),'errors':errors,'complexity':c,'score':errors['total']+penalty*c})
-    results.sort(key=lambda r:r['score'])
-    return {'analysis':features,'candidates':results,'patch':results[0]['patch'],'selection':'Score = erreur pondérée + λ × (blocs + 0,25 × paramètres explicites). Familles testées : modes amortis, modes filtrés, bruit filtré amorti, modes proches affinés et impact bruité selon les options.','penalty':penalty,'refinement':refinement,'impact_tested':include_impact}
+    from .generation_search import select_compact_generation
+    results,reference=select_compact_generation(patches,x,features,objective,weights or Weights(),penalty)
+    return {'analysis':features,'candidates':results,'patch':results[0]['patch'],'reference_patch':reference['patch'],'selection':'Recherche systématique de montages compacts : enveloppes partagées, sinus + saturation + filtres, fondamentale + bruit amplifié + peigne. Minimum de blocs parmi les candidats sans hausse des erreurs temporelle, spectrale, d’enveloppe, d’attaque ou par bande par rapport à la référence (tolérance numérique 1e−12). Référence choisie selon erreur + λ × complexité. Aucun gain de prix ou de consommation mesuré.','penalty':penalty,'refinement':refinement,'impact_tested':include_impact}
