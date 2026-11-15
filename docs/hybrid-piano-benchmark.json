@@ -1,0 +1,240 @@
+{
+  "environment": "macOS-26.6.2-arm64-arm-64bit",
+  "python": "3.12.14",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "scope": "Recherche des branches hybrides seule, hors génération/chargement, sauf section simplify si demandée.",
+  "duration": 3.0,
+  "fs": 44100,
+  "input_sha256": "efd7a1dfa898d2de0eeb3b3bfb995fb912223c5c054c0c31fa2f66995afb4a39",
+  "patch_sha256": "99fdcd91f0e8a261532c47aafb16f6946ee4f789663ddac621779c8005cf48b2",
+  "reference": {
+    "name": "40 modes / résonances isolées · attaque ajustée + impact",
+    "blocks": 87,
+    "modes": 40,
+    "errors": {
+      "time": 0.36209114005440346,
+      "spectral": 0.3006079261246304,
+      "spectrogram": 0.29965937764663453,
+      "envelope": 0.1068004563741683,
+      "attack": 0.3806383536118839,
+      "total": 0.2978963529752091
+    },
+    "bands": {
+      "grave": 0.3391648885201911,
+      "medium": 0.19969264088479283,
+      "presence": 0.8346192322007979,
+      "aigu": 0.4520375494334237
+    }
+  },
+  "runs": [
+    {
+      "seconds": 0.2365604999995412,
+      "candidates": [
+        {
+          "name": "Hybride · 34 modes conservés + aigus bruités",
+          "blocks": 79,
+          "modes": 34,
+          "errors": {
+            "time": 0.36614735833048817,
+            "spectral": 0.30536896183294654,
+            "spectrogram": 0.30432447457812606,
+            "envelope": 0.10768004072732781,
+            "attack": 0.3878361373211935,
+            "total": 0.3025842032157968
+          },
+          "bands": {
+            "grave": 0.3391635203901769,
+            "medium": 0.19963834248070256,
+            "presence": 0.9667828547359105,
+            "aigu": 1.0000833520735328
+          },
+          "strict": false
+        },
+        {
+          "name": "Hybride · 34 modes conservés + aigus bruités / peigne",
+          "blocks": 80,
+          "modes": 34,
+          "errors": {
+            "time": 0.3661690369808373,
+            "spectral": 0.30531760267881164,
+            "spectrogram": 0.304226036155294,
+            "envelope": 0.10768448415401682,
+            "attack": 0.3876659145986244,
+            "total": 0.3025027789745538
+          },
+          "bands": {
+            "grave": 0.3391646246508505,
+            "medium": 0.199687407930385,
+            "presence": 0.9637938903838557,
+            "aigu": 0.4517497376851774
+          },
+          "strict": false
+        }
+      ]
+    },
+    {
+      "seconds": 0.23041154200109304,
+      "candidates": [
+        {
+          "name": "Hybride · 34 modes conservés + aigus bruités",
+          "blocks": 79,
+          "modes": 34,
+          "errors": {
+            "time": 0.36614735833048817,
+            "spectral": 0.30536896183294654,
+            "spectrogram": 0.30432447457812606,
+            "envelope": 0.10768004072732781,
+            "attack": 0.3878361373211935,
+            "total": 0.3025842032157968
+          },
+          "bands": {
+            "grave": 0.3391635203901769,
+            "medium": 0.19963834248070256,
+            "presence": 0.9667828547359105,
+            "aigu": 1.0000833520735328
+          },
+          "strict": false
+        },
+        {
+          "name": "Hybride · 34 modes conservés + aigus bruités / peigne",
+          "blocks": 80,
+          "modes": 34,
+          "errors": {
+            "time": 0.3661690369808373,
+            "spectral": 0.30531760267881164,
+            "spectrogram": 0.304226036155294,
+            "envelope": 0.10768448415401682,
+            "attack": 0.3876659145986244,
+            "total": 0.3025027789745538
+          },
+          "bands": {
+            "grave": 0.3391646246508505,
+            "medium": 0.199687407930385,
+            "presence": 0.9637938903838557,
+            "aigu": 0.4517497376851774
+          },
+          "strict": false
+        }
+      ]
+    },
+    {
+      "seconds": 0.23007754100035527,
+      "candidates": [
+        {
+          "name": "Hybride · 34 modes conservés + aigus bruités",
+          "blocks": 79,
+          "modes": 34,
+          "errors": {
+            "time": 0.36614735833048817,
+            "spectral": 0.30536896183294654,
+            "spectrogram": 0.30432447457812606,
+            "envelope": 0.10768004072732781,
+            "attack": 0.3878361373211935,
+            "total": 0.3025842032157968
+          },
+          "bands": {
+            "grave": 0.3391635203901769,
+            "medium": 0.19963834248070256,
+            "presence": 0.9667828547359105,
+            "aigu": 1.0000833520735328
+          },
+          "strict": false
+        },
+        {
+          "name": "Hybride · 34 modes conservés + aigus bruités / peigne",
+          "blocks": 80,
+          "modes": 34,
+          "errors": {
+            "time": 0.3661690369808373,
+            "spectral": 0.30531760267881164,
+            "spectrogram": 0.304226036155294,
+            "envelope": 0.10768448415401682,
+            "attack": 0.3876659145986244,
+            "total": 0.3025027789745538
+          },
+          "bands": {
+            "grave": 0.3391646246508505,
+            "medium": 0.199687407930385,
+            "presence": 0.9637938903838557,
+            "aigu": 0.4517497376851774
+          },
+          "strict": false
+        }
+      ]
+    }
+  ],
+  "simplify": {
+    "seconds": 12.033612207998885,
+    "settings": {
+      "tolerance": 0.2,
+      "test_shaping": false,
+      "protect_texture": true,
+      "test_noise": true
+    },
+    "selected": {
+      "name": "Compact · élagage vérifié",
+      "blocks": 20,
+      "modes": 9,
+      "errors": {
+        "time": 0.38163956160895757,
+        "spectral": 0.3270547167580555,
+        "spectrogram": 0.340023753269385,
+        "envelope": 0.12181799159590681,
+        "attack": 0.42299242611376886,
+        "total": 0.33116825380234427
+      },
+      "bands": {
+        "grave": 0.38330468092693815,
+        "medium": 0.22273002706806658,
+        "presence": 0.9953106897627999,
+        "aigu": 0.24833119563395442
+      }
+    },
+    "limit": 0.3574756235712509,
+    "candidates": [
+      {
+        "name": "Hybride · 34 modes conservés + aigus bruités",
+        "modules": 79,
+        "errors": {
+          "time": 0.36614735833048817,
+          "spectral": 0.30536896183294654,
+          "spectrogram": 0.30432447457812606,
+          "envelope": 0.10768004072732781,
+          "attack": 0.3878361373211935,
+          "total": 0.3025842032157968
+        },
+        "bands": {
+          "grave": 0.3391635203901769,
+          "medium": 0.19963834248070256,
+          "presence": 0.9667828547359105,
+          "aigu": 1.0000833520735328
+        },
+        "within_tolerance": false,
+        "rejection_reasons": [
+          "Bande aigu"
+        ]
+      },
+      {
+        "name": "Hybride · 34 modes conservés + aigus bruités / peigne",
+        "modules": 80,
+        "errors": {
+          "time": 0.3661690369808373,
+          "spectral": 0.30531760267881164,
+          "spectrogram": 0.304226036155294,
+          "envelope": 0.10768448415401682,
+          "attack": 0.3876659145986244,
+          "total": 0.3025027789745538
+        },
+        "bands": {
+          "grave": 0.3391646246508505,
+          "medium": 0.199687407930385,
+          "presence": 0.9637938903838557,
+          "aigu": 0.4517497376851774
+        },
+        "within_tolerance": true,
+        "rejection_reasons": []
+      }
+    ]
+  }
+}

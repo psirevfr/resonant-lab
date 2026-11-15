@@ -80,14 +80,31 @@ def select_compact_generation(patches,x,features,objective,weights,penalty):
             best,_=refine_shared(best,x,objective)
             proposed.append(best)
     proposed.extend(comb_candidates(x,ref.sample_rate,features,objective))
+    from .hybrid import high_band_candidates
+    proposed.extend(high_band_candidates(tidy(ref),x,objective,features.get('f0')))
     rows.extend(row(p) for p in proposed)
-    for r in rows:
+    def check(r):
         reasons=[]
         for key in baseline['errors']:
             if r['errors'][key]>baseline['errors'][key]+1e-12:reasons.append('Erreur '+key+' supérieure à la référence')
         for band,error in r['bands'].items():
             if error>baseline['bands'][band]+1e-12:reasons.append('Bande '+band+' moins fidèle')
         r['within_tolerance']=not reasons;r['rejection_reasons']=reasons
+        return r
+    for r in rows:check(r)
+    # Bounded backward pruning of the best admissible graph. Other branches,
+    # including the measured impact, are never discarded to rebuild a bank.
+    from .hybrid import summed_families,remove_modes
+    current=Patch.model_validate(min((r for r in rows if r['within_tolerance']),key=lambda r:(r['modules'],r['errors']['total'],r['complexity']))['patch'])
+    families=summed_families(current,('modal','oscillator'))
+    removable=[n for family in families.values() for n in family]
+    for node in sorted(removable,key=lambda n:n.parameters.get('amplitude',0)**2*n.parameters.get('tau',1)):
+        target=next(e.target for e in current.edges if e.source==node.id)
+        if sum(e.target==target for e in current.edges)<2:continue
+        q=tidy(remove_modes(current,{node.id}));q.name='Hybride · modes utiles vérifiés'
+        candidate=check(row(q))
+        if candidate['within_tolerance']:
+            rows.append(candidate);current=q
     eligible=[r for r in rows if r['within_tolerance']]
     chosen=min(eligible,key=lambda r:(r['modules'],r['errors']['total'],r['complexity']))
     rows.sort(key=lambda r:(r is not chosen,not r['within_tolerance'],r['score']))

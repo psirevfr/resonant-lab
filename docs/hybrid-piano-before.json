@@ -1,0 +1,32 @@
+{
+  "commit": "a95be03",
+  "seconds": 11.664068999998563,
+  "input_sha256": "efd7a1dfa898d2de0eeb3b3bfb995fb912223c5c054c0c31fa2f66995afb4a39",
+  "settings": {
+    "tolerance": 0.2,
+    "test_shaping": false,
+    "protect_texture": true,
+    "test_noise": true
+  },
+  "blocks": 20,
+  "error": 0.33116825380234427,
+  "bands": {
+    "grave": 0.38330468092693815,
+    "medium": 0.22273002706806658,
+    "presence": 0.9953106897627999,
+    "aigu": 0.24833119563395442
+  },
+  "types": [
+    "modal",
+    "modal",
+    "modal",
+    "modal",
+    "modal",
+    "modal",
+    "modal",
+    "modal",
+    "modal",
+    "sum",
+    "output"
+  ]
+}

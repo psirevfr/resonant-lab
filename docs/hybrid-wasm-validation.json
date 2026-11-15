@@ -1,0 +1,44 @@
+{
+  "environment": "Node + Pyodide, pas un navigateur ni un appareil mobile physique",
+  "initialization_ms": 5980.084708,
+  "tolerances": {
+    "wave_max": 1e-7,
+    "wave_rms": 1e-7,
+    "comb_max": 1e-7,
+    "objective_abs": 1e-8
+  },
+  "result": {
+    "hybrid_max": 1.3877787807814457e-16,
+    "hybrid_objective_abs": 5.3612633959995356e-17,
+    "hybrid_types": [
+      "modal",
+      "impulse",
+      "sum",
+      "output",
+      "noise",
+      "gain",
+      "highpass",
+      "envelope"
+    ],
+    "wave_max": 4.2695829510774885e-12,
+    "wave_rms": 1.5395403153240674e-12,
+    "comb_max": 2.710505431213761e-20,
+    "objective_abs": 1.3992973446619317e-13,
+    "types": [
+      "oscillator",
+      "oscillator",
+      "output",
+      "sum",
+      "envelope"
+    ],
+    "comb_candidates": 2,
+    "algorithm_version": "shared-python-v4-hybrid",
+    "compute_ms": 11635.791290999998,
+    "passed": true
+  },
+  "versions": {
+    "python": "3.14.2",
+    "numpy": "2.4.6",
+    "scipy": "1.18.0"
+  }
+}

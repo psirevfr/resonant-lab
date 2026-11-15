@@ -1,5 +1,5 @@
 """Synthetic native reference for validate_generation_wasm.mjs (no user audio)."""
-import json
+import json,runpy
 from pathlib import Path
 import numpy as np
 from lab.compute import compute
@@ -13,5 +13,13 @@ r=compute('generate',request,x,fs)
 p=Patch.model_validate(r['patch'])
 comb=Patch(duration=.15,nodes=[Block(id='osc',type='oscillator',parameters={'frequency':731,'amplitude':.31,'phase':.2}),Block(id='comb',type='comb',parameters={'frequency':261.63,'feedback':.9999}),Block(id='out',type='output')],edges=[link('osc','comb'),link('comb','out')])
 reference={'request':request,'input':x.tolist(),'fs':fs,'output':render(p).tolist(),'error':r['candidates'][0]['errors']['total'],'types':[n.type for n in p.nodes],'comb_patch':comb.model_dump(),'comb_output':render(comb).tolist()}
-path=Path(__file__).resolve().parents[1]/'.local/generation-wasm-reference.json'
+root=Path(__file__).resolve().parents[1]
+from lab.hybrid import high_band_candidates
+from lab.metrics import Objective
+from lab.schema import Weights
+hp,hx=runpy.run_path(str(root/'backend/tests/test_hybrid.py'))['fixture']()
+objective=Objective(hx,hp.sample_rate,Weights())
+hq=min(high_band_candidates(hp,hx,objective,300),key=lambda q:objective(render(q)))
+reference['hybrid']={'patch':hp.model_dump(),'input':hx.tolist(),'output':render(hq).tolist(),'types':[n.type for n in hq.nodes],'error':objective(render(hq))}
+path=root/'.local/generation-wasm-reference.json'
 path.parent.mkdir(exist_ok=True);path.write_text(json.dumps(reference,allow_nan=False))

@@ -214,6 +214,14 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
             textured,info=search_texture(p,x,objective)
             texture_diagnostics.extend(info)
             for q in textured:add(q)
+    if test_noise and sum(n.type=='modal' for n in folded.nodes)>=5:
+        from .hybrid import high_band_candidates
+        from .analysis import pitch
+        # Keep the reference's low modes AND existing impact/routing; replace
+        # only a high-frequency group. The same user-selected budget applies.
+        for q in high_band_candidates(folded,x,objective,pitch(x,patch.sample_rate)[0]):
+            add(q)
+            texture_diagnostics.append({'architecture':q.name,'blocks':physical_count(q),'full_rate_error':candidates[-1]['errors']['total'],'analysis_rate':patch.sample_rate,'noise_seed':42})
     # Test a residual impact only when the reference actually has that branch.
     if any(n.type=='noise' for n in original.nodes):
         from .impact import fit_impact
