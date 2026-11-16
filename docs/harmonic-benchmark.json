@@ -1,0 +1,284 @@
+{
+  "environment": "macOS-26.6.2-arm64-arm-64bit",
+  "processor": "arm",
+  "python": "3.12.14",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "scope": "Recherche du groupe et ajustement uniquement, sans chargement, génération ni rendu audio navigateur. Trois répétitions, aucun cache de résultat.",
+  "cases": [
+    {
+      "name": "synthetic",
+      "duration": 0.15,
+      "sample_rate": 44100,
+      "reference": {
+        "blocks": 21,
+        "sources": 10,
+        "errors": {
+          "time": 0.0004710110178205835,
+          "spectral": 0.0003020825566440111,
+          "spectrogram": 0.0004651899580357733,
+          "envelope": 1.2158352563378146e-06,
+          "attack": 0.00042226486735638745,
+          "total": 0.00036877224967079626
+        },
+        "bands": {
+          "grave": 1.0495135708303609e-08,
+          "medium": 2.268895989542384e-06,
+          "presence": 0.1548149116933578,
+          "aigu": 1.6515756418598539e-06
+        },
+        "max_sample_error": 0.0004365022912324911
+      },
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 0.1740617920004297,
+          "candidates": [
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 0.4952672157686229,
+                "spectral": 0.5615076554292706,
+                "spectrogram": 0.5382363670208441,
+                "envelope": 0.247877429140448,
+                "attack": 0.4953662809993975,
+                "total": 0.4960360028524149
+              },
+              "bands": {
+                "grave": 0.499858633644555,
+                "medium": 1.6060931553250093,
+                "presence": 0.8190448204522873,
+                "aigu": 1.4498146819046062e-05
+              },
+              "max_sample_error": 0.17551202534253818,
+              "generation_strict": false,
+              "simplification_budget_20pct": false
+            },
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 0.01925296701569809,
+                "spectral": 0.002960992889331269,
+                "spectrogram": 0.0029208610435935674,
+                "envelope": 0.0027185622470164224,
+                "attack": 0.0031508392377495122,
+                "total": 0.004257175673751401
+              },
+              "bands": {
+                "grave": 0.0025995935862954574,
+                "medium": 0.010489977545660787,
+                "presence": 0.028924451702839613,
+                "aigu": 1.1542124763436746e-06
+              },
+              "max_sample_error": 0.00796097084014753,
+              "generation_strict": false,
+              "simplification_budget_20pct": false
+            },
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 1.1472157401817838e-07,
+                "spectral": 4.074739516571775e-08,
+                "spectrogram": 4.075539420170717e-08,
+                "envelope": 3.383366611530558e-08,
+                "attack": 4.1195554730910266e-08,
+                "total": 4.592851351529941e-08
+              },
+              "bands": {
+                "grave": 3.116091197493599e-08,
+                "medium": 2.0266417224388618e-07,
+                "presence": 6.896884458847097e-07,
+                "aigu": 5.5113046385796504e-12
+              },
+              "max_sample_error": 4.706365751283581e-08,
+              "generation_strict": false,
+              "simplification_budget_20pct": true
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "seconds": 0.16106233300160966,
+          "candidates": [
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 0.4952672157686229,
+                "spectral": 0.5615076554292706,
+                "spectrogram": 0.5382363670208441,
+                "envelope": 0.247877429140448,
+                "attack": 0.4953662809993975,
+                "total": 0.4960360028524149
+              },
+              "bands": {
+                "grave": 0.499858633644555,
+                "medium": 1.6060931553250093,
+                "presence": 0.8190448204522873,
+                "aigu": 1.4498146819046062e-05
+              },
+              "max_sample_error": 0.17551202534253818,
+              "generation_strict": false,
+              "simplification_budget_20pct": false
+            },
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 0.01925296701569809,
+                "spectral": 0.002960992889331269,
+                "spectrogram": 0.0029208610435935674,
+                "envelope": 0.0027185622470164224,
+                "attack": 0.0031508392377495122,
+                "total": 0.004257175673751401
+              },
+              "bands": {
+                "grave": 0.0025995935862954574,
+                "medium": 0.010489977545660787,
+                "presence": 0.028924451702839613,
+                "aigu": 1.1542124763436746e-06
+              },
+              "max_sample_error": 0.00796097084014753,
+              "generation_strict": false,
+              "simplification_budget_20pct": false
+            },
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 1.1472157401817838e-07,
+                "spectral": 4.074739516571775e-08,
+                "spectrogram": 4.075539420170717e-08,
+                "envelope": 3.383366611530558e-08,
+                "attack": 4.1195554730910266e-08,
+                "total": 4.592851351529941e-08
+              },
+              "bands": {
+                "grave": 3.116091197493599e-08,
+                "medium": 2.0266417224388618e-07,
+                "presence": 6.896884458847097e-07,
+                "aigu": 5.5113046385796504e-12
+              },
+              "max_sample_error": 4.706365751283581e-08,
+              "generation_strict": false,
+              "simplification_budget_20pct": true
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "seconds": 0.1628369579993887,
+          "candidates": [
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 0.4952672157686229,
+                "spectral": 0.5615076554292706,
+                "spectrogram": 0.5382363670208441,
+                "envelope": 0.247877429140448,
+                "attack": 0.4953662809993975,
+                "total": 0.4960360028524149
+              },
+              "bands": {
+                "grave": 0.499858633644555,
+                "medium": 1.6060931553250093,
+                "presence": 0.8190448204522873,
+                "aigu": 1.4498146819046062e-05
+              },
+              "max_sample_error": 0.17551202534253818,
+              "generation_strict": false,
+              "simplification_budget_20pct": false
+            },
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 0.01925296701569809,
+                "spectral": 0.002960992889331269,
+                "spectrogram": 0.0029208610435935674,
+                "envelope": 0.0027185622470164224,
+                "attack": 0.0031508392377495122,
+                "total": 0.004257175673751401
+              },
+              "bands": {
+                "grave": 0.0025995935862954574,
+                "medium": 0.010489977545660787,
+                "presence": 0.028924451702839613,
+                "aigu": 1.1542124763436746e-06
+              },
+              "max_sample_error": 0.00796097084014753,
+              "generation_strict": false,
+              "simplification_budget_20pct": false
+            },
+            {
+              "blocks": 9,
+              "sources": 3,
+              "errors": {
+                "time": 1.1472157401817838e-07,
+                "spectral": 4.074739516571775e-08,
+                "spectrogram": 4.075539420170717e-08,
+                "envelope": 3.383366611530558e-08,
+                "attack": 4.1195554730910266e-08,
+                "total": 4.592851351529941e-08
+              },
+              "bands": {
+                "grave": 3.116091197493599e-08,
+                "medium": 2.0266417224388618e-07,
+                "presence": 6.896884458847097e-07,
+                "aigu": 5.5113046385796504e-12
+              },
+              "max_sample_error": 4.706365751283581e-08,
+              "generation_strict": false,
+              "simplification_budget_20pct": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "piano",
+      "duration": 3.0,
+      "sample_rate": 44100,
+      "reference": {
+        "blocks": 88,
+        "sources": 41,
+        "errors": {
+          "time": 0.36209114005440346,
+          "spectral": 0.3006079261246304,
+          "spectrogram": 0.29965937764663453,
+          "envelope": 0.1068004563741683,
+          "attack": 0.3806383536118839,
+          "total": 0.2978963529752091
+        },
+        "bands": {
+          "grave": 0.3391648885201911,
+          "medium": 0.19969264088479283,
+          "presence": 0.8346192322007979,
+          "aigu": 0.4520375494334237
+        },
+        "max_sample_error": 0.08172582221807347
+      },
+      "runs": [
+        {
+          "index": 0,
+          "seconds": 0.006962957999348873,
+          "candidates": []
+        },
+        {
+          "index": 1,
+          "seconds": 0.007088082998961909,
+          "candidates": []
+        },
+        {
+          "index": 2,
+          "seconds": 0.007013082999037579,
+          "candidates": []
+        }
+      ]
+    }
+  ]
+}

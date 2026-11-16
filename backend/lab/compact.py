@@ -201,6 +201,10 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
         from .nonlinear_fit import search
         global_candidates,processing_diagnostics=search(proposals,x,weights,objective)
         for p in global_candidates:add(p)
+        from .harmonic_groups import harmonic_candidates
+        for p in harmonic_candidates(folded,x,weights):
+            add(p)
+            processing_diagnostics.append({'architecture':p.name,'blocks':physical_count(p),'sources':sum(REGISTRY[n.type].inputs==0 for n in p.nodes),'full_rate_error':candidates[-1]['errors']['total'],'analysis_rate':patch.sample_rate})
         for p in shortlist:
             shaped=shaping(p,objective)
             if shaped is not None:add(shaped)

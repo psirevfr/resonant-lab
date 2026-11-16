@@ -4,7 +4,7 @@ from threading import Event
 import numpy as np
 from .schema import GenerateRequest,OptimizeRequest,CompactRequest,AnalyzeRequest
 
-ALGORITHM_VERSION='shared-python-v4-hybrid'
+ALGORITHM_VERSION='shared-python-v5-harmonic'
 MODELS={'analyze':AnalyzeRequest,'generate':GenerateRequest,'optimize':OptimizeRequest,'compact':CompactRequest}
 
 

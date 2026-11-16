@@ -1,5 +1,5 @@
 """Synthetic native reference for validate_generation_wasm.mjs (no user audio)."""
-import json,runpy
+import json,runpy,sys
 from pathlib import Path
 import numpy as np
 from lab.compute import compute
@@ -21,5 +21,11 @@ hp,hx=runpy.run_path(str(root/'backend/tests/test_hybrid.py'))['fixture']()
 objective=Objective(hx,hp.sample_rate,Weights())
 hq=min(high_band_candidates(hp,hx,objective,300),key=lambda q:objective(render(q)))
 reference['hybrid']={'patch':hp.model_dump(),'input':hx.tolist(),'output':render(hq).tolist(),'types':[n.type for n in hq.nodes],'error':objective(render(hq))}
+from lab.harmonic_groups import harmonic_candidates
+sys.path.insert(0,str(root/'backend/tests'))
+from test_harmonic_groups import fixture as harmonic_fixture
+ap,ax=harmonic_fixture();ao=Objective(ax,ap.sample_rate,Weights())
+aq=min(harmonic_candidates(ap,ax,Weights()),key=lambda q:ao(render(q)))
+reference['harmonic']={'patch':ap.model_dump(),'input':ax.tolist(),'output':render(aq).tolist(),'types':[n.type for n in aq.nodes],'error':ao(render(aq))}
 path=root/'.local/generation-wasm-reference.json'
 path.parent.mkdir(exist_ok=True);path.write_text(json.dumps(reference,allow_nan=False))

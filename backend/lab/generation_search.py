@@ -82,6 +82,8 @@ def select_compact_generation(patches,x,features,objective,weights,penalty):
     proposed.extend(comb_candidates(x,ref.sample_rate,features,objective))
     from .hybrid import high_band_candidates
     proposed.extend(high_band_candidates(tidy(ref),x,objective,features.get('f0')))
+    from .harmonic_groups import harmonic_candidates
+    proposed.extend(harmonic_candidates(tidy(ref),x,weights))
     rows.extend(row(p) for p in proposed)
     def check(r):
         reasons=[]
