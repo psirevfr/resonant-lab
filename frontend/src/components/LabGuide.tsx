@@ -1,6 +1,6 @@
 import {useEffect,useRef,useState} from 'react';
-import type {Catalog} from '../types';
 import {GuidedTour} from './GuidedTour';
+import type {GuideStep,LabSpace} from '../guideContent';
 import {GuideMascot} from './GuideMascot';
 
 export const moduleHelp:Record<string,string>={
@@ -16,41 +16,35 @@ export const moduleHelp:Record<string,string>={
  highpass:'Il atténue les graves et laisse davantage passer les aigus. Il peut aider à isoler une attaque brillante ou un souffle.',
  bandpass:'Il laisse surtout passer une zone de fréquences, comme si vous choisissiez une couleur précise dans le son.',
  notch:'Il creuse une zone précise du son pour atténuer une fréquence gênante, tout en gardant les fréquences autour.',
- comb:'Une boucle de retard renforce une série de fréquences espacées régulièrement. Le bruit fait résonner cette boucle ; cela ne garantit pas le timbre ni les battements d’un piano. Une mémoire numérique est nécessaire dans cette implémentation.',
+ comb:'Il renforce des fréquences régulièrement espacées, comme les dents d’un peigne. Il peut donner un son de corde à un souffle.',
  resonator:'Comme une caisse qui résonne après un choc : il renforce une vibration particulière et la laisse s’éteindre progressivement.',
  delay:'Il décale le son dans le temps. Seul, il ne répète pas le son ; mélangé à l’original, il peut produire une impression de double ou d’écho.',
  envelope:'Elle dessine le volume au fil du temps : le son apparaît, puis s’éteint. Ici, elle agit directement sur le son qui entre.',
  adsr:'Quatre moments du volume : Attack, le son monte ; Decay, il redescend ; Sustain, il tient un niveau ; Release, il s’éteint quand la note se termine.',
  saturation:'Elle arrondit les grandes vibrations et ajoute des fréquences liées à la note, appelées harmoniques. Le son devient plus riche, mais pas forcément plus fidèle.',
- asymmetric_saturation:'Elle déforme différemment les deux côtés de la vibration pour enrichir le son. Le calcul à quatre fois la fréquence aide à limiter les fréquences parasites, sans toutes les supprimer.',
+ asymmetric_saturation:'Elle déforme la vibration pour enrichir le son, comme une distorsion douce.',
  peak_eq:'Un réglage ciblé : il augmente ou diminue une zone de fréquences. Il permet d’éclaircir ou d’assombrir une partie du son sans tout changer.',
  lowpass1:'Un filtre qui adoucit les aigus plus progressivement que le passe-bas habituel. Utile pour une correction légère.',
  output:'Le point d’arrivée du montage : c’est le son connecté à cette sortie que vous écoutez et exportez.'
 };
 
-const intro={title:'Bienvenue, je suis Rémi !',text:'Importez une note, construisez un montage de petits modules, puis comparez le son obtenu à l’original. Je vais vous montrer les commandes directement dans votre laboratoire, avec un exemple que vous pourrez essayer.',tip:'Votre travail sera conservé puis restauré à la fin de la visite. Rien n’est calculé sans votre clic. Vous pouvez aussi simplement explorer les explications des modules.'};
+export function ModuleHelp({type}:{type:string}){return moduleHelp[type]?<details className="module-simple-help"><summary>En mots simples</summary><p>{moduleHelp[type]}</p></details>:null}
 
-
-
-export function ModuleHelp({type}:{type:string}){return moduleHelp[type]?<details className="module-simple-help"><summary>En mots simples</summary><p>{moduleHelp[type]}</p><p>Amplitude = force du son · fréquence = hauteur · attaque = vitesse d’apparition · décroissance = temps pour s’éteindre. Dans un filtre, Q règle à quel point l’action est concentrée autour d’une fréquence.</p></details>:null}
-
-export function LabGuide({userId,catalog,tour}:{userId?:number;catalog:Catalog;tour:{onStart:()=>void;onDemo:()=>Promise<void>;onGenerate:()=>Promise<void>;onRestore:()=>void;onArea:(target:string)=>void;onCancel:()=>void;busy:boolean;loaded:boolean;generated:boolean}}){
- const dialog=useRef<HTMLDialogElement>(null),trigger=useRef<HTMLButtonElement>(null);
- const [open,setOpen]=useState(false),[mode,setMode]=useState<'tour'|'modules'>('tour'),[type,setType]=useState('modal');
- const [walking,setWalking]=useState(false);
- const key=`resonant-guide-v2:${userId}`;
- useEffect(()=>{if(!userId)return;try{if(localStorage.getItem(key)!=='seen')setOpen(true)}catch{setOpen(true)}},[userId,key]);
- useEffect(()=>{if(open&&userId){if(!dialog.current?.open)dialog.current?.showModal()}else if(dialog.current?.open)dialog.current.close()},[open,userId]);
- function close(){dialog.current?.close();setOpen(false);try{localStorage.setItem(key,'seen')}catch{/* Help remains usable when storage is blocked. */}trigger.current?.focus()}
- function reopen(){setMode('tour');setOpen(true)}
- function walk(){if(tour.busy)return;tour.onStart();dialog.current?.close();setOpen(false);setWalking(true)}
- function endWalk(){tour.onRestore();setWalking(false);try{localStorage.setItem(key,'seen')}catch{}trigger.current?.focus()}
- if(!userId)return null;
- return <>{walking&&<GuidedTour onEnd={endWalk} {...tour}/>}<button ref={trigger} className="lab-help-button" onClick={reopen} aria-haspopup="dialog"><span aria-hidden="true">✦</span> Help <span className="help-fr">· Guide</span></button>
+export function LabGuide({userId,space,onNavigate,onArea}:{userId?:number;space:LabSpace;onNavigate:(space:LabSpace)=>void;onArea:(step:GuideStep)=>void}){
+ const dialog=useRef<HTMLDialogElement>(null),trigger=useRef<HTMLButtonElement>(null),origin=useRef(space);
+ const [open,setOpen]=useState(false),[walking,setWalking]=useState(false);
+ const key=`resonant-guide-v3:${userId}`;
+ useEffect(()=>{setWalking(false);if(!userId){setOpen(false);return}try{setOpen(localStorage.getItem(key)!=='seen')}catch{setOpen(true)}},[userId,key]);
+ useEffect(()=>{if(open){if(!dialog.current?.open)dialog.current?.showModal()}else if(dialog.current?.open)dialog.current.close()},[open]);
+ function remember(){try{localStorage.setItem(key,'seen')}catch{}}
+ function close(){dialog.current?.close();setOpen(false);remember();trigger.current?.focus()}
+ function start(){origin.current=space;dialog.current?.close();setOpen(false);setWalking(true)}
+ function end(){setWalking(false);remember();onNavigate(origin.current);trigger.current?.focus()}
+ return <>{walking&&<GuidedTour onEnd={end} onArea={onArea}/>}<button ref={trigger} className="lab-help-button" onClick={()=>setOpen(true)} aria-haspopup="dialog"><span aria-hidden="true">✦</span> Aide</button>
  <dialog ref={dialog} className="lab-guide" aria-labelledby="lab-guide-title" onCancel={e=>{e.preventDefault();close()}}>
  <div className="guide-top"><span>RÉMI · VOTRE GUIDE</span><button onClick={close} aria-label="Fermer le guide">✕</button></div>
- <div className="guide-body"><GuideMascot/><div className="guide-speech"><h2 id="lab-guide-title" aria-live="polite">{mode==='tour'?intro.title:'À quoi sert chaque module ?'}</h2>
- <nav className="guide-tabs" aria-label="Sections du guide"><button aria-pressed={mode==='tour'} onClick={()=>setMode('tour')}>Premiers pas</button><button aria-pressed={mode==='modules'} onClick={()=>setMode('modules')}>Les modules</button></nav>
- {mode==='tour'?<><p>{intro.text}</p><div className="guide-tip">{intro.tip}</div><button className="primary guide-interactive-start" disabled={tour.busy} onClick={walk}>Me montrer dans le laboratoire →</button></>:<><label className="guide-module-select">Choisir un module<select value={type} onChange={e=>setType(e.target.value)}>{Object.entries(catalog).map(([id,def])=><option key={id} value={id}>{def.label}</option>)}</select></label><p>{moduleHelp[type]??'Ce module ne dispose pas encore d’une explication simplifiée.'}</p><div className="guide-tip">Retrouvez aussi « En mots simples » dans l’inspecteur, après avoir sélectionné un bloc du montage.</div></>}
- </div></div><button className="guide-skip" onClick={close}>Fermer et explorer le laboratoire</button></dialog></>
+ <div className="guide-body"><GuideMascot/><div className="guide-speech"><h2 id="lab-guide-title">Bienvenue, je suis Rémi !</h2><p>Deux espaces pour donner vie à vos idées.</p>
+ <div className="guide-spaces"><button onClick={()=>{onNavigate('atelier');close()}}><b>Atelier Arduino</b><span>Assemblez des composants, reliez-les et testez votre montage en 2D ou en 3D.</span></button><button onClick={()=>{onNavigate('analyse');close()}}><b>Analyse du son</b><span>Importez un WAV, recréez son son et cherchez un montage plus simple.</span></button></div>
+ <p>Le menu ☰ permet de passer de l’un à l’autre.</p><button className="primary guide-interactive-start" onClick={start}>Me montrer les outils →</button>
+ </div></div><button className="guide-skip" onClick={close}>Explorer librement</button></dialog></>
 }

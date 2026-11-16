@@ -218,7 +218,6 @@ export default function CircuitScene3D({selected,wiring,onSelect}:CircuitScene3D
   <div ref={hostRef} className="circuit-scene-host" />
   {renderError&&<div className="circuit-webgl-error" role="status">{renderError}</div>}
   {!renderError&&<>
-   <div className="circuit-scene-hint">Glisser pour tourner · clic droit pour déplacer · molette pour zoomer</div>
    <div className="circuit-scene-controls" aria-label="Commandes de la vue 3D">
     <button aria-label="Zoom arrière" onClick={()=>controllerRef.current?.zoom(1.18)}><Minus size={15}/></button>
     <button aria-label="Zoom avant" onClick={()=>controllerRef.current?.zoom(.85)}><Plus size={15}/></button>
@@ -226,8 +225,6 @@ export default function CircuitScene3D({selected,wiring,onSelect}:CircuitScene3D
     <button aria-label="Réinitialiser la caméra" onClick={()=>controllerRef.current?.reset()}><RotateCcw size={14}/></button>
     <button className={labelsVisible?'is-active':''} aria-pressed={labelsVisible} aria-label="Afficher ou masquer les étiquettes" onClick={()=>setLabelsVisible(value=>!value)}><Tags size={14}/><span>Labels</span></button>
    </div>
-   <div className="circuit-scene-status"><i/> 3D · 2 blocs actifs · firmware calculé</div>
   </>}
-  <p className="circuit-scene-description">Maquette 3D manipulable du montage proposé. Les dimensions sont illustratives ; le schéma et la nomenclature restent les références de câblage.</p>
  </div>;
 }
