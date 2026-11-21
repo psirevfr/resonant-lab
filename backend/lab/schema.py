@@ -51,6 +51,11 @@ class AnalyzeRequest(BaseModel):
     max_partials: int = Field(default=24, ge=1, le=24)
 
 class GenerateRequest(AnalyzeRequest):
+    synthesis: Literal['additive', 'subtractive'] = 'additive'
+    source: Literal['auto', 'white_noise', 'pink_noise', 'saw', 'pulse', 'pulse_train'] = 'auto'
+    strict: bool = True
+    tolerance: float = Field(default=.2, ge=0, le=1, allow_inf_nan=False)
+    protect_texture: bool = True
     refine_modes: bool = True
     detailed: bool = True
     include_impact: bool = True

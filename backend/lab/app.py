@@ -1,10 +1,12 @@
 """Private API with bounded caches and temporary, owner-scoped WAV references."""
 from collections import OrderedDict
+from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
 from threading import RLock,BoundedSemaphore
 from uuid import uuid4
 import math
+import os
 import csv
 import numpy as np
 
@@ -40,7 +42,8 @@ from .auth import (
     get_visitor,create_visitor,claim_visitor,require_account,rate_limit,valid_csrf
 )
 
-app=FastAPI(title='Résonant Lab',version='0.1.0')
+APP_VERSION='1.1.0'
+app=FastAPI(title='Résonant Lab',version=APP_VERSION)
 
 from . import job_store
 from . import audio_store
@@ -54,6 +57,17 @@ def developer_status(user:dict=Depends(require_api_user)):
     return {'status':'online','authenticated_as':user['username']}
 
 api_router=APIRouter(dependencies=[Depends(require_api_user)])
+
+
+def require_server_compute():
+    """Legacy CPU endpoints are opt-in; the current application calculates locally.
+
+    Keep old result retrieval and numerical input delivery available. This guard
+    runs before reading an audio reference, computing, or creating a queued job.
+    """
+    if os.environ.get('RESONANT_SERVER_COMPUTE')!='1':
+        raise HTTPException(503,'Le calcul serveur est désactivé. Utilisez le calcul local sur cet appareil.')
+
 
 recordings=OrderedDict(); renders=OrderedDict(); downloads=OrderedDict(); lock=RLock()
 upload_guard=BoundedSemaphore(1)
@@ -72,8 +86,14 @@ async def invalid_fields(_,exc):
     return JSONResponse(status_code=422,content={'detail':errors})
 
 def get_recording(key,owner):
-    with lock:
-        if key in recordings and recordings[key][0]==owner:return recordings[key][1]
+    with lock:cached=recordings.get(key)
+    if cached is not None and cached[0]==owner:
+        # The persisted lease/owner remains authoritative even for decoded audio.
+        # Do not hold the global cache lock during a SQLite read.
+        if audio_store.reference(key,owner) is not None:return cached[1]
+        with lock:
+            if recordings.get(key) is cached:recordings.pop(key,None)
+        raise HTTPException(404,'Référence audio absente ou expirée ; réimporter le WAV.')
     record=audio_store.load(key,owner)
     if record is None:raise HTTPException(404,'Référence audio absente ou expirée ; réimporter le WAV.')
     cache_audio(key,record,owner)
@@ -98,28 +118,38 @@ def target_audio(req,owner):
     return np.pad(x,(0,max(0,n-len(x))))[:n]
 
 @app.get('/api/health')
-def health(): return {'status':'ok','version':'0.1.0'}
+def health(): return {'status':'ok','version':APP_VERSION}
 
 @api_router.get('/api/blocks')
 def blocks(): return catalog()
 
+@contextmanager
+def audio_import_slot(request,user):
+    """Share admission and one decoding slot between uploads and demo creation."""
+    rate_limit(request,'audio-import-ip',limit=40,window=60)
+    rate_limit(request,'audio-import-owner',subject=str(user['id']),limit=20,window=60)
+    if not upload_guard.acquire(blocking=False):
+        raise HTTPException(429,'Un import audio est en cours. Réessayez dans quelques secondes.',headers={'Retry-After':'3'})
+    try:yield
+    finally:upload_guard.release()
+
+
 @api_router.post('/api/audio')
-def upload(file: UploadFile=File(...),user:dict=Depends(require_api_user)):
-    if not upload_guard.acquire(blocking=False):raise HTTPException(429,'Un import audio est en cours. Réessayez dans quelques secondes.',headers={'Retry-After':'3'})
-    try:
+def upload(request:Request,file:UploadFile=File(...),user:dict=Depends(require_api_user)):
+    with audio_import_slot(request,user):
         limit=32_000_000 if user.get('guest') else 128*1024*1024
         data=file.file.read(limit+1)
         if len(data)>limit:raise HTTPException(413,'WAV visiteur limité à 32 Mo.' if user.get('guest') else 'WAV limité à 128 Mo.')
         rec=read_wav(data,Path(file.filename or 'audio.wav').name,4_000_000 if user.get('guest') else 30_000_000);key=store_audio(rec,user['id'])
         return {'id':key,'metadata':rec.metadata(),'view':view(rec.mono,rec.sample_rate)}
-    finally:upload_guard.release()
 
 @api_router.post('/api/demo')
-def demo(user:dict=Depends(require_api_user)):
-    fs=44100; t=np.arange(fs*3)/fs
-    x=sum(a*np.exp(-t/tau)*(1-np.exp(-t/.005))*np.sin(2*np.pi*f*t) for a,f,tau in [(0.45,261.63,1.5),(.23,523.6,.8),(.12,786.8,.5),(.07,1051.6,.35)])
-    rec=read_wav(wav_bytes(x,fs),'Note modale de démonstration.wav'); key=store_audio(rec,user["id"])
-    return {'id':key,'metadata':rec.metadata(),'view':view(x,fs)}
+def demo(request:Request,user:dict=Depends(require_api_user)):
+    with audio_import_slot(request,user):
+        fs=44100; t=np.arange(fs*3)/fs
+        x=sum(a*np.exp(-t/tau)*(1-np.exp(-t/.005))*np.sin(2*np.pi*f*t) for a,f,tau in [(0.45,261.63,1.5),(.23,523.6,.8),(.12,786.8,.5),(.07,1051.6,.35)])
+        rec=read_wav(wav_bytes(x,fs),'Note modale de démonstration.wav'); key=store_audio(rec,user["id"])
+        return {'id':key,'metadata':rec.metadata(),'view':view(x,fs)}
 
 @api_router.get('/api/audio/{key}/wav',dependencies=[Depends(require_account)])
 def original(key:str,request:Request,user:dict=Depends(require_api_user)): return wav_response(get_recording(key,user["id"]).original,request.headers.get('range'))
@@ -130,12 +160,12 @@ def segment(key:str,request:Request,start:float=0,duration:float=3,user:dict=Dep
     rec=get_recording(key,user["id"]); x=excerpt(rec,start,duration)
     return wav_response(wav_bytes(x,rec.sample_rate),request.headers.get('range'))
 
-@api_router.post('/api/analyze')
+@api_router.post('/api/analyze',dependencies=[Depends(require_server_compute)])
 def analysis(req:AnalyzeRequest,user:dict=Depends(require_api_user)):
     rec=get_recording(req.audio_id,user["id"]); x=excerpt(rec,req.start,req.duration)
     return analyze(x,rec.sample_rate,req.max_partials)
 
-@api_router.post('/api/circuit/simulate')
+@api_router.post('/api/circuit/simulate',dependencies=[Depends(require_server_compute)])
 def simulate_electronics(req:RcProject,request:Request,user:dict=Depends(require_api_user)):
     rate_limit(request,'circuit-simulation',subject=str(user['id']),limit=30,window=60)
     if not circuit_sim_guard.acquire(blocking=False):
@@ -168,7 +198,7 @@ def submit(kind,req,request,user):
         else:validate_simplification(req.patch,req.tolerance)
     return job_store.enqueue(user['id'],kind,data,x,fs,idem)
 
-@api_router.post('/api/generate',status_code=202)
+@api_router.post('/api/generate',status_code=202,dependencies=[Depends(require_server_compute)])
 def identify(req:GenerateRequest,request:Request,user:dict=Depends(require_api_user)):
     return submit('generate',req,request,user)
 
@@ -178,7 +208,7 @@ def expand(req:Patch):return expand_modes(req).model_dump()
 @api_router.post('/api/instrument/prepare')
 def prepare_instrument(req:Patch):return prepare(req).model_dump()
 
-@api_router.post('/api/instrument/note',dependencies=[Depends(require_account)])
+@api_router.post('/api/instrument/note',dependencies=[Depends(require_server_compute),Depends(require_account)])
 def instrument_note(req:InstrumentRequest):
     if req.patch.duration>12:raise ValueError('Instrument limité à 12 secondes par note.')
     p,muted=transpose(req.patch,req.note,req.reference_note,req.velocity,req.gate,req.track_filters)
@@ -189,11 +219,11 @@ def instrument_patch(req:InstrumentRequest):
     p,muted=transpose(req.patch,req.note,req.reference_note,req.velocity,req.gate,req.track_filters)
     return {'patch':p.model_dump(),'muted':muted}
 
-@api_router.post('/api/compact',status_code=202)
+@api_router.post('/api/compact',status_code=202,dependencies=[Depends(require_server_compute)])
 def compact(req:CompactRequest,request:Request,user:dict=Depends(require_api_user)):
     return submit('compact',req,request,user)
 
-@api_router.post('/api/render',dependencies=[Depends(require_account)])
+@api_router.post('/api/render',dependencies=[Depends(require_server_compute),Depends(require_account)])
 def simulate(req:RenderRequest,user:dict=Depends(require_api_user)):
     x=target_audio(req,user["id"]); y=render(req.patch); key=uuid4().hex
     with lock:
@@ -266,7 +296,7 @@ def download_export(key:str,user:dict=Depends(require_api_user)):
         'Content-Disposition':f'attachment; filename="{name}"',
         'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'})
 
-@api_router.post('/api/optimize',status_code=202)
+@api_router.post('/api/optimize',status_code=202,dependencies=[Depends(require_server_compute)])
 def optimize(req:OptimizeRequest,request:Request,user:dict=Depends(require_api_user)):
     return submit('optimize',req,request,user)
 
@@ -493,6 +523,19 @@ def mon_lab(request:Request):
             response.set_cookie('visitor_token',create_visitor(),httponly=True,secure=secure_cookie(request),samesite='lax',max_age=86400)
         return response
     return HTMLResponse('Interface non compilée. Exécutez le build frontend.',status_code=503)
+
+@app.get('/p/{slug}',response_class=HTMLResponse)
+def published_page(slug: str, request: Request):
+    import json
+    if len(slug)>48:
+        raise HTTPException(404, 'Page introuvable.')
+    # The layout is a validated, versioned presentation file in the repository.
+    path=DIST.parent/'src'/'siteLayout.json'
+    pages=json.loads(path.read_text())['pages'] if path.is_file() else []
+    if not any(page['id']==slug and slug not in ('analyse','atelier') for page in pages):
+        raise HTTPException(404, 'Page introuvable.')
+    return mon_lab(request)
+
 
 class AccountUpdate(BaseModel):
     email:str

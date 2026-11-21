@@ -114,17 +114,17 @@ def transpose(patch,note,reference_note,velocity=127,gate=60,track_filters=True)
     p=prepare(patch);ratio=2**((note-reference_note)/12);muted=[]
     # Noise colour is not pitch-transposed. Descendants of noise up to mixes
     # are marked; their filtering represents the hammer/texture rather than pitch.
-    noise_path={n.id for n in p.nodes if n.type=='noise'}
+    noise_path={n.id for n in p.nodes if n.type in ('noise','white_noise','pink_noise')}
     for _ in p.nodes:
         added={e.target for e in p.edges if e.source in noise_path}
         if added<=noise_path:break
         noise_path|=added
     for n in p.nodes:
         v=parameters(n.type,n.parameters,p.sample_rate);n.parameters=v
-        if n.type in ('oscillator','resonator','comb'):
+        if n.type in ('oscillator','saw','triangle','pulse','pulse_train','relaxation','resonator','comb'):
             old=v['frequency'];new=old*ratio
             if new>=min(47000,p.sample_rate*.49):
-                if n.type=='oscillator':v['amplitude']=0;muted.append(n.id)
+                if 'amplitude' in v:v['amplitude']=0;muted.append(n.id)
                 new=min(47000,p.sample_rate*.49)
             new=max(20 if n.type=='comb' else 1,new)
             if n.type=='oscillator':

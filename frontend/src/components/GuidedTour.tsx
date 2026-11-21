@@ -27,7 +27,7 @@ export function GuidedTour({onEnd,onArea}:{onEnd:()=>void;onArea:(step:GuideStep
   return()=>{cancelAnimationFrame(frame);observer.disconnect();mutations.disconnect();window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true)};
  },[current]);
  useEffect(()=>{card.current?.focus()},[step]);
- useEffect(()=>{function escape(e:KeyboardEvent){if(e.key==='Escape')onEnd()};window.addEventListener('keydown',escape);return()=>window.removeEventListener('keydown',escape)},[onEnd]);
+ useEffect(()=>{function escape(e:KeyboardEvent){if(e.key==='Escape'&&!e.defaultPrevented&&!document.querySelector('dialog[open]'))onEnd()};window.addEventListener('keydown',escape);return()=>window.removeEventListener('keydown',escape)},[onEnd]);
  const small=innerWidth<700;
  const cardStyle=rect&&!small?{top:rect.top>270?20:undefined,bottom:rect.top>270?undefined:20,left:rect.left>innerWidth/2?20:undefined,right:rect.left>innerWidth/2?undefined:20}:{};
  return createPortal(<div className="guided-tour">

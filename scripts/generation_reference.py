@@ -27,5 +27,8 @@ from test_harmonic_groups import fixture as harmonic_fixture
 ap,ax=harmonic_fixture();ao=Objective(ax,ap.sample_rate,Weights())
 aq=min(harmonic_candidates(ap,ax,Weights()),key=lambda q:ao(render(q)))
 reference['harmonic']={'patch':ap.model_dump(),'input':ax.tolist(),'output':render(aq).tolist(),'types':[n.type for n in aq.nodes],'error':ao(render(aq))}
+sub_request={**request,'synthesis':'subtractive','source':'pink_noise'}
+sub=compute('generate',sub_request,x,fs)['comparison']['subtractive']
+reference['subtractive']={'request':sub_request,'output':render(Patch.model_validate(sub['patch'])).tolist(),'error':sub['errors']['total'],'strict':sub['strict']}
 path=root/'.local/generation-wasm-reference.json'
 path.parent.mkdir(exist_ok=True);path.write_text(json.dumps(reference,allow_nan=False))

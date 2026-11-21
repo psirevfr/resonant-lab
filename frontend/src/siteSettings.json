@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "brandName": "résonant",
+  "signature": "r0m1 - étudiant en PSI",
+  "home": "analyse",
+  "labels": {
+    "atelier": "Atelier Arduino",
+    "analyse": "Analyse du son"
+  },
+  "colors": {
+    "background": "#111719",
+    "surface": "#18201f",
+    "accent": "#b4ed79",
+    "text": "#dbe4e5"
+  },
+  "fontScale": 1,
+  "radius": 10,
+  "welcome": "Deux espaces pour donner vie à vos idées."
+}

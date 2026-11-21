@@ -4,7 +4,7 @@ from threading import Event
 import numpy as np
 from .schema import GenerateRequest,OptimizeRequest,CompactRequest,AnalyzeRequest
 
-ALGORITHM_VERSION='shared-python-v5-harmonic'
+ALGORITHM_VERSION='shared-python-v6-subtractive'
 MODELS={'analyze':AnalyzeRequest,'generate':GenerateRequest,'optimize':OptimizeRequest,'compact':CompactRequest}
 
 
@@ -34,6 +34,9 @@ def compute(kind,request,x,fs,progress=lambda _:None,cancel=None):
     if kind=='analyze':
         from .analysis import analyze
         result=analyze(x,fs,r.max_partials)
+    elif kind=='generate' and r.synthesis=='subtractive':
+        from .subtractive import subtractive_generation
+        result=subtractive_generation(x,fs,r)
     elif kind=='generate':
         from .identify import generate
         result=generate(x,fs,r.max_partials,r.complexity_penalty,r.weights,r.refine_modes,r.include_impact,r.detailed)

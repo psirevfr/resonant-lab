@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "pages": [
+    {"id":"analyse","name":"","parent":null,"blocks":[]},
+    {"id":"atelier","name":"","parent":null,"blocks":[]}
+  ],
+  "bank": [],
+  "plots": {}
+}

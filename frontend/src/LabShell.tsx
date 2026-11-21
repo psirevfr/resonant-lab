@@ -8,21 +8,63 @@ import './workspaces.css';
 import {LabGuide} from './components/LabGuide';
 import type {GuideStep} from './guideContent';
 import {APP_VERSION} from './version';
+import {useSitePresentation} from './SitePresentation';
+import {layoutPage,LayoutContext,pagePath,siteLayout} from './siteLayout';
+import {siteSettings,type SiteSpace} from './siteSettings';
 const Workshop=lazy(()=>import('./components/ArduinoWorkshop'));
 const Audio=lazy(()=>import('./App').then(m=>({default:m.App})));
-class WorkspaceBoundary extends Component<{children:ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return {failed:true}}render(){return this.state.failed?<div className="workspace-loading" role="alert"><p>Cette vue n’a pas pu être chargée. Votre brouillon local est conservé.</p><button onClick={()=>location.reload()}>Recharger le laboratoire</button></div>:this.props.children}}
-type Space='atelier'|'analyse';
-const currentSpace=():Space=>location.pathname.replace(/\/$/,'')==='/analyse'?'analyse':'atelier';
+class WorkspaceBoundary extends Component<{children:ReactNode},{failed:boolean}>{
+ state={failed:false};static getDerivedStateFromError(){return {failed:true}}
+ render(){return this.state.failed?<div className="workspace-loading" role="alert"><button onClick={()=>location.reload()}>Recharger le laboratoire</button></div>:this.props.children}
+}
+const currentPage=()=>layoutPage(location.pathname,siteLayout)?.id??siteSettings.home;
+
 export function LabShell(){
- const [space,setSpace]=useState<Space>(currentSpace),[audioLoaded,setAudioLoaded]=useState(currentSpace()==='analyse'),[menu,setMenu]=useState(false),[user,setUser]=useState<LabUser|null>(null),[login,setLogin]=useState(false),[incoming,setIncoming]=useState<IncomingCircuit|null>(null),[resume,setResume]=useState<ComputeJob|null>(null),[title,setTitle]=useState('Nouveau montage'),[saved,setSaved]=useState('');const trigger=useRef<HTMLButtonElement>(null),nav=useRef<HTMLDivElement>(null);
- useEffect(()=>{api<LabUser>('/me').then(setUser).catch(()=>{});if(!['/atelier','/analyse'].includes(location.pathname.replace(/\/$/,'')))history.replaceState(null,'','/atelier');const pop=()=>{const next=currentSpace();setSpace(next);if(next==='analyse')setAudioLoaded(true)};window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop)},[]);
- function navigate(next:Space,restoreFocus=true){setMenu(false);if(restoreFocus)trigger.current?.focus();if(next==='analyse')setAudioLoaded(true);if(space!==next){document.querySelectorAll('audio').forEach(a=>a.pause());history.pushState(null,'','/'+next);setSpace(next)}}
- useEffect(()=>{if(!menu)return;const el=nav.current;el?.querySelector<HTMLAnchorElement>('a[aria-current="page"]')?.focus();const key=(e:KeyboardEvent)=>{if(e.key==='Escape'){setMenu(false);trigger.current?.focus()}if(e.key==='Tab'){const items=[...el!.querySelectorAll<HTMLElement>('a,button')];const i=items.indexOf(document.activeElement as HTMLElement);if((e.shiftKey&&i===0)||(!e.shiftKey&&i===items.length-1)){e.preventDefault();items[e.shiftKey?items.length-1:0].focus()}}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key)},[menu]);
- const [guideTarget,setGuideTarget]=useState('');
- const guideArea=useCallback((step:GuideStep)=>{navigate(step.space,false);setGuideTarget(step.target)},[space]);
- const status=useCallback((name:string,state:string)=>{setTitle(name);setSaved(state)},[]);
- return <div className="lab-shell"><header className="lab-topbar"><button ref={trigger} className="lab-menu-button" aria-label="Ouvrir le menu des espaces" aria-expanded={menu} aria-controls="space-navigation" onClick={()=>setMenu(v=>!v)}>☰</button><a className="lab-wordmark" href="/atelier" onClick={e=>{e.preventDefault();navigate('atelier')}}>résonant <span>LAB</span></a><b className="active-space">{space==='atelier'?'Atelier Arduino':'Analyse du son'}</b><span className="shell-project-name">{space==='atelier'?title:''}</span><small className="shell-save-state">{space==='atelier'?saved:''}</small><LabGuide userId={user?.id} space={space} onNavigate={navigate} onArea={guideArea}/><Account user={user} onUserChange={setUser} onLogin={()=>setLogin(true)} busy={false} onResume={j=>{setResume(j);navigate('analyse')}}/></header>
- {menu&&<div className="space-menu-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget){setMenu(false);trigger.current?.focus()}}}><div ref={nav} id="space-navigation" className="space-menu" role="dialog" aria-modal="true" aria-label="Choisir un espace"><div className="space-menu-title">Votre laboratoire<button aria-label="Fermer le menu" onClick={()=>{setMenu(false);trigger.current?.focus()}}>×</button></div><nav>{(['atelier','analyse'] as const).map(id=><a key={id} href={'/'+id} aria-current={space===id?'page':undefined} onClick={e=>{e.preventDefault();navigate(id)}}><b>{id==='atelier'?'Atelier Arduino':'Analyse du son'}</b><span>{id==='atelier'?'Concevoir et mesurer un montage':'Analyser, synthétiser et écouter'}</span></a>)}</nav></div></div>}
- {login&&<ExportLogin onClose={()=>setLogin(false)} onConnected={u=>{resetSession();setUser(u);setLogin(false)}}/>}
- <main className="workspace-host"><WorkspaceBoundary><div hidden={space!=='atelier'} className="workshop-space" data-workspace="atelier"><Suspense fallback={<p className="workspace-loading">Ouverture de l’atelier…</p>}><Workshop active={space==='atelier'} owner={user?.id} canExport={!!user&&!user.guest} onLogin={()=>setLogin(true)} incoming={incoming} onStatus={status}/></Suspense></div>{audioLoaded&&<div hidden={space!=='analyse'} className="audio-space" data-workspace="analyse"><Suspense fallback={<p className="workspace-loading">Ouverture de l’analyse…</p>}><Audio guideTarget={guideTarget} active={space==='analyse'} onAccountChange={setUser} accountUser={user} resumeJob={resume} onCreateCircuit={(patch,origin)=>{setIncoming(structuredClone({patch,origin}));navigate('atelier')}}/></Suspense></div>}</WorkspaceBoundary></main><footer className="site-footer"><span>© r0m1 - étudiant en PSI</span><span>Version {APP_VERSION}</span></footer></div>
+ const {settings,layout}=useSitePresentation();
+ const [pageId,setPageId]=useState(currentPage),[audioLoaded,setAudioLoaded]=useState(currentPage()!=='atelier'),[workshopLoaded,setWorkshopLoaded]=useState(currentPage()==='atelier');
+ const [menu,setMenu]=useState(false),[user,setUser]=useState<LabUser|null>(null),[login,setLogin]=useState(false),[incoming,setIncoming]=useState<IncomingCircuit|null>(null),[resume,setResume]=useState<ComputeJob|null>(null),[title,setTitle]=useState('Nouveau montage'),[saved,setSaved]=useState(''),[guideTarget,setGuideTarget]=useState('');
+ const trigger=useRef<HTMLButtonElement>(null),nav=useRef<HTMLDivElement>(null);
+ const page=layoutPage(location.pathname,layout)??layout.pages.find(p=>p.id===pageId)??layout.pages.find(p=>p.id===settings.home)??layout.pages[0];
+ const name=(id:string)=>layout.pages.find(p=>p.id===id)?.name||settings.labels[id as SiteSpace]||id;
+ const nativeWorkshop=page.id==='atelier'&&!page.custom;
+ const custom=page.custom?page:undefined;
+ const workshopInLayout=!!custom?.blocks.some(b=>b.kind==='workshop');
+ const audioActive=!nativeWorkshop;
+ useEffect(()=>{api<LabUser>('/me').then(setUser).catch(()=>{})},[]);
+ useEffect(()=>{
+  const path=location.pathname.replace(/\/$/,'');
+  if(path===''||path==='/mon-lab')history.replaceState(null,'',pagePath(settings.home)+location.search);
+  const pop=()=>{const next=layoutPage(location.pathname,layout)?.id??settings.home;setPageId(next);if(next==='atelier')setWorkshopLoaded(true);else setAudioLoaded(true)};
+  window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);
+ },[settings.home,layout]);
+ const navigate=useCallback((id:string,focus=true)=>{
+  setMenu(false);if(focus)trigger.current?.focus();
+  if(id==='atelier')setWorkshopLoaded(true);else setAudioLoaded(true);
+  if(pageId!==id){document.querySelectorAll('audio').forEach(a=>a.pause());history.pushState(null,'',pagePath(id)+location.search);setPageId(id)}
+ },[pageId]);
+ useEffect(()=>{
+  if(!menu)return;
+  nav.current?.querySelector<HTMLAnchorElement>('a[aria-current="page"]')?.focus();
+  const key=(e:KeyboardEvent)=>{
+   if(e.key==='Escape'){setMenu(false);trigger.current?.focus()}
+   if(e.key==='Tab'){const items=[...nav.current!.querySelectorAll<HTMLElement>('a,button')],i=items.indexOf(document.activeElement as HTMLElement);if((e.shiftKey&&i===0)||(!e.shiftKey&&i===items.length-1)){e.preventDefault();items[e.shiftKey?items.length-1:0].focus()}}
+  };
+  window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);
+ },[menu]);
+ const guideArea=useCallback((step:GuideStep)=>{navigate(step.space,false);setGuideTarget(step.target)},[navigate]);
+ const status=useCallback((value:string,state:string)=>{setTitle(value);setSaved(state)},[]);
+ const workshop=(active:boolean)=><Workshop active={active} owner={user?.id} canExport={!!user&&!user.guest} onLogin={()=>setLogin(true)} incoming={incoming} onStatus={status}/>;
+ function menuItems(parent:string|null,depth=0):ReactNode{
+  if(depth>4)return null;
+  return layout.pages.filter(p=>p.parent===parent).map(p=><div key={p.id} className={depth?'layout-subpage':''}><a href={pagePath(p.id)} aria-current={page.id===p.id?'page':undefined} onClick={e=>{e.preventDefault();navigate(p.id)}}>{name(p.id)}</a>{menuItems(p.id,depth+1)}</div>);
+ }
+ return <LayoutContext.Provider value={layout}><div className="lab-shell" data-editor-key="appearance">
+  <header className="lab-topbar"><button ref={trigger} className="lab-menu-button" data-editor-key="navigation" aria-label="Ouvrir le menu des espaces" aria-expanded={menu} aria-controls="space-navigation" onClick={()=>setMenu(v=>!v)}>☰</button><a className="lab-wordmark" data-editor-key="identity" href={pagePath(settings.home)} onClick={e=>{e.preventDefault();navigate(settings.home)}}>{settings.brandName} <span>LAB</span></a><b className="active-space" data-editor-key="navigation">{name(page.id)}</b><span className="shell-project-name">{nativeWorkshop?title:''}</span><small className="shell-save-state">{nativeWorkshop?saved:''}</small><LabGuide labels={settings.labels} welcome={settings.welcome} userId={user?.id} space={nativeWorkshop?'atelier':'analyse'} onNavigate={navigate} onArea={guideArea}/><Account user={user} onUserChange={setUser} onLogin={()=>setLogin(true)} busy={false} onResume={j=>{setResume(j);navigate('analyse')}}/></header>
+  {menu&&<div className="space-menu-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget){setMenu(false);trigger.current?.focus()}}}><div ref={nav} id="space-navigation" className="space-menu" data-editor-key="navigation" role="dialog" aria-modal="true" aria-label="Choisir un espace"><div className="space-menu-title"><button aria-label="Fermer le menu" onClick={()=>{setMenu(false);trigger.current?.focus()}}>×</button></div><nav>{menuItems(null)}</nav></div></div>}
+  {login&&<ExportLogin onClose={()=>setLogin(false)} onConnected={u=>{resetSession();setUser(u);setLogin(false)}}/>}
+  <main className="workspace-host"><WorkspaceBoundary>
+   {workshopLoaded&&!workshopInLayout&&<div className="workshop-space" data-workspace="atelier" hidden={!nativeWorkshop}><Suspense fallback={<p className="workspace-loading">Ouverture de l’atelier…</p>}>{workshop(nativeWorkshop)}</Suspense></div>}
+   {(audioLoaded||!!custom)&&<div className="audio-space" data-workspace="analyse" hidden={!audioActive}><Suspense fallback={<p className="workspace-loading">Ouverture de l’analyse…</p>}><Audio layoutPage={custom} extraBlocks={workshopInLayout?{workshop:workshop(audioActive)}:undefined} guideTarget={guideTarget} active={audioActive} accountUser={user} onAccountChange={setUser} resumeJob={resume} onCreateCircuit={(patch,origin)=>{setIncoming(structuredClone({patch,origin}));navigate('atelier')}}/></Suspense></div>}
+  </WorkspaceBoundary></main><footer className="site-footer"><span data-editor-key="identity">© {settings.signature}</span><span>Version {APP_VERSION}</span></footer>
+ </div></LayoutContext.Provider>;
 }

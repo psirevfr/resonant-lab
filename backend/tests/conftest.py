@@ -7,6 +7,9 @@ from lab.job_store import init_jobs
 def authenticated_lab(monkeypatch,tmp_path):
     monkeypatch.setenv('RESONANT_DB_PATH',str(tmp_path/'test.sqlite'))
     monkeypatch.setenv('RESONANT_SESSION_SECRET','test-session-signing-secret-not-for-production')
+    # Historical API compatibility tests explicitly opt into legacy CPU routes.
+    # Production defaults to local calculation; dedicated tests remove this flag.
+    monkeypatch.setenv('RESONANT_SERVER_COMPUTE','1')
     init_db();init_jobs()
     user=lambda: {'id':1,'username':'test','email':'test@example.invalid'}
     app.dependency_overrides[require_user]=user

@@ -1,10 +1,12 @@
 import {createContext,useContext,useEffect,useRef,useState} from 'react';
 import Plotly from 'plotly.js-dist-min';
 import type {Data,Layout,PlotlyHTMLElement} from 'plotly.js';
+import {useSiteLayout} from '../siteLayout';
 import {download} from '../api';
 export const colors={original:'#9bd5ea',model:'#b4ed79',error:'#ed987a'};
 export const ExportPermission=createContext(false);
-export function Plot({data,layout={},height=200,onCursor,cursor}:{data:Data[];layout?:Partial<Layout>;height?:number;onCursor?:(x:number)=>void;cursor?:number}){
+export function Plot({data,layout={},height=200,onCursor,cursor,plotId}:{plotId?:string;data:Data[];layout?:Partial<Layout>;height?:number;onCursor?:(x:number)=>void;cursor?:number}){
+ const plotStyle=useSiteLayout().plots[plotId??''];
  const canExport=useContext(ExportPermission);
  const [exportError,setExportError]=useState('');
  const ref=useRef<HTMLDivElement>(null),callback=useRef(onCursor),queue=useRef<Promise<unknown>>(Promise.resolve()),mounted=useRef(true),generation=useRef(0);callback.current=onCursor;
@@ -15,8 +17,24 @@ export function Plot({data,layout={},height=200,onCursor,cursor}:{data:Data[];la
  },[]);
  useEffect(()=>{const el=ref.current!,revision=++generation.current;
   const base:Partial<Layout>={height,margin:{l:52,r:18,t:18,b:40},paper_bgcolor:'transparent',plot_bgcolor:'transparent',font:{family:'system-ui, sans-serif',color:'#94a6b6',size:11},colorway:[colors.original,colors.model,colors.error],xaxis:{gridcolor:'#24303b',zerolinecolor:'#34414e',title:{text:'Temps (s)'}},yaxis:{gridcolor:'#24303b',zerolinecolor:'#34414e'},showlegend:false,hovermode:'x unified',uirevision:'keep',...layout};
+  const plain=(s:string)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(plotStyle){
+   if(plotStyle.title)base.title={text:plain(plotStyle.title)};
+   for(const [axis,label,unit] of [['xaxis',plotStyle.x,plotStyle.xUnit],['yaxis',plotStyle.y,plotStyle.yUnit],['yaxis2',plotStyle.y2,plotStyle.y2Unit]] as const){
+    if(label||unit)base[axis]={...base[axis],title:{text:plain([label,unit&&'('+unit+')'].filter(Boolean).join(' '))}};
+   }
+   if(plotStyle.legend!==undefined)base.showlegend=plotStyle.legend;
+  }
+  const traces=data.map((trace,i):Data=>{
+   const style=plotStyle?.traces?.[i],color=style?.color??(i===0?plotStyle?.color:undefined),name=style?.name;
+   if(!name&&!color)return trace;
+   const labeled=name?{...trace,name:plain(name)}:trace;
+   if(!color)return labeled;
+   if(trace.type==='heatmap')return {...labeled,colorscale:[[0,'#111a27'],[1,color]]} as Data;
+   return {...labeled,line:{...('line' in trace?trace.line:{}),color},marker:{...('marker' in trace?trace.marker:{}),color}} as Data;
+  });
   if(cursor!==undefined)base.shapes=[{type:'line',xref:'x',yref:'paper',x0:cursor,x1:cursor,y0:0,y1:1,line:{color:'#8195a8',width:1,dash:'dot'}}];
-  queue.current=queue.current.catch(()=>{}).then(async()=>{if(!mounted.current||revision!==generation.current)return;await Plotly.react(el,data,base,{responsive:false,displaylogo:false,scrollZoom:false,modeBarButtonsToRemove:['lasso2d','select2d','toImage'],modeBarButtonsToAdd:canExport?[{name:'Exporter le graphique en PNG',title:'Exporter le graphique en PNG',icon:{width:24,height:24,path:'M3 6h4l2-3h6l2 3h4v15H3z M12 8a5 5 0 1 0 0 10a5 5 0 1 0 0-10'},click:()=>{setExportError('');void Plotly.toImage(el,{format:'png',height:700,width:1200,scale:2}).then(async url=>{const blob=await(await fetch(url)).blob();await download(blob,'resonant-figure.png','image/png')}).catch(e=>setExportError(e instanceof Error?e.message:'Export du graphique impossible.'))}}]:[],toImageButtonOptions:{format:'png',filename:'resonant-figure',height:700,width:1200,scale:2}});if(!mounted.current)return;const plot=el as unknown as PlotlyHTMLElement;plot.removeAllListeners('plotly_hover');plot.on('plotly_hover',e=>{const x=e.points[0]?.x;if(typeof x==='number')callback.current?.(x)})});
- },[data,layout,height,cursor,canExport]);
- return <><div ref={ref} className="plot" style={{minHeight:height}}/>{exportError&&<p className="error-inline" role="alert">{exportError}</p>}</>;
+  queue.current=queue.current.catch(()=>{}).then(async()=>{if(!mounted.current||revision!==generation.current)return;await Plotly.react(el,traces,base,{responsive:false,displaylogo:false,scrollZoom:false,modeBarButtonsToRemove:['lasso2d','select2d','toImage'],modeBarButtonsToAdd:canExport?[{name:'Exporter le graphique en PNG',title:'Exporter le graphique en PNG',icon:{width:24,height:24,path:'M3 6h4l2-3h6l2 3h4v15H3z M12 8a5 5 0 1 0 0 10a5 5 0 1 0 0-10'},click:()=>{setExportError('');void Plotly.toImage(el,{format:'png',height:700,width:1200,scale:2}).then(async url=>{const blob=await(await fetch(url)).blob();await download(blob,'resonant-figure.png','image/png')}).catch(e=>setExportError(e instanceof Error?e.message:'Export du graphique impossible.'))}}]:[],toImageButtonOptions:{format:'png',filename:'resonant-figure',height:700,width:1200,scale:2}});if(!mounted.current)return;const plot=el as unknown as PlotlyHTMLElement;plot.removeAllListeners('plotly_hover');plot.on('plotly_hover',e=>{const x=e.points[0]?.x;if(typeof x==='number')callback.current?.(x)})});
+ },[data,layout,height,cursor,canExport,plotStyle]);
+ return <><div ref={ref} className="plot" data-plot-id={plotId} style={{minHeight:height}}/>{exportError&&<p className="error-inline" role="alert">{exportError}</p>}</>;
 }

@@ -1,5 +1,5 @@
 """Single source of truth for DSP, parameter units and mathematical documentation."""
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, replace
 from typing import Callable
 import numpy as np
 from scipy import signal
@@ -55,6 +55,47 @@ REGISTRY: dict[str, Definition] = {
  'output': Definition('Sortie', 'Mathématiques', 1, {}, 'y[n] = x[n]', 'Sortie mono du graphe. Aucun écrêtage ni normalisation cachée.', True),
 }
 
+# These blocks are executable on both numerical engines. Circuit equivalents
+# describe the topology; the browser simulates idealised DSP, not a SPICE IC.
+PERIODIC = {'frequency': FREQ, 'amplitude': AMP}
+SEEDED = {'amplitude': AMP, 'seed': p(42, 0, 1000000, '', 'Graine')}
+for kind, label, description in (
+    ('pulse_train', 'Train d’impulsions', 'Impulsions périodiques, riches en harmoniques.'),
+    ('saw', 'VCO dent de scie', 'Rampe périodique idéale.'),
+    ('triangle', 'VCO triangle', 'Rampe symétrique périodique.'),
+    ('pulse', 'VCO carré / PWM', 'Comparateur de rampe avec largeur réglable.'),
+    ('lfo', 'LFO sinusoïdal', 'Oscillation lente de modulation.'),
+    ('relaxation', 'Oscillateur à relaxation', 'Approximation par rampe de charge/décharge.'),
+):
+    params = dict(PERIODIC)
+    if kind == 'lfo': params['frequency'] = p(5, .01, 100, 'Hz', 'Fréquence')
+    if kind == 'pulse': params['width'] = p(.5,.01,.99,'×','Largeur')
+    REGISTRY[kind] = Definition(label, 'Générateurs', 0, params, 'x(t) = A F(ft)', description)
+for kind,label in [('white_noise','Bruit blanc déterministe'),('pink_noise','Bruit rose')]:
+    REGISTRY[kind] = Definition(label, 'Générateurs', 0, SEEDED, 'x[n] = A h(ξ[n])', 'Source reproductible. Le bruit rose utilise une coloration IIR.')
+REGISTRY.update({
+    'highpass1': Definition('RC passe-haut','Filtres',1,{'fc':FILTER['fc']},'H(s) = s/(s+Ω)','RC idéal, premier ordre.',True),
+    'schmitt': Definition('Trigger de Schmitt','Non linéaire',1,{'threshold':p(.1,.001,1,'','Seuil')},'y = ±1','Comparateur à hystérésis.'),
+    'clipper': Definition('Écrêteur à diodes','Non linéaire',1,{'threshold':p(.6,.01,4,'','Seuil')},'y = clip(x, ±V)','Diodes idéalisées.'),
+    'rectifier': Definition('Redresseur','Non linéaire',1,{},'y = |x|','Redressement double alternance idéal.'),
+    'wavefolder': Definition('Wavefolder','Non linéaire',1,{'drive':p(2,.1,10,'×','Gain')},'y = 1−|((gx+1) mod 4)−2|','Repliement de la forme d’onde.'),
+    'sample_hold': Definition('Sample & hold','Dynamique',1,{'frequency':FREQ},'y[n] = x[kN]','Horloge interne ; tension mémorisée jusqu’au prochain échantillon.'),
+    'integrator': Definition('Intégrateur','Mathématiques',1,{},'y[n] = 0,999 y[n−1]+0,001 x[n]','Intégrateur avec fuite pour éviter la dérive.',True),
+    'differentiator': Definition('Dérivateur','Mathématiques',1,{},'y[n] = x[n]−x[n−1]','Différence discrète.',True),
+})
+
+FILTER_TOPOLOGIES = {
+    'sallen_key': ('lowpass', 'Sallen-Key passe-bas'),
+    'mfb': ('bandpass', 'MFB passe-bande'),
+    'svf_lowpass': ('lowpass', 'Variables d’état · passe-bas'),
+    'svf_highpass': ('highpass', 'Variables d’état · passe-haut'),
+    'svf_bandpass': ('bandpass', 'Variables d’état · passe-bande'),
+    'vcf': ('lowpass', 'VCF résonant'),
+}
+for kind, (response, label) in FILTER_TOPOLOGIES.items():
+    REGISTRY[kind] = replace(REGISTRY[response], label=label,
+                             description='Réponse idéale à fréquence et Q fixes pendant le rendu.')
+
 def parameters(kind: str, values: dict[str, float], fs: int) -> dict[str, float]:
     if kind not in REGISTRY:
         raise ValueError(f'Bloc inconnu : {kind}')
@@ -75,14 +116,16 @@ def parameters(kind: str, values: dict[str, float], fs: int) -> dict[str, float]
 
 def coefficients(kind: str, p: dict[str, float], fs: int):
     """Return b,a in ascending powers of z^-1, shared by audio and Bode."""
+    if kind in FILTER_TOPOLOGIES:
+        kind = FILTER_TOPOLOGIES[kind][0]
     if kind in ('lowpass', 'highpass', 'bandpass', 'notch'):
         w = 2 * fs * np.tan(np.pi * p['fc'] / fs)
         a = [1, w / p['q'], w*w]
         b = {'lowpass':[w*w], 'highpass':[1,0,0], 'bandpass':[w/p['q'],0], 'notch':[1,0,w*w]}[kind]
         return signal.bilinear(b, a, fs)
-    if kind in ('peak_eq','lowpass1'):
+    if kind in ('peak_eq','lowpass1','highpass1'):
         w=2*fs*np.tan(np.pi*p['fc']/fs)
-        if kind=='lowpass1':return signal.bilinear([w],[1,w],fs)
+        if kind in ('lowpass1','highpass1'):return signal.bilinear([w] if kind=='lowpass1' else [1,0],[1,w],fs)
         a=10**(p['db']/40)
         return signal.bilinear([1,a*w/p['q'],w*w],[1,w/(a*p['q']),w*w],fs)
     if kind == 'comb':
@@ -92,6 +135,8 @@ def coefficients(kind: str, p: dict[str, float], fs: int):
     if kind == 'resonator':
         r = np.exp(-1 / (fs * p['tau']))
         return np.array([1-r]), np.array([1,-2*r*np.cos(2*np.pi*p['frequency']/fs),r*r])
+    if kind == 'integrator': return np.array([.001]),np.array([1.,-.999])
+    if kind == 'differentiator': return np.array([1.,-1.]),np.array([1.])
     if kind in ('gain','sum','output','input'):
         return np.array([p.get('gain',1)]), np.array([1.])
     if kind == 'delay':
@@ -121,6 +166,32 @@ def process(kind: str, p: dict, inputs: list[np.ndarray], fs: int, n: int) -> np
     t = np.arange(n) / fs
     if kind == 'oscillator':
         return p['amplitude'] * np.sin(2*np.pi*p['frequency']*t+p['phase'])
+    if kind in ('saw','triangle','pulse','lfo','relaxation','pulse_train'):
+        phase = (t*p['frequency']) % 1
+        if kind == 'lfo': wave = np.sin(2*np.pi*phase)
+        elif kind in ('triangle','relaxation'): wave = 1-4*np.abs(phase-.5)
+        elif kind == 'pulse_train': wave = phase < p['frequency']/fs
+        elif kind == 'pulse': wave = np.where(phase < p['width'], 1, -1)
+        else: wave = 2*phase-1
+        return p['amplitude']*wave
+    if kind in ('white_noise','pink_noise'):
+        bits = (np.arange(n,dtype=np.uint32)+int(p['seed']))*np.uint32(747796405)+np.uint32(2891336453)
+        word = ((bits >> ((bits >> 28)+4)) ^ bits)*np.uint32(277803737)
+        x = ((word >> 22)^word).astype(np.float64)/2147483648-1
+        if kind == 'pink_noise':
+            x = signal.lfilter([.049922035,-.095993537,.050612699,-.004408786],
+                              [1,-2.494956002,2.017265875,-.5221894],x)
+        return p['amplitude']*x
+    if kind == 'clipper':return np.clip(inputs[0],-p['threshold'],p['threshold'])
+    if kind == 'rectifier':return np.abs(inputs[0])
+    if kind == 'wavefolder':return 1-np.abs((p['drive']*inputs[0]+1)%4-2)
+    if kind == 'sample_hold':
+        step=max(1,round(fs/p['frequency']))
+        return inputs[0][np.arange(n)//step*step]
+    if kind == 'schmitt':
+        indices=np.where(np.abs(inputs[0])>=p['threshold'],np.arange(n)+1,0)
+        indices=np.maximum.accumulate(indices)
+        return np.where(indices>0,np.sign(inputs[0][np.maximum(0,indices-1)]),-1.)
     if kind == 'modal':
         u = np.maximum(0, t-p['onset'])
         return p['amplitude']*exponential(u,p['attack'],p['tau'])*np.sin(2*np.pi*p['frequency']*u+p['phase'])*(t>=p['onset'])

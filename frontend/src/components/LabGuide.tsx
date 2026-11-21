@@ -30,7 +30,7 @@ export const moduleHelp:Record<string,string>={
 
 export function ModuleHelp({type}:{type:string}){return moduleHelp[type]?<details className="module-simple-help"><summary>En mots simples</summary><p>{moduleHelp[type]}</p></details>:null}
 
-export function LabGuide({userId,space,onNavigate,onArea}:{userId?:number;space:LabSpace;onNavigate:(space:LabSpace)=>void;onArea:(step:GuideStep)=>void}){
+export function LabGuide({userId,space,onNavigate,onArea,labels,welcome}:{labels:Record<LabSpace,string>;welcome:string;userId?:number;space:LabSpace;onNavigate:(space:LabSpace)=>void;onArea:(step:GuideStep)=>void}){
  const dialog=useRef<HTMLDialogElement>(null),trigger=useRef<HTMLButtonElement>(null),origin=useRef(space);
  const [open,setOpen]=useState(false),[walking,setWalking]=useState(false);
  const key=`resonant-guide-v3:${userId}`;
@@ -38,13 +38,14 @@ export function LabGuide({userId,space,onNavigate,onArea}:{userId?:number;space:
  useEffect(()=>{if(open){if(!dialog.current?.open)dialog.current?.showModal()}else if(dialog.current?.open)dialog.current.close()},[open]);
  function remember(){try{localStorage.setItem(key,'seen')}catch{}}
  function close(){dialog.current?.close();setOpen(false);remember();trigger.current?.focus()}
+ function reopen(){setWalking(false);setOpen(true)}
  function start(){origin.current=space;dialog.current?.close();setOpen(false);setWalking(true)}
  function end(){setWalking(false);remember();onNavigate(origin.current);trigger.current?.focus()}
- return <>{walking&&<GuidedTour onEnd={end} onArea={onArea}/>}<button ref={trigger} className="lab-help-button" onClick={()=>setOpen(true)} aria-haspopup="dialog"><span aria-hidden="true">✦</span> Aide</button>
+ return <>{walking&&<GuidedTour onEnd={end} onArea={onArea}/>}<button ref={trigger} className="lab-help-button" onClick={reopen} aria-haspopup="dialog"><span aria-hidden="true">✦</span> Aide</button>
  <dialog ref={dialog} className="lab-guide" aria-labelledby="lab-guide-title" onCancel={e=>{e.preventDefault();close()}}>
  <div className="guide-top"><span>RÉMI · VOTRE GUIDE</span><button onClick={close} aria-label="Fermer le guide">✕</button></div>
- <div className="guide-body"><GuideMascot/><div className="guide-speech"><h2 id="lab-guide-title">Bienvenue, je suis Rémi !</h2><p>Deux espaces pour donner vie à vos idées.</p>
- <div className="guide-spaces"><button onClick={()=>{onNavigate('atelier');close()}}><b>Atelier Arduino</b><span>Assemblez des composants, reliez-les et testez votre montage en 2D ou en 3D.</span></button><button onClick={()=>{onNavigate('analyse');close()}}><b>Analyse du son</b><span>Importez un WAV, recréez son son et cherchez un montage plus simple.</span></button></div>
+ <div className="guide-body"><GuideMascot/><div className="guide-speech" data-editor-key="welcome"><h2 id="lab-guide-title">Bienvenue, je suis Rémi !</h2><p>{welcome}</p>
+ <div className="guide-spaces"><button onClick={()=>{onNavigate('analyse');close()}}><b>{labels.analyse}</b><span>Importez un WAV, recréez son son et cherchez un montage plus simple.</span></button><button onClick={()=>{onNavigate('atelier');close()}}><b>{labels.atelier}</b><span>Assemblez des composants, reliez-les et testez votre montage en 2D ou en 3D.</span></button></div>
  <p>Le menu ☰ permet de passer de l’un à l’autre.</p><button className="primary guide-interactive-start" onClick={start}>Me montrer les outils →</button>
  </div></div><button className="guide-skip" onClick={close}>Explorer librement</button></dialog></>
 }

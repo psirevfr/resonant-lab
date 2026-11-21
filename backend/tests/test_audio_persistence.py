@@ -55,3 +55,37 @@ def test_reference_can_be_loaded_by_an_independent_process():
     result=subprocess.check_output([sys.executable,'-c',
         'import sys,hashlib; from lab.audio_store import load; print(hashlib.sha256(load(sys.argv[1],1).original).hexdigest())',key],text=True)
     assert result.strip()==expected
+
+
+def test_live_cached_reference_keeps_ownership_and_avoids_redecoding(monkeypatch):
+    client=TestClient(app);key=client.post('/api/demo').json()['id']
+    expected=get_recording(key,1)
+    def unexpected(*args,**kwargs):
+        raise AssertionError('A live decoded cache hit must not reread the WAV')
+    monkeypatch.setattr(audio_store,'load',unexpected)
+    assert get_recording(key,1) is expected
+    # Ownership is checked against the index even if memory has a stale owner.
+    c=audio_store.connection()
+    try:c.execute('UPDATE audio_references SET owner=2 WHERE id=?',(key,));c.commit()
+    finally:c.close()
+    response=client.get(f'/api/audio/{key}/segment?duration=.05')
+    assert response.status_code==404
+    assert response.json()['detail']=='Référence audio absente ou expirée ; réimporter le WAV.'
+    assert key not in recordings
+
+
+def test_expired_cached_reference_is_not_served_after_disk_cleanup(monkeypatch):
+    client=TestClient(app);key=client.post('/api/demo').json()['id']
+    assert key in recordings
+    monkeypatch.setenv('RESONANT_AUDIO_TTL_SECONDS','-1')
+    audio_store.cleanup()
+    response=client.get(f'/api/audio/{key}/segment?duration=.05')
+    assert response.status_code==404 and key not in recordings
+    assert response.json()['detail']=='Référence audio absente ou expirée ; réimporter le WAV.'
+
+
+def test_expired_cached_reference_is_not_served_before_cleanup(monkeypatch):
+    client=TestClient(app);key=client.post('/api/demo').json()['id']
+    monkeypatch.setenv('RESONANT_AUDIO_TTL_SECONDS','-1')
+    assert client.get(f'/api/audio/{key}/segment?duration=.05').status_code==404
+    assert key not in recordings

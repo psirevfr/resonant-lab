@@ -1,0 +1,21 @@
+/* Public presentation settings contain no executable CSS or application logic. */
+.lab-shell{background:var(--site-background,#111719);color:var(--site-text,#dbe4e5)}
+.lab-shell .lab-topbar,.lab-shell .site-footer,.lab-shell .space-menu{background:var(--site-surface,#18201f);color:var(--site-text,#dbe4e5)}
+.lab-shell :is(.main-workspace,.graph-wrap,.workshop-stage,.schematic-sheet){background:var(--site-background,#111719)}
+.lab-shell :is(.source-panel,.library,.inspector,.audio-node,.workshop-tools,.workshop-bottom,.workshop-panel,.part-selection-bar){background:var(--site-surface,#18201f);color:var(--site-text,#dbe4e5)}
+.lab-shell .audio-node.generator{background:color-mix(in srgb,var(--site-accent,#b4ed79) 12%,var(--site-surface,#18201f))}
+.lab-shell .lab-wordmark,.lab-shell .space-menu nav a{color:var(--site-text,#dbe4e5)}
+.lab-shell .lab-wordmark span,.lab-shell .lab-help-button,.lab-shell .tabs .active,.lab-shell .tabs .active svg{color:var(--site-accent,#b4ed79)}
+.lab-shell .space-menu nav a[aria-current],.lab-guide,.tour-coach{border-color:var(--site-accent,#b4ed79)}
+.lab-shell :is(button,input,select,textarea,.source-panel,.audio-detail,.audio-inventory,.workshop-panel),.lab-guide,.tour-coach,.guide-spaces button{border-radius:var(--site-radius,8px)}
+.lab-shell .lab-wordmark{font-size:calc(20px * var(--site-font-scale,1))}
+.lab-shell .active-space{font-size:calc(13px * var(--site-font-scale,1))}
+.lab-shell .space-menu nav a{font-size:calc(14px * var(--site-font-scale,1))}
+.lab-shell .site-footer{font-size:calc(10px * var(--site-font-scale,1))}
+.lab-shell .workshop-tools button,.lab-shell .instrument-toolbar button{font-size:calc(11px * var(--site-font-scale,1))}
+.lab-shell .action-bar button,.lab-shell .tabs button{font-size:calc(12px * var(--site-font-scale,1))}
+.lab-shell .audio-node .node-title{font-size:calc(12px * var(--site-font-scale,1))}
+.lab-shell .audio-node .node-values{font-size:calc(10px * var(--site-font-scale,1))}
+.lab-shell .workspace-host p,.lab-guide p,.tour-coach p{font-size:calc(14px * var(--site-font-scale,1))}
+.lab-guide h2,.tour-coach h2{font-size:calc(22px * var(--site-font-scale,1))}
+:root[data-editor-select-mode] [data-editor-key]:hover{outline:2px dashed var(--site-accent,#b4ed79);outline-offset:-2px;cursor:crosshair}

@@ -1,6 +1,9 @@
 import type {Patch,Catalog,SignalView} from './types';
 const clamp=(x:number,a:number,b:number)=>Math.max(a,Math.min(b,x));
 const roundEven=(x:number)=>x%1===.5?2*Math.round(x/2):Math.round(x);
+const filterTopology:Record<string,string>={
+ sallen_key:'lowpass',mfb:'bandpass',svf_lowpass:'lowpass',svf_highpass:'highpass',svf_bandpass:'bandpass',vcf:'lowpass',
+};
 function filter(x:Float64Array,b:number[],a:number[]){const y=new Float64Array(x.length);for(let i=0;i<x.length;i++){let v=0;for(let j=0;j<b.length&&j<=i;j++)v+=b[j]*x[i-j];for(let j=1;j<a.length&&j<=i;j++)v-=a[j]*y[i-j];y[i]=v/a[0]}return y}
 function bessel(x:number){let sum=1,term=1;for(let k=1;k<40;k++){term*=x*x/(4*k*k);sum+=term;if(term<1e-16)break}return sum}
 function fir(){const h=Array.from({length:81},(_,j)=>{const i=j-40;return (i===0?.25:Math.sin(Math.PI*i/4)/(Math.PI*i))*bessel(5*Math.sqrt(1-(i/40)**2))/bessel(5)});const sum=h.reduce((a,b)=>a+b,0);return h.map(v=>v/sum)}
@@ -24,14 +27,16 @@ export function renderGraph(patch:Patch,catalog:Catalog):Float64Array{
  for(const id of nodes.keys())visit(id);order.length=0;visited.clear();visit(outputs[0].id);
  if(n*order.reduce((a,id)=>a+(nodes.get(id)!.type==='asymmetric_saturation'?8:1),0)>100_000_000)throw Error('Rendu trop volumineux. Réduisez la durée.');
  const buffers=new Map<string,Float64Array>();
- for(const id of order){const node=nodes.get(id)!,p=values.get(id)!,ins=inputs.get(id)!.map(k=>buffers.get(k)!),kind=node.type;let y=new Float64Array(n);
+ for(const id of order){const node=nodes.get(id)!,p=values.get(id)!,ins=inputs.get(id)!.map(k=>buffers.get(k)!),kind=filterTopology[node.type]??node.type;let y=new Float64Array(n);
   const envelope=(t:number)=>{const u=t-(p.onset??0);return u<0?0:Math.exp(-u/p.tau)*(p.attack>0?-Math.expm1(-u/p.attack):1)};
   if(kind==='asymmetric_saturation')y=saturate4(ins[0],p);
-  else if(['lowpass','highpass','bandpass','notch','peak_eq','lowpass1','resonator'].includes(kind)){
+  else if(['lowpass','highpass','bandpass','notch','peak_eq','lowpass1','highpass1','integrator','differentiator','resonator'].includes(kind)){
    let a:number[],b:number[];
-   if(kind==='resonator'){const r=Math.exp(-1/(fs*p.tau));a=[1,-2*r*Math.cos(2*Math.PI*p.frequency/fs),r*r];b=[1-r]}
+   if(kind==='integrator'){a=[1,-.999];b=[.001]}
+   else if(kind==='differentiator'){a=[1];b=[1,-1]}
+   else if(kind==='resonator'){const r=Math.exp(-1/(fs*p.tau));a=[1,-2*r*Math.cos(2*Math.PI*p.frequency/fs),r*r];b=[1-r]}
    else{const k=Math.tan(Math.PI*p.fc/fs),k2=k*k,q=p.q??1;
-    if(kind==='lowpass1'){a=[1+k,k-1];b=[k,k]}
+    if(kind==='lowpass1'||kind==='highpass1'){a=[1+k,k-1];b=kind==='lowpass1'?[k,k]:[1,-1]}
     else if(kind==='peak_eq'){const A=10**(p.db/40);a=[1+k/(A*q)+k2,2*(k2-1),1-k/(A*q)+k2];b=[1+A*k/q+k2,2*(k2-1),1-A*k/q+k2]}
     else{a=[1+k/q+k2,2*(k2-1),1-k/q+k2];b=kind==='lowpass'?[k2,2*k2,k2]:kind==='highpass'?[1,-2,1]:kind==='bandpass'?[k/q,0,-k/q]:[1+k2,2*(k2-1),1+k2]}
    }y=filter(ins[0],b,a);
@@ -39,9 +44,17 @@ export function renderGraph(patch:Patch,catalog:Catalog):Float64Array{
    let seed=(p.seed??42)>>>0;seed=seed||0x6d2b79f5;
    const uniform=()=>{seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return ((seed>>>0)+.5)/4294967296};
    const held=(t:number)=>t<p.attack?t/Math.max(p.attack,1/fs):1-(1-p.sustain)*clamp((t-p.attack)/p.decay,0,1);
+   let schmitt=-1;const holdStep=kind==='sample_hold'?Math.max(1,roundEven(fs/p.frequency)):1;
    for(let i=0;i<n;i++){const t=i/fs;
     switch(kind){
      case 'oscillator':y[i]=p.amplitude*Math.sin(2*Math.PI*p.frequency*t+p.phase);break;
+     case 'saw':case 'triangle':case 'pulse':case 'lfo':case 'relaxation':case 'pulse_train':{const phase=(t*p.frequency)%1;y[i]=p.amplitude*(kind==='pulse_train'?Number(phase<p.frequency/fs):kind==='saw'?2*phase-1:kind==='pulse'?(phase<p.width?1:-1):kind==='lfo'?Math.sin(2*Math.PI*phase):1-4*Math.abs(phase-.5));break}
+     case 'white_noise':case 'pink_noise':{const bits=(Math.imul(i+p.seed,747796405)+2891336453)>>>0,word=Math.imul((((bits>>>28)+4>=32?0:bits>>>((bits>>>28)+4)))^bits,277803737);y[i]=p.amplitude*(((word>>>22)^word)>>>0)/2147483648-p.amplitude;break}
+     case 'clipper':y[i]=clamp(ins[0][i],-p.threshold,p.threshold);break;
+     case 'rectifier':y[i]=Math.abs(ins[0][i]);break;
+     case 'wavefolder':y[i]=1-Math.abs(((p.drive*ins[0][i]+1)%4+4)%4-2);break;
+     case 'sample_hold':y[i]=ins[0][Math.floor(i/holdStep)*holdStep];break;
+     case 'schmitt':if(Math.abs(ins[0][i])>=p.threshold)schmitt=Math.sign(ins[0][i]);y[i]=schmitt;break;
      case 'modal':y[i]=p.amplitude*envelope(t)*Math.sin(2*Math.PI*p.frequency*Math.max(0,t-p.onset)+p.phase);break;
      case 'noise':y[i]=p.amplitude*Math.sqrt(-2*Math.log(uniform()))*Math.cos(2*Math.PI*uniform());break;
      case 'input':case 'impulse':y[i]=i===0?(p.amplitude??1):0;break;
@@ -58,6 +71,7 @@ export function renderGraph(patch:Patch,catalog:Catalog):Float64Array{
     }
    }
   }
+  if(kind==='pink_noise')y=filter(y,[.049922035,-.095993537,.050612699,-.004408786],[1,-2.494956002,2.017265875,-.5221894]);
   for(const v of y)if(!Number.isFinite(v)||Math.abs(v)>1e8)throw Error('Signal divergent. Vérifiez les gains.');
   buffers.set(id,y);for(const source of inputs.get(id)!){uses.set(source,uses.get(source)!-1);if(uses.get(source)===0)buffers.delete(source)}
  }

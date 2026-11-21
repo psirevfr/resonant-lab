@@ -7,7 +7,7 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[1]
 VERSION='314.0.7'
 BASE=f'https://cdn.jsdelivr.net/pyodide/v{VERSION}/full/'
-MODULES=('__init__','schema','audio','blocks','graph','analysis','metrics','identify','generation_search','hybrid','harmonic_groups','modal_fit','attack_fit','impact','compact','instrument','texture','shared_envelopes','nonlinear_fit','optimization','compute')
+MODULES=('__init__','schema','audio','blocks','graph','analysis','metrics','identify','generation_search','subtractive','hybrid','harmonic_groups','modal_fit','attack_fit','impact','compact','instrument','texture','shared_envelopes','nonlinear_fit','optimization','compute')
 CORE=('pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json')
 
 
@@ -45,7 +45,7 @@ def prepare(destination,network=False):
     allowed=set(CORE)|{'numerical.zip'}|{lock['packages'][name]['file_name'] for name in selected}
     files={name:{'bytes':(destination/name).stat().st_size,'sha256':hashlib.sha256((destination/name).read_bytes()).hexdigest()} for name in sorted(allowed) if (destination/name).is_file()}
     ready=lock is not None and allowed<=set(files) and all(files[lock['packages'][n]['file_name']]['sha256']==lock['packages'][n]['sha256'] for n in selected)
-    manifest={'runtime_version':VERSION,'algorithm_version':'shared-python-v5-harmonic','source_sha256':files['numerical.zip']['sha256'],'files':files,'download_bytes':sum(f['bytes'] for f in files.values()),'ready':ready}
+    manifest={'runtime_version':VERSION,'algorithm_version':'shared-python-v6-subtractive','source_sha256':files['numerical.zip']['sha256'],'files':files,'download_bytes':sum(f['bytes'] for f in files.values()),'ready':ready}
     temp=destination/'manifest.json.tmp';temp.write_text(json.dumps(manifest,sort_keys=True));temp.replace(destination/'manifest.json')
     return manifest
 

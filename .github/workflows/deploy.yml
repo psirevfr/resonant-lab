@@ -28,7 +28,24 @@ jobs:
               set -eu
               cd ~/resonant-lab
               .venv/bin/python -c 'import sys; sys.exit("Déploiement arrêté : .venv utilise Python " + sys.version.split()[0] + ". Python 3.12+ requis ; recréer la .venv sans toucher à SQLite.") if sys.version_info < (3,12) else None'
-              git pull --ff-only origin main
+              # Fetch the helper from the exact commit to deploy, including on
+              # the first update where the old checkout does not contain it.
+              git fetch origin main
+              deploy_ref="$(git rev-parse FETCH_HEAD)"
+              deploy_runner="$(mktemp)"
+              cleanup_assets() {
+                result=$?
+                trap - EXIT
+                .venv/bin/python "$deploy_runner" restore --root "$PWD" || result=1
+                rm -f "$deploy_runner"
+                exit "$result"
+              }
+              trap cleanup_assets EXIT
+              git show "$deploy_ref:scripts/deploy_assets.py" > "$deploy_runner"
+              .venv/bin/python "$deploy_runner" before --root "$PWD"
+              git merge --ff-only "$deploy_ref"
+              # Restore old chunks immediately, before dependency installation.
+              .venv/bin/python "$deploy_runner" restore --root "$PWD"
               .venv/bin/python -m pip install --disable-pip-version-check pip==26.2.1
               .venv/bin/python -m pip install -r requirements.lock.txt
               .venv/bin/python -m pip uninstall -y python-jose ecdsa
@@ -36,3 +53,13 @@ jobs:
               .venv/bin/python scripts/prepare_local_runtime.py --download
               .venv/bin/python -c 'import json; from pathlib import Path; assert json.loads(Path(".local/compute-runtime/manifest.json").read_text())["ready"], "Runtime incomplet"'
               sudo systemctl restart resonant-lab
+              sudo systemctl is-active --quiet resonant-lab
+              healthy=0
+              for attempt in 1 2 3 4 5 6 7 8 9 10; do
+                if curl --fail --silent --show-error --max-time 3 http://127.0.0.1:8000/api/health | .venv/bin/python -c 'import json,sys; v=json.load(sys.stdin); sys.exit(0 if v.get("status")=="ok" and v.get("version")=="1.1.0" else 1)'; then
+                  healthy=1
+                  break
+                fi
+                sleep 2
+              done
+              test "$healthy" -eq 1 || { printf 'La nouvelle version ne répond pas correctement après redémarrage.\n' >&2; exit 1; }

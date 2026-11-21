@@ -17,7 +17,7 @@ ics==0.7.2
 idna==3.20
 macholib @ file:///AppleInternal/Library/BuildRoots/4~CNlKugBUuKM58FJFHeNR3wcmLXUyWlLa_MEj66k/Library/Caches/com.apple.xbs/TemporaryDirectory.BQzQ7o/Sources/python3/macholib-1.15.2-py2.py3-none-any.whl
 passlib==1.7.4
-pyasn1==0.6.4
+pyasn1==0.6.5
 pycparser==2.23
 pydantic==2.13.5
 pydantic_core==2.46.5

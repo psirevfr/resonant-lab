@@ -65,13 +65,26 @@ def save(record,owner):
     return key
 
 
-def load(key,owner):
-    # Validate before constructing a filesystem path, including database contents.
-    if len(key)!=32 or any(x not in '0123456789abcdef' for x in key):return None
+def reference(key,owner):
+    """Read live, owner-scoped metadata before a cache hit or a file load.
+
+    Expiration must not depend on whether the decoded WAV happens to remain in
+    process memory. No filesystem access or recorded samples are needed here.
+    """
+    if not isinstance(key,str) or len(key)!=32 or any(x not in '0123456789abcdef' for x in key):return None
     c=connection()
     try:row=c.execute('SELECT name,size,created FROM audio_references WHERE id=? AND owner=?',(key,owner)).fetchone()
     finally:c.close()
-    if row is None or row['created']<time.time()-int(os.environ.get('RESONANT_AUDIO_TTL_SECONDS','604800')):return None
+    now=time.time()
+    if row is None or row['created']<now-int(os.environ.get('RESONANT_AUDIO_TTL_SECONDS','604800')):return None
+    if owner<0 and row['created']<now-86400:return None
+    return row
+
+
+def load(key,owner):
+    # Validate before constructing a filesystem path, including database contents.
+    row=reference(key,owner)
+    if row is None:return None
     path=directory()/(key+'.wav')
     if path.is_symlink() or not path.is_file():return None
     try:data=path.read_bytes()
