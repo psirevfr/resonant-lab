@@ -40,8 +40,8 @@ export function LabShell(){
  const navigate=useCallback((id:string,focus=true)=>{
   setMenu(false);if(focus)trigger.current?.focus();
   if(id==='atelier')setWorkshopLoaded(true);else setAudioLoaded(true);
-  if(pageId!==id){document.querySelectorAll('audio').forEach(a=>a.pause());history.pushState(null,'',pagePath(id)+location.search);setPageId(id)}
- },[pageId]);
+  if(page.id!==id){document.querySelectorAll('audio').forEach(a=>a.pause());history.pushState(null,'',pagePath(id)+location.search);setPageId(id)}
+ },[page.id]);
  useEffect(()=>{
   if(!menu)return;
   nav.current?.querySelector<HTMLAnchorElement>('a[aria-current="page"]')?.focus();
@@ -64,7 +64,7 @@ export function LabShell(){
   {login&&<ExportLogin onClose={()=>setLogin(false)} onConnected={u=>{resetSession();setUser(u);setLogin(false)}}/>}
   <main className="workspace-host"><WorkspaceBoundary>
    {workshopLoaded&&!workshopInLayout&&<div className="workshop-space" data-workspace="atelier" hidden={!nativeWorkshop}><Suspense fallback={<p className="workspace-loading">Ouverture de l’atelier…</p>}>{workshop(nativeWorkshop)}</Suspense></div>}
-   {(audioLoaded||!!custom)&&<div className="audio-space" data-workspace="analyse" hidden={!audioActive}><Suspense fallback={<p className="workspace-loading">Ouverture de l’analyse…</p>}><Audio layoutPage={custom} extraBlocks={workshopInLayout?{workshop:workshop(audioActive)}:undefined} guideTarget={guideTarget} active={audioActive} accountUser={user} onAccountChange={setUser} resumeJob={resume} onCreateCircuit={(patch,origin)=>{setIncoming(structuredClone({patch,origin}));navigate('atelier')}}/></Suspense></div>}
+   {(audioLoaded||!!custom)&&<div className="audio-space" data-workspace="analyse" hidden={!audioActive}><Suspense fallback={<p className="workspace-loading">Ouverture de l’analyse…</p>}><Audio layoutPage={custom} onNavigatePage={navigate} extraBlocks={workshopInLayout?{workshop:workshop(audioActive)}:undefined} guideTarget={guideTarget} active={audioActive} accountUser={user} onAccountChange={setUser} resumeJob={resume} onCreateCircuit={(patch,origin)=>{setIncoming(structuredClone({patch,origin}));navigate('atelier')}}/></Suspense></div>}
   </WorkspaceBoundary></main><footer className="site-footer"><span data-editor-key="identity">© {settings.signature}</span><span>Version {APP_VERSION}</span></footer>
  </div></LayoutContext.Provider>;
 }

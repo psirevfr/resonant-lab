@@ -364,13 +364,16 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
         startupTimer?.invalidate()
         if process.isRunning { process.terminate() }
         let deadline = Date().addingTimeInterval(3)
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+        // AppKit can wait for this reply in its modal run-loop mode.
+        let timer = Timer(timeInterval: 0.1, repeats: true) { timer in
             if !process.isRunning || Date() >= deadline {
                 if process.isRunning { kill(process.processIdentifier, SIGKILL) }
                 timer.invalidate()
                 NSApp.reply(toApplicationShouldTerminate: true)
             }
         }
+        RunLoop.main.add(timer, forMode: .common)
+        RunLoop.main.add(timer, forMode: .modalPanel)
     }
 
     func applicationWillTerminate(_ notification: Notification) { stopBackend() }
