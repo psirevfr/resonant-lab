@@ -627,10 +627,7 @@ class SiteEditor:
     def run_job(self, action, prepared, review):
         try:
             if action == 'prepare':
-                self.log('Vérification du dépôt et de la destination GitHub…')
-                self.ensure_publishable(review)
-                self.git('fetch', '--no-tags', 'origin', 'main', timeout=120, on_line=self.log)
-                self.ensure_publishable(review)
+                self.log('Vérification des fichiers et des commits locaux…')
                 self.scan_secrets(review)
                 script = self.repo/'test.sh'
                 if not script.is_file() or script.is_symlink():
@@ -649,6 +646,8 @@ class SiteEditor:
                     self.job['readyToPublish'] = available
                 self.log('Vérifications réussies. Cliquez sur Publier pour mettre en ligne.' if available else 'Vérifications réussies. Aucune modification à publier.')
             else:
+                self.log('Vérification de la branche distante GitHub…')
+                self.git('fetch', '--no-tags', 'origin', 'main', timeout=30, on_line=self.log)
                 if self.fingerprint(review) != prepared:
                     raise EditorError('Les fichiers ont changé. Préparez à nouveau la publication.', 409)
                 destination = self.remote()

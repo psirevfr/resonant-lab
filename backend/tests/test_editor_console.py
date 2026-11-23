@@ -128,7 +128,7 @@ def test_review_allows_explicitly_reviewed_code_history(project, monkeypatch):
 
     project.run_job('prepare', None, review['review'])
     assert project.job['readyToPublish']
-    assert [args[0] for args in network] == ['fetch']
+    assert network == []
     git('commit', '--allow-empty', '-m', 'Unexpected new HEAD')
     with pytest.raises(server.EditorError, match='changé'):
         project.ensure_publishable(review['review'])
