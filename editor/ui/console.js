@@ -49,11 +49,7 @@
    revision=result.revision;savedContent=content;
    if(['frontend/src/siteSettings.json','frontend/src/siteLayout.json'].includes(file)){
     state=await api('/api/state');
-    draft=clone(state.settings);saved=clone(state.settings);
-    layout=clone(state.layout);savedLayout=clone(state.layout);
-    undo=[];redo=[];lastChange=null;selectedBlock='';
-    if(!current())page=draft.home;
-    setPage(page);
+    synchronizePresentation(state);
    }else{
     if(state?.job)state.job.readyToPublish=false;
     // Vite applies source edits through its normal hot-reload path.

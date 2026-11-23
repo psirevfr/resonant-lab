@@ -2,11 +2,12 @@
 const $=selector=>document.querySelector(selector),all=selector=>[...document.querySelectorAll(selector)],token=$('meta[name="editor-token"]').content;
 $('meta[name="editor-token"]').remove();
 let draft=null,saved=null,state=null,layout=null,savedLayout=null,undo=[],redo=[],lastChange=null,section='insert',gridMode=false,previewDeadline=0,page='analyse',selectMode=true,previewOrigin='',previewReady=false,previewTimer=0,requesting=false,lastJobId='',lastStatus='',dirty=false,device='desktop';
+let diskRevision=null,editorRevision=null,restartAt=0,previousReady=false,previewBusy=false;
 const clone=v=>JSON.parse(JSON.stringify(v));
 const canonical=v=>JSON.stringify(v,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.keys(item).sort().reduce((o,k)=>(o[k]=item[k],o),{}):item);
 const same=(a,b)=>canonical(a)===canonical(b);
 function showMessage(text,error=false){$('#banner').textContent=text;$('#banner').classList.toggle('error',error);$('#banner').hidden=!text;}
-async function api(path,body){const response=await fetch(path,{method:body===undefined?'GET':'POST',credentials:'same-origin',headers:{'X-Editor-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});let result;try{result=await response.json()}catch{throw Error('La réponse de l’éditeur est illisible.')}if(!response.ok)throw Error(result.error||result.detail||'Cette action n’a pas abouti.');return result;}
+async function api(path,body){const response=await fetch(path,{method:body===undefined?'GET':'POST',credentials:'same-origin',headers:{'X-Editor-Token':token,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});let result;try{result=await response.json()}catch{throw Error('La réponse de l’éditeur est illisible.')}if(!response.ok)throw Object.assign(Error(result.error||result.detail||'Cette action n’a pas abouti.'),{status:response.status});return result;}
 function get(obj,path){return path.split('.').reduce((o,k)=>o?.[k],obj);}
 function set(obj,path,value){const keys=path.split('.'),last=keys.pop();keys.reduce((o,k)=>o[k],obj)[last]=value;}
 function busy(){return requesting||['running','preparing','publishing'].includes(state?.job?.status);}
@@ -55,21 +56,45 @@ function setPage(next){
  const url=new URL(state.previewUrl);
  url.pathname=['analyse','atelier'].includes(next)?'/'+next:'/p/'+next;
  url.searchParams.set('editor','1');
- previewReady=false;
+ previewReady=false;previewBusy=false;
  setPreviewStatus('Ouverture du site local…');
  clearTimeout(previewDeadline);
  previewDeadline=setTimeout(()=>setPreviewStatus('La page locale ne répond pas.',true),18000);
  $('#preview').src=url.href;
 }
 function showActivity(value){$('#activity').hidden=!value;$('#log-toggle').setAttribute('aria-expanded',String(value));}
-function updateJob(job){if(!job)return;const log=Array.isArray(job.log)?job.log.join('\n'):job.log||'';if($('#activity-log').textContent!==log){$('#activity-log').textContent=log;$('#activity-log').scrollTop=$('#activity-log').scrollHeight;}if(job.id!==lastJobId||job.status!==lastStatus){if(job.status==='failed')showMessage(job.error||'La vérification a échoué. Consultez le suivi.',true);if(job.readyToPublish)showMessage('Version vérifiée. Vous pouvez maintenant la publier.');if(job.status==='succeeded'&&job.stage==='Terminé')showMessage('Version envoyée sur GitHub. Le déploiement est lancé.');lastJobId=job.id;lastStatus=job.status;}}
+function updateJob(job){if(!job)return;if(previousReady&&!job.readyToPublish&&job.status!=='running')showMessage('Le projet a été actualisé. La vérification peut être relancée.');previousReady=job.readyToPublish;const log=Array.isArray(job.log)?job.log.join('\n'):job.log||'';if($('#activity-log').textContent!==log){$('#activity-log').textContent=log;$('#activity-log').scrollTop=$('#activity-log').scrollHeight;}if(job.id!==lastJobId||job.status!==lastStatus){if(job.status==='failed')showMessage(job.error||'La vérification a échoué. Consultez le suivi.',true);if(job.readyToPublish)showMessage('Version vérifiée. Vous pouvez maintenant la publier.');if(job.status==='succeeded'&&job.stage==='Terminé')showMessage('Version envoyée sur GitHub. Le déploiement est lancé.');lastJobId=job.id;lastStatus=job.status;}}
+function synchronizePresentation(next){
+ if(!next.presentationRevision||diskRevision===next.presentationRevision)return;
+ const before=page;
+ if(draft){
+  const rebase=item=>({...item,
+   draft:mergePresentation(saved,item.draft,next.settings),
+   layout:mergePresentation(savedLayout,item.layout,next.layout)});
+  undo=undo.map(rebase);redo=redo.map(rebase);
+  const merged=rebase({draft,layout});
+  draft=merged.draft;layout=merged.layout;lastChange=null;
+ }else{
+  draft=clone(next.settings);layout=clone(next.layout);page=draft.home;
+ }
+ saved=clone(next.settings);savedLayout=clone(next.layout);diskRevision=next.presentationRevision;
+ if(!layout.pages.some(item=>item.id===page))page=draft.home;
+ if(page!==before&&previewOrigin)setPage(page);else renderLayout();
+ refresh();sendPreview();
+}
 async function poll(){
  try{
-  state=draft?{...state,...await api('/api/progress')}:await api('/api/state');
-  if(!draft){
-   draft=clone(state.settings);saved=clone(state.settings);
-   layout=clone(state.layout);savedLayout=clone(layout);page=draft.home;
-   renderLayout();
+  const payload=draft?await api('/api/progress'):await api('/api/state');
+  state={...state,...payload};
+  if(restartAt&&editorRevision!==state.editorRevision){location.reload();return;}
+  editorRevision=state.editorRevision;
+  if(!draft)synchronizePresentation(state);
+  else if(!requesting&&state.presentationRevision&&state.presentationRevision!==diskRevision)
+   synchronizePresentation(await api('/api/state'));
+  if(state.editorChanged&&draft&&!busy()&&!dirty&&!previewBusy&&!window.resonantSourceDirty?.()&&!document.querySelector('dialog[open]')&&!restartAt){
+   restartAt=Date.now();
+   showMessage('Actualisation de l’éditeur…');
+   try{await api('/api/restart',{});}catch(error){restartAt=0;throw error;}
   }
   if(state.previewUrl&&!previewOrigin){
    const url=new URL(state.previewUrl);
@@ -80,10 +105,25 @@ async function poll(){
   }
   if(state.previewError)setPreviewStatus(state.previewError,true);
   updateJob(state.job);refresh();
- }catch(e){showMessage(e.message,true);}
+ }catch(e){if(!restartAt||Date.now()-restartAt>20000){restartAt=0;showMessage(e.message,true);}}
  setTimeout(poll,busy()?1000:2000);
 }
-async function save(){if(!draft)return;const result=await api('/api/save',{settings:draft,layout});saved=clone(result.settings||draft);savedLayout=clone(result.layout||layout);showMessage('Présentation enregistrée.');lastChange=null;refresh();}
+async function save(){
+ if(!draft)return;
+ let result;
+ for(let attempt=0;attempt<2;attempt++){
+  try{
+   result=await api('/api/save',{settings:draft,layout,revision:diskRevision});
+   break;
+  }catch(error){
+   if(error.status!==409||attempt)throw error;
+   synchronizePresentation(await api('/api/state'));
+  }
+ }
+ draft=clone(result.settings);layout=clone(result.layout);
+ saved=clone(result.settings);savedLayout=clone(result.layout);diskRevision=result.presentationRevision;
+ showMessage('Présentation enregistrée.');lastChange=null;refresh();sendPreview();
+}
 all('[data-setting]').forEach(input=>input.addEventListener('input',()=>{let value=input.value;const path=input.dataset.setting;if(path==='fontScale'||path==='radius')value=Number(value);if(path.startsWith('colors.')&&!/^#[0-9a-f]{6}$/i.test(value))return;edit(path,value);}));
 all('[data-section]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
 all('[data-device]').forEach(b=>b.addEventListener('click',()=>{all('[data-device]').forEach(v=>v.setAttribute('aria-pressed',String(v===b)));device=b.dataset.device;$('.preview-frame').className='preview-frame '+device;resizePreview();$('#preview-menu').open=false;showGrid(false);}));
@@ -131,7 +171,7 @@ $('#publish').onclick=()=>{
  $('#publish-dialog').showModal();
 };
 $('#cancel-publish').onclick=()=>$('#publish-dialog').close();
-$('#confirm-publish').onclick=async()=>{if(requesting)return;$('#publish-dialog').close();try{requesting=true;refresh();showActivity(true);showMessage('Envoi de la version sur GitHub…');await api('/api/publish',{});state=await api('/api/state');updateJob(state.job);}catch(e){showMessage(e.message,true);}finally{requesting=false;refresh();}};
+$('#confirm-publish').onclick=async()=>{if(requesting)return;$('#publish-dialog').close();try{requesting=true;refresh();showActivity(true);showMessage('Envoi de la version sur GitHub…');await api('/api/publish',{});state=await api('/api/state');updateJob(state.job);}catch(e){showMessage(e.message,true);if(e.status===409){requesting=false;await openReview();}}finally{requesting=false;refresh();}};
 function changeMode(enabled){
  selectMode=enabled;
  $('#select-mode').setAttribute('aria-pressed',String(enabled));
@@ -155,6 +195,7 @@ window.addEventListener('message',event=>{
  if(event.data.type==='resonant-editor:ready'){
   previewReady=true;clearTimeout(previewDeadline);setPreviewStatus('');sendPreview();
  }
+ if(event.data.type==='resonant-editor:activity')previewBusy=event.data.busy===true;
  if(event.data.type==='resonant-editor:selected')showSection(event.data.key);
  if(event.data.type==='resonant-editor:move'&&selectMode&&!gridMode)moveLiveBlock(event.data);
  if(event.data.type==='resonant-editor:block'&&current()?.blocks.some(block=>block.id===event.data.id)){

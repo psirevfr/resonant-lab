@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Self-host a pinned Python/WASM runtime and ONLY allowlisted numerical sources."""
 import argparse,hashlib,json
+import tempfile
 from pathlib import Path
 from urllib.request import urlopen
 import zipfile
@@ -37,16 +38,23 @@ def prepare(destination,network=False):
                 p=lock['packages'][name];download(p['file_name'],destination/p['file_name'],p['sha256'])
     # Deterministic archive, no repository sweep, no auth/app/credentials/user data.
     archive=destination/'numerical.zip'
-    with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
-        for name in MODULES:
-            data=(ROOT/'backend/lab'/f'{name}.py').read_bytes()
-            info=zipfile.ZipInfo(f'lab/{name}.py',date_time=(2026,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
-            z.writestr(info,data)
+    with tempfile.TemporaryDirectory(dir=destination) as temp_dir:
+        staging=Path(temp_dir)/'numerical.zip'
+        with zipfile.ZipFile(staging,'w',compression=zipfile.ZIP_DEFLATED) as z:
+            for name in MODULES:
+                data=(ROOT/'backend/lab'/f'{name}.py').read_bytes()
+                info=zipfile.ZipInfo(f'lab/{name}.py',date_time=(2026,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+                z.writestr(info,data)
+        if not archive.is_file() or archive.read_bytes()!=staging.read_bytes():
+            staging.replace(archive)
     allowed=set(CORE)|{'numerical.zip'}|{lock['packages'][name]['file_name'] for name in selected}
     files={name:{'bytes':(destination/name).stat().st_size,'sha256':hashlib.sha256((destination/name).read_bytes()).hexdigest()} for name in sorted(allowed) if (destination/name).is_file()}
     ready=lock is not None and allowed<=set(files) and all(files[lock['packages'][n]['file_name']]['sha256']==lock['packages'][n]['sha256'] for n in selected)
-    manifest={'runtime_version':VERSION,'algorithm_version':'shared-python-v7-adaptive','source_sha256':files['numerical.zip']['sha256'],'files':files,'download_bytes':sum(f['bytes'] for f in files.values()),'ready':ready}
-    temp=destination/'manifest.json.tmp';temp.write_text(json.dumps(manifest,sort_keys=True));temp.replace(destination/'manifest.json')
+    manifest={'runtime_version':VERSION,'algorithm_version':'shared-python-v8-workbench','source_sha256':files['numerical.zip']['sha256'],'files':files,'download_bytes':sum(f['bytes'] for f in files.values()),'ready':ready}
+    with tempfile.NamedTemporaryFile(dir=destination,mode='w',delete=False) as stream:
+        json.dump(manifest,stream,sort_keys=True)
+        temp=Path(stream.name)
+    temp.replace(destination/'manifest.json')
     return manifest
 
 

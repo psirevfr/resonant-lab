@@ -9,6 +9,6 @@ export function AlgorithmHelp({method}:{method:string}){
  <h3 id="algorithm-help-title">Comprendre les algorithmes</h3>
  <div className="algorithm-table-scroll" tabIndex={0} role="region" aria-label="Comparaison des algorithmes, tableau défilable">
  <table><caption>La méthode sélectionnée est mise en évidence.</caption><thead><tr><th scope="col">Méthode</th><th scope="col">Fonctionnement simple</th><th scope="col">Intérêt et limite</th></tr></thead>
- <tbody>{methods.map(m=><tr key={m.id} className={method===m.id?'selected-method':''}><th scope="row"><strong>{m.name}</strong>{m.scientific&&<small>{m.scientific}</small>}{method===m.id&&<span className="algorithm-selected">Sélectionnée</span>}</th><td>{m.how}</td><td>{m.limits}</td></tr>)}</tbody></table>
+ <tbody>{methods.map(m=><tr key={m.id} className={(method==='compare'||method===m.id)?'selected-method':''}><th scope="row"><strong>{m.name}</strong>{m.scientific&&<small>{m.scientific}</small>}{(method==='compare'||method===m.id)&&<span className="algorithm-selected">Sélectionnée</span>}</th><td>{m.how}</td><td>{m.limits}</td></tr>)}</tbody></table>
  </div></section>
 }

@@ -64,6 +64,8 @@ def init_db():
         conn.execute('CREATE TABLE IF NOT EXISTS visitor_sessions (owner INTEGER PRIMARY KEY, expires REAL NOT NULL, claimed INTEGER NOT NULL DEFAULT 0)')
         conn.execute('CREATE TABLE IF NOT EXISTS auth_rate_limits (bucket TEXT PRIMARY KEY, count INTEGER NOT NULL, expires REAL NOT NULL)')
         conn.execute('CREATE INDEX IF NOT EXISTS auth_limits_expiry ON auth_rate_limits(expires)')
+        from .learning_store import init_learning
+        init_learning(conn)
         conn.commit()
     finally:conn.close()
 

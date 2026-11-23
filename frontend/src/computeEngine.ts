@@ -2,18 +2,23 @@ import type {AcousticHint} from './acousticLearning';
 import {request as apiRequest} from './api';
 import type {JobKind} from './hooks/useComputeJob';
 export interface LocalUpdate {id:string;phase:'initializing'|'computing'|'progress'|'result'|'error';progress?:Record<string,unknown>;result?:unknown;error?:string;metrics?:Record<string,unknown>}
-let worker:Worker|null=null,active:string|null=null;
-export function disposeCompute(){worker?.terminate();worker=null;active=null}
+let worker:Worker|null=null,active:string|null=null,workerSource:string|null=null;
+export function disposeCompute(){worker?.terminate();worker=null;active=null;workerSource=null}
 if(typeof window!=='undefined')window.addEventListener('pagehide',disposeCompute);
-export async function computeLocally(kind:JobKind|'analyze',request:unknown,signal:AbortSignal,onUpdate:(value:LocalUpdate)=>void,learning?:AcousticHint):Promise<unknown>{
+export async function computeLocally(kind:JobKind|'analyze',request:unknown,signal:AbortSignal,onUpdate:(value:LocalUpdate)=>void,learning?:AcousticHint,onTicket?:(ticket:string)=>void):Promise<unknown>{
  if(active)throw Error('Un calcul local est déjà actif.');
  const id=crypto.randomUUID();active=id;const begun=performance.now();
  try{
-  const response=await apiRequest('/compute/input',{kind,request},signal);
+  const response=await apiRequest('/compute/input',{kind,request,...(onTicket&&kind==='generate'?{contribute:true}:{})},signal);
+  const ticket=response.headers.get('X-Acoustic-Ticket');
+  if(ticket&&ticket.length<=550)onTicket?.(ticket);
   const sampleRate=Number(response.headers.get('X-Sample-Rate')),buffer=await response.arrayBuffer();
   if(signal.aborted)throw new DOMException('Calcul annulé','AbortError');
   if(buffer.byteLength>10_000_000||buffer.byteLength%8||![44100,48000,96000].includes(sampleRate))throw Error('Référence incompatible.');
   const input_ms=performance.now()-begun;
+  const source=response.headers.get('X-Compute-Source');
+  if(worker&&source&&workerSource!==source){worker.terminate();worker=null;}
+  workerSource=source;
   worker??=new Worker(new URL('./computeWorker.ts',import.meta.url),{type:'module'});
   return await new Promise((resolve,reject)=>{
    const current=worker!;

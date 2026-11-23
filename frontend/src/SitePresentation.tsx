@@ -9,6 +9,7 @@ export function useSitePresentation(){
  const [settings,setSettings]=useState(siteSettings),[layout,setLayout]=useState(siteLayout);
  // Source edits from the local visual editor also apply after Vite hot reload.
  useEffect(()=>setSettings(siteSettings),[siteSettings]);
+ useEffect(()=>setLayout(siteLayout),[siteLayout]);
  useEffect(()=>{
   const root=document.documentElement;
   const values={'--site-background':settings.colors.background,'--site-surface':settings.colors.surface,'--site-accent':settings.colors.accent,'--site-text':settings.colors.text,'--site-font-scale':String(settings.fontScale),'--site-radius':settings.radius+'px','--green':settings.colors.accent};

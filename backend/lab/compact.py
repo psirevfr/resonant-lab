@@ -120,11 +120,12 @@ def shaping(patch,objective):
     return tidy(p)
 
 
-def validate_simplification(patch,tolerance=.2):
+def validate_simplification(patch,tolerance=.2,preserve_chain=False):
     """Cheap semantic checks shared by submission and worker; no audio rendering."""
     validate(patch)
     if not np.isfinite(tolerance) or not 0<=tolerance<=1:raise ValueError("Tolérance invalide (0 à 1).")
     if patch.duration>12:raise ValueError('Simplification limitée à 12 secondes.')
+    if preserve_chain:return patch,[]
     folded=collapse_modes(patch)
     modes=[n.model_copy(deep=True) for n in folded.nodes if n.type=='modal']
     if not modes:
@@ -146,16 +147,22 @@ def validate_simplification(patch,tolerance=.2):
     return folded,modes
 
 
-def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=False,test_noise=True):
-    folded,modes=validate_simplification(patch,tolerance)
+def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=False,test_noise=True,preserve_chain=False):
+    folded,modes=validate_simplification(patch,tolerance,preserve_chain)
+    if preserve_chain:test_shaping=test_noise=False
     if len(x)!=round(patch.duration*patch.sample_rate):raise ValueError("Longueur de référence incompatible avec le modèle.")
     original=patch.model_copy(deep=True);objective=Objective(x,patch.sample_rate,weights)
-    baseline=objective(render(original));limit=baseline*(1+tolerance)+1e-12
-    reference_bands=band_errors(x,render(original),patch.sample_rate)
-    reference_attack=objective.components(render(original))["attack"]
+    signal_original=render(original)
+    measures=objective.components(signal_original)
+    baseline=measures['total'];limit=baseline*(1+tolerance)+1e-12
+    reference_bands=band_errors(x,signal_original,patch.sample_rate)
+    reference_attack=measures['attack']
     candidates=[]
     def add(p,reference=False):
-        y=render(p);errors=objective.components(y);bands=band_errors(x,y,p.sample_rate);count=sum(len(parameters(n.type,n.parameters,p.sample_rate)) for n in p.nodes)
+        if reference:errors,bands=measures,reference_bands
+        else:
+            y=render(p);errors=objective.components(y);bands=band_errors(x,y,p.sample_rate)
+        count=sum(len(parameters(n.type,n.parameters,p.sample_rate)) for n in p.nodes)
         reasons=[]
         if errors['total']>limit:reasons.append('Erreur globale')
         if protect_texture:
@@ -163,36 +170,45 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
             reasons.extend('Bande '+k for k in bands if bands[k]>max(reference_bands[k]*(1+tolerance),.03)+1e-12)
         candidates.append({'patch':p.model_dump(),'errors':errors,'complexity':complexity(p),'score':errors['total'],'parameter_count':count,'modules':physical_count(p),'bands':bands,'rejection_reasons':reasons,'generators':sum(REGISTRY[n.type].inputs==0 for n in p.nodes),'reference':reference,'within_tolerance':not reasons})
     add(original,True)
-    clean=tidy(original)
+    try:
+        clean=original
+        if preserve_chain:
+            active=set(validate(original)[3])
+            clean=original.model_copy(update={'nodes':[node for node in original.nodes if node.id in active],
+                                              'edges':[edge for edge in original.edges if edge.target in active]})
+        clean=tidy(clean)
+    except ValueError:clean=original
     if len(clean.nodes)<len(original.nodes):add(clean)
-    D,target,down=analysis_basis(x,patch.sample_rate,modes);gram=D.T@D;projection=D.T@target;del D
-    selected=[];proposals=[]
-    maximum=min(16,len(modes))
-    budgets={1,2,3,4,6,8,10,12,16,maximum}
-    for count in range(1,maximum+1):
-        best=None
-        for j in range(len(modes)):
-            if j in selected:continue
-            ids=[k for m in selected+[j] for k in (2*m,2*m+1)]
-            g=gram[np.ix_(ids,ids)];b=projection[ids]
-            coef=np.linalg.lstsq(g,b,rcond=1e-9)[0]
-            if np.any(np.hypot(coef[::2],coef[1::2])>4):continue
-            reduction=float(2*coef@b-coef@g@coef)
-            if best is None or reduction>best[0]:best=(reduction,j,coef)
-        if best is None:break
-        _,j,coef=best;selected.append(j)
-        if count not in budgets:continue
-        partials=[{**modes[m].parameters,'amplitude':float(np.hypot(coef[2*i],coef[2*i+1])),'phase':float(np.arctan2(coef[2*i+1],coef[2*i])),'decay_r2':None} for i,m in enumerate(selected)]
-        features={'partials':partials,'onset':modes[0].parameters['onset'],'attack':modes[0].parameters['attack']}
-        p=modal_patch(features,patch.sample_rate,patch.duration,count)
-        p=joint_fit(p,x,objective,down)
-        if features['attack']>0:
-            calibrated,_=calibrate_attack(p,objective)
-            if objective(render(calibrated))<objective(render(p)):p=calibrated
-        p.name=f'Compact · {count} modes';p=tidy(p)
-        for n in p.nodes:
-            if n.type=='modal':n.reason='Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché.'
-        add(p);proposals.append(p)
+    proposals=[]
+    if modes:
+        D,target,down=analysis_basis(x,patch.sample_rate,modes);gram=D.T@D;projection=D.T@target;del D
+        selected=[]
+        maximum=min(16,len(modes))
+        budgets={1,2,3,4,6,8,10,12,16,maximum}
+        for count in range(1,maximum+1):
+            best=None
+            for j in range(len(modes)):
+                if j in selected:continue
+                ids=[k for m in selected+[j] for k in (2*m,2*m+1)]
+                g=gram[np.ix_(ids,ids)];b=projection[ids]
+                coef=np.linalg.lstsq(g,b,rcond=1e-9)[0]
+                if np.any(np.hypot(coef[::2],coef[1::2])>4):continue
+                reduction=float(2*coef@b-coef@g@coef)
+                if best is None or reduction>best[0]:best=(reduction,j,coef)
+            if best is None:break
+            _,j,coef=best;selected.append(j)
+            if count not in budgets:continue
+            partials=[{**modes[m].parameters,'amplitude':float(np.hypot(coef[2*i],coef[2*i+1])),'phase':float(np.arctan2(coef[2*i+1],coef[2*i])),'decay_r2':None} for i,m in enumerate(selected)]
+            features={'partials':partials,'onset':modes[0].parameters['onset'],'attack':modes[0].parameters['attack']}
+            p=modal_patch(features,patch.sample_rate,patch.duration,count)
+            p=joint_fit(p,x,objective,down)
+            if features['attack']>0:
+                calibrated,_=calibrate_attack(p,objective)
+                if objective(render(calibrated))<objective(render(p)):p=calibrated
+            p.name=f'Compact · {count} modes';p=tidy(p)
+            for n in p.nodes:
+                if n.type=='modal':n.reason='Mode sélectionné par sa contribution à la reconstruction, puis fréquences, phases, amplitudes et décroissances réajustées ensemble. Coût final mesuré à la fréquence d’échantillonnage originale. Aucun générateur caché.'
+            add(p);proposals.append(p)
     # Only a few useful budgets receive an extra processing search, limiting
     # identification time. A new block must justify its cost in the final choice.
     shortlist=[p for p in proposals if sum(n.type=='modal' for n in p.nodes) in (4,8,12)]
@@ -238,7 +254,8 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
     chosen=min(eligible,key=size)
     # Backward pruning fills the gaps between coarse source budgets. A source
     # can be removed only if its actual new render stays inside every constraint.
-    pruned=collapse_modes(Patch.model_validate(chosen['patch']))
+    pruned=Patch.model_validate(chosen['patch'])
+    if not preserve_chain:pruned=collapse_modes(pruned)
     for node in sorted([n for n in pruned.nodes if n.type=='modal'],key=lambda n:n.parameters.get('amplitude',0)**2*n.parameters.get('tau',1)):
         outgoing=[e for e in pruned.edges if e.source==node.id]
         if len(outgoing)!=1:continue
@@ -262,7 +279,7 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
         if candidates[-1]['within_tolerance']:pruned=q
     chosen=min([c for c in candidates if c['within_tolerance']],key=size)
     from .shared_envelopes import share_envelopes
-    shared_sources=proposals+[collapse_modes(Patch.model_validate(chosen['patch']))]
+    shared_sources=[] if preserve_chain else proposals+[collapse_modes(Patch.model_validate(chosen['patch']))]
     for source in shared_sources:
         for groups in (1,2,3,4,6,8):
             shared=share_envelopes(source,groups)
@@ -284,6 +301,7 @@ def simplify(patch,x,weights,tolerance=.2,test_shaping=True,protect_texture=Fals
             ablated.edges=[Edge(id=f'{source}-{e.target}',source=source,target=e.target) if e.source==node.id else e for e in ablated.edges if e.target!=node.id]
             ablated.nodes=[n for n in ablated.nodes if n.id!=node.id]
         else:continue
-        delta=objective(render(ablated))-chosen['errors']['total']
+        try:delta=objective(render(ablated))-chosen['errors']['total']
+        except ValueError:continue  # bypass can make a duplicate cable in a hand-edited graph
         utilities.append({'block_id':node.id,'label':node.label or node.type,'error_increase_without':float(delta)})
     return {'patch':chosen_patch.model_dump(),'original':original.model_dump(),'candidates':candidates,'baseline':baseline,'limit':limit,'tolerance':tolerance,'final':chosen['errors']['total'],'original_blocks':physical_count(original),'final_blocks':physical_count(chosen_patch),'original_generators':sum(REGISTRY[n.type].inputs==0 for n in original.nodes),'final_generators':chosen['generators'],'reverted':chosen['reference'],'utilities':utilities,'shaping_tested':test_shaping,'processing_diagnostics':processing_diagnostics,'texture_diagnostics':texture_diagnostics,'noise_tested':test_noise,'reference_bands':reference_bands,'final_bands':chosen['bands'],'protect_texture':protect_texture,'selection':'Minimum de blocs sous la limite d’erreur acceptée ; à égalité, moins de paramètres puis erreur minimale. Version initiale conservée. Utilité : hausse de coût en coupant une source, sans réajuster les autres.'}

@@ -264,7 +264,7 @@ class SiteEditor:
             raise EditorError('Jeton local absent ou invalide.')
         self.repo = given.resolve()
         self.token = token
-        self.cookie = secrets.token_urlsafe(32)
+        self.cookie = os.environ.get('RESONANT_EDITOR_RESTART_COOKIE') or secrets.token_urlsafe(32)
         self.origin = ''
         self.cookie_name = 'resonant_editor'
         self.ui_root = Path(ui_root) if ui_root else Path(__file__).resolve().parent/'ui'
@@ -277,9 +277,14 @@ class SiteEditor:
                     'error': None, 'readyToPublish': False}
         self.prepared_fingerprint = None
         self.prepared_review = None
+        self.prepared_head = None
+        self.restart_requested = False
+        self.initial_editor_revision = self.editor_revision()
         self.preview_url = None
         self.preview_error = None
         self.preview_starting = False
+        self.preview_ports = ()
+        self.preview_secret = os.environ.get('RESONANT_EDITOR_RESTART_PREVIEW_SECRET') or secrets.token_urlsafe(48)
         self.preview_processes = []
         root = self.git('rev-parse', '--show-toplevel').strip()
         if Path(root).resolve() != self.repo:
@@ -402,7 +407,7 @@ class SiteEditor:
         finally:
             Path(temporary).unlink(missing_ok=True)
 
-    def save(self, value, layout=None):
+    def save(self, value, layout=None, revision=None):
         settings=validate_settings(value)
         try:
             if layout is not None:validate_layout(layout)
@@ -411,6 +416,8 @@ class SiteEditor:
         with self.lock:
             if self.job['status']=='running':
                 raise EditorError('Attendez la fin de l’opération en cours.',409)
+            if revision is not None and revision != self.presentation()['presentationRevision']:
+                raise EditorError('La présentation vient d’être actualisée.', 409)
             documents={SETTINGS_FILE:settings}
             if layout is not None:documents[LAYOUT_FILE]=layout
             documents={self.safe_path(relative):document for relative,document in documents.items()}
@@ -427,7 +434,7 @@ class SiteEditor:
                 raise
             self.prepared_fingerprint=None
             self.job['readyToPublish']=False
-        return {'ok':True,'settings':settings,'savedSettings':settings,'layout':self.read_layout()}
+            return {'ok':True,**self.presentation()}
 
     def remote(self):
         fetch = self.git('remote', 'get-url', '--all', 'origin').strip().splitlines()
@@ -643,6 +650,7 @@ class SiteEditor:
                 with self.lock:
                     self.prepared_fingerprint = fingerprint if available else None
                     self.prepared_review = review if available else None
+                    self.prepared_head = self.git('rev-parse','HEAD').strip() if available else None
                     self.job['readyToPublish'] = available
                 self.log('Vérifications réussies. Cliquez sur Publier pour mettre en ligne.' if available else 'Vérifications réussies. Aucune modification à publier.')
             else:
@@ -700,14 +708,37 @@ class SiteEditor:
             repo = {'branch': '', 'ahead': None, 'behind': None, 'dirty': [],
                     'unauthorizedChanges': [], 'error': 'État Git indisponible.'}
         with self.lock:
-            settings = self.read_settings()
-            return {'settings': settings, 'savedSettings': settings, 'repo': repo,
-                    'layout': self.read_layout(), **self.progress()}
+            return {'repo':repo,**self.progress(),**self.presentation()}
+
+    def presentation(self):
+        settings,layout=self.read_settings(),self.read_layout()
+        data=json.dumps([settings,layout],sort_keys=True,ensure_ascii=False).encode()
+        return {'settings':settings,'savedSettings':settings,'layout':layout,
+                'presentationRevision':hashlib.sha256(data).hexdigest()}
+
+    def editor_revision(self):
+        paths=[Path(__file__),Path(__file__).with_name('layout.py'),*self.ui_root.glob('*')]
+        return self.source_revision(paths)
+
+    @staticmethod
+    def source_revision(paths):
+        stamps=[]
+        for path in sorted(paths):
+            try:stamps.append((path.name,path.stat().st_mtime_ns))
+            except OSError:continue
+        return hashlib.sha256(repr(stamps).encode()).hexdigest()
 
     def progress(self):
         with self.lock:
-            return {'previewUrl': self.preview_url, 'previewError': self.preview_error,
-                    'job': {**self.job, 'log': list(self.job['log'])}}
+            if self.job['readyToPublish'] and self.prepared_head!=self.git('rev-parse','HEAD').strip():
+                self.prepared_fingerprint=None
+                self.job['readyToPublish']=False
+            try:revision=self.presentation()['presentationRevision']
+            except EditorError:revision=None
+            return {'previewUrl':self.preview_url,'previewError':self.preview_error,
+                    'presentationRevision':revision,'editorChanged':self.editor_revision()!=self.initial_editor_revision,
+                    'editorRevision':self.initial_editor_revision,
+                    'job':{**self.job,'log':list(self.job['log'])}}
 
     @staticmethod
     def free_port():
@@ -752,14 +783,26 @@ class SiteEditor:
                     raise EditorError('Node.js est introuvable. Installez-le puis réessayez.')
                 if not python.is_file() or not vite.is_file():
                     raise EditorError('Les dépendances de Résonant sont manquantes. Lancez setup.sh puis réessayez.')
-                backend_port, frontend_port = self.free_port(), self.free_port()
+                previous_ports = os.environ.pop('RESONANT_EDITOR_RESTART_PORTS', '').split(',')
+                if len(previous_ports) == 2 and all(p.isdecimal() and 1024<=int(p)<=65535 for p in previous_ports):
+                    backend_port, frontend_port = map(int,previous_ports)
+                else:
+                    backend_port, frontend_port = self.free_port(), self.free_port()
                 while frontend_port == backend_port:
                     frontend_port = self.free_port()
                 env = dict(self.env, PYTHONPATH=str(self.repo/'backend'),
                            RESONANT_DB_PATH=str(root/'preview.sqlite'),
-                           RESONANT_SESSION_SECRET=secrets.token_urlsafe(48),
+                           RESONANT_SESSION_SECRET=self.preview_secret,
                            RESONANT_PREVIEW_API_ORIGIN=f'http://127.0.0.1:{backend_port}')
-                commands = [([str(python), '-m', 'uvicorn', 'lab.app:app', '--host', '127.0.0.1', '--port', str(backend_port)], self.repo),
+                runtime_script=self.repo/'scripts/prepare_local_runtime.py'
+                sources=lambda:self.source_revision([runtime_script,*(self.repo/'backend/lab').glob('*.py')])
+                def rebuild():
+                    self.runner.run([python,runtime_script],cwd=self.repo,env=env,timeout=20,cancel=self.stop_event)
+                revision=sources()
+                if runtime_script.is_file():
+                    rebuild()
+                commands = [([str(python), '-m', 'uvicorn', 'lab.app:app', '--host', '127.0.0.1', '--port', str(backend_port),
+                              '--reload','--reload-dir',str(self.repo/'backend/lab')], self.repo),
                             ([node, str(vite), '--host', '127.0.0.1', '--port', str(frontend_port), '--strictPort'], self.repo/'frontend')]
                 processes = []
                 for args, cwd in commands:
@@ -779,7 +822,17 @@ class SiteEditor:
                 if not self.wait_http(backend_port, '/api/health', self.stop_event, processes[0]) or not self.wait_http(frontend_port, '/analyse', self.stop_event, processes[1]):
                     raise EditorError('L’aperçu n’a pas pu démarrer. Vérifiez l’installation du projet.')
                 with self.lock:
+                    self.preview_ports = (backend_port,frontend_port)
                     self.preview_url = f'http://127.0.0.1:{frontend_port}/analyse?editor=1'
+                def watch_runtime():
+                    nonlocal revision
+                    while not self.stop_event.wait(1.5):
+                        current=sources()
+                        if current==revision or not runtime_script.is_file():continue
+                        try:rebuild()
+                        except (OSError,EditorError):continue
+                        revision=current
+                threading.Thread(target=watch_runtime,daemon=True).start()
             except Exception as exc:
                 with self.lock:
                     self.preview_error = sanitize(str(exc), self.secrets)[:240]
@@ -889,6 +942,7 @@ class EditorHandler(BaseHTTPRequestHandler):
             files = {'/': ('index.html', 'text/html; charset=utf-8'),
                      '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
                      '/layout.js': ('layout.js', 'text/javascript; charset=utf-8'),
+                     '/sync.js': ('sync.js', 'text/javascript; charset=utf-8'),
                      '/placement.js': ('placement.js', 'text/javascript; charset=utf-8'),
                      '/console.js': ('console.js', 'text/javascript; charset=utf-8'),
                      '/style.css': ('style.css', 'text/css; charset=utf-8')}
@@ -937,7 +991,7 @@ class EditorHandler(BaseHTTPRequestHandler):
             if not self.host_valid() or not self.token_valid() or self.headers.get('Origin') != self.editor.origin:
                 raise EditorError('Action locale non autorisée.', 403)
             path = self.route()
-            if path not in ('/api/save', '/api/prepare', '/api/publish', '/api/files/open', '/api/files/save', '/api/preview/retry', '/api/terminal'):
+            if path not in ('/api/save', '/api/prepare', '/api/publish', '/api/files/open', '/api/files/save', '/api/preview/retry', '/api/terminal', '/api/restart'):
                 raise EditorError('Action inconnue.', 404)
             body = self.read_json(MAX_SOURCE * 6 + 4096 if path == '/api/files/save' else MAX_BODY)
             if path == '/api/files/open' and set(body) == {'name'}:
@@ -949,10 +1003,21 @@ class EditorHandler(BaseHTTPRequestHandler):
                 return self.send(202, {'ok': True})
             if path.startswith(('/api/files/', '/api/preview/')):
                 raise EditorError('Paramètres invalides.')
+            if path == '/api/restart':
+                with self.editor.lock:
+                    if body or self.editor.job['status']=='running' or not self.editor.progress()['editorChanged']:
+                        raise EditorError('L’éditeur ne peut pas être actualisé maintenant.',409)
+                    self.editor.restart_requested=True
+                    self.send(202, {'ok':True})
+                    threading.Thread(target=self.server.shutdown,daemon=True).start()
+                    return
             if path == '/api/save':
-                if set(body) not in ({'settings'},{'settings','layout'}):
+                if 'settings' not in body or set(body)-{'settings','layout','revision'}:
                     raise EditorError('Demande de sauvegarde invalide.')
-                return self.send(200, self.editor.save(body['settings'],body.get('layout')))
+                revision=body.get('revision')
+                if revision is not None and (not isinstance(revision,str) or not re.fullmatch(r'[0-9a-f]{64}',revision)):
+                    raise EditorError('Révision invalide.')
+                return self.send(200,self.editor.save(body['settings'],body.get('layout'),revision))
             if path == '/api/terminal':
                 if set(body) != {'command'}:
                     raise EditorError('Une commande est requise.')
@@ -971,6 +1036,7 @@ class EditorHandler(BaseHTTPRequestHandler):
 def make_server(editor, port=0):
     class LocalServer(ThreadingHTTPServer):
         daemon_threads = True
+        allow_reuse_address = True
     server = LocalServer(('127.0.0.1', port), EditorHandler)
     server.editor = editor
     editor.origin = f'http://127.0.0.1:{server.server_address[1]}'
@@ -998,6 +1064,14 @@ def main(argv=None):
         editor.start_preview()
         print(json.dumps({'ready': True, 'url': editor.origin+'/'}), flush=True)
         server.serve_forever(poll_interval=.2)
+        if editor.restart_requested and not editor.stop_event.is_set():
+            port=server.server_address[1]
+            server.server_close()
+            editor.close()
+            os.environ['RESONANT_EDITOR_RESTART_COOKIE']=editor.cookie
+            os.environ['RESONANT_EDITOR_RESTART_PORTS']=','.join(map(str,editor.preview_ports))
+            os.environ['RESONANT_EDITOR_RESTART_PREVIEW_SECRET']=editor.preview_secret
+            os.execv(sys.executable,[sys.executable,str(Path(__file__).resolve()),'--repo',str(editor.repo),'--port',str(port)])
         return 0
     except Exception as exc:
         # Never echo an inherited token or a credential-bearing Git URL.

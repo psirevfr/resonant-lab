@@ -1,6 +1,10 @@
 # Apprentissage acoustique de Résonant
 
-Dans **Analyse du son → Réglages → Mémoire d’apprentissage**, activer **Apprendre sur cet appareil**. Le navigateur conserve au plus 128 essais par compte ou session visiteur. Chaque entrée contient l’empreinte des échantillons de la sélection, leur fréquence d’échantillonnage, le profil, la piste essayée et son score. L’historique se désactive ou s’efface depuis le même menu. Les essais, les empreintes et les scores restent dans le navigateur. Le chargement de la référence WAV utilise le parcours déjà en place.
+Dans **Analyse du son → Réglages → Mémoire d’apprentissage**, activer **Apprendre sur cet appareil**. Le navigateur conserve au plus 128 essais par compte ou session visiteur. Chaque entrée contient l’empreinte des échantillons de la sélection, leur fréquence d’échantillonnage, le profil, la piste essayée et son score. L’historique se désactive ou s’efface depuis le même menu. Les empreintes et l’historique détaillé restent dans le navigateur. Le chargement de la référence WAV utilise le parcours déjà en place.
+
+L’option **Partager mes scores avec Résonant** permet aux visiteurs comme aux comptes de contribuer. Elle est désactivée par défaut. Le calcul se fait sur l’appareil. Le serveur reçoit le profil, la piste, une récompense bornée et un justificatif lié à cette session. La mémoire collective ne conserve ni WAV, ni nom de fichier, ni montage, ni empreinte publique de l’audio. Elle limite les doublons et le débit. Les observations expirent au bout de 60 jours et l’utilisateur peut retirer ses contributions.
+
+Les scores déclarés par les navigateurs indiquent quelles pistes explorer. À partir de cinq contributeurs distincts pour un couple profil/piste, chaque personne compte pour une voix sur la base de la moyenne de ses essais. Son influence est plafonnée à six essais fictifs. Chaque modèle candidat est encore rendu et comparé à son propre WAV sur l’appareil. Les protections limitent l’influence de contributions erronées, sans démontrer l’authenticité de leurs scores.
 
 L’analyse de l’extrait estime ses partiels et son enveloppe. Le worker garde une seule analyse en mémoire. Une génération peut la réutiliser si les échantillons, la fréquence d’échantillonnage et le nombre maximal de partiels sont identiques. La fermeture du worker efface ce cache.
 
@@ -41,3 +45,16 @@ Sur le test ADSR de parité, l’écart maximal par échantillon entre Python et
 Le modèle reste jouable par transposition. Calibrer le timbre sur le clavier entier demande des enregistrements à plusieurs notes, vélocités et durées. Les percussions apériodiques demandent des références par frappe ou articulation. Le plan donne les blocs à réaliser. La conformité du montage, la traduction complète du DSP dans le firmware et les mesures sur carte restent à valider.
 
 Sources méthodologiques. [Sélection de modèles pour les bandits contextuels](https://papers.nips.cc/paper_files/paper/2019/hash/433371e69eb202f8e7bc8ec2c8d48021-Abstract.html) et [apprentissage de paramètres pour des modules DSP explicites](https://arxiv.org/abs/2001.04643).
+
+
+## Optimiser un montage retouché
+
+**Comparer les trois** évalue JeanJacky (Powell), Jean Neymar (L-BFGS-B) et l’évolution différentielle avec un budget par méthode. Le montage initial reste admissible et la sortie conserve la meilleure erreur mesurée. Les paramètres sont pris sur le trajet connecté à la sortie. Les modules modifiés et leurs filtres passent en tête. Les cases de l’inspecteur permettent de limiter volontairement ce travail. Les graines de bruit restent constantes.
+
+**Tester un égaliseur après saturation** propose au plus un filtre paramétrique sur une branche pertinente. Le filtre est conservé s’il réduit le coût pondéré de plus de 1 % par rapport au meilleur montage sans ce nouveau filtre. **Simplifier** reprend le montage affiché. Pour un montage retouché, il compare les allègements sur le signal réellement calculé avec les tolérances choisies.
+
+## Synchronisation de l’éditeur
+
+L’aperçu local suit les sources du site et reconstruit l’archive de calcul WebAssembly lorsque les sources numériques changent. Les changements de présentation sur disque sont fusionnés avec les modifications en cours. Lorsqu’un même réglage est modifié de part et d’autre, la saisie en cours reste dans le brouillon et la version externe reste enregistrée jusqu’à la sauvegarde suivante. Un changement de l’éditeur lui-même entraîne sa relance lorsque le brouillon et les calculs sont au repos.
+
+La synchronisation locale et la publication sont deux actions distinctes. La mise en ligne passe par **Vérification**, puis **Publier**. Le déploiement existant reconstruit l’archive WebAssembly, puis le serveur crée la table de mémoire collective au démarrage.

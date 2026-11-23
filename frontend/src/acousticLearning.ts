@@ -12,6 +12,7 @@ export interface AcousticTrial {
 }
 type Score={count:number;reward:number};
 type History=Partial<Record<Profile,Partial<Record<Strategy,Score>>>>;
+export type CollectiveHistory=Partial<Record<Profile,Partial<Record<Strategy,{contributors:number;mean:number}>>>>;
 export interface AcousticHint {version:1;history:History}
 const limit=128;
 const prefix='resonant-acoustic-learning-v1:';
@@ -42,13 +43,22 @@ export function setAcousticEnabled(owner:number, enabled:boolean){
  if(enabled)localStorage.setItem(prefix+'enabled:'+owner,'1');
  else localStorage.removeItem(prefix+'enabled:'+owner);
 }
-export function acousticHint(owner:number):AcousticHint{
+export function acousticHint(owner:number, collective:CollectiveHistory={}):AcousticHint{
  const history:History={};
  for(const {profile,strategy,reward} of trials(owner)){
   const row=history[profile]??={};
   const score=row[strategy]??={count:0,reward:0};
   score.count++;
   score.reward+=reward;
+ }
+ for(const profile of profiles)for(const strategy of strategies){
+  const prior=collective[profile]?.[strategy];
+  if(!prior||!Number.isInteger(prior.contributors)||prior.contributors<5||!Number.isFinite(prior.mean)||prior.mean<0||prior.mean>1)continue;
+  const row=history[profile]??={};
+  const own=row[strategy]??={count:0,reward:0};
+  const count=Math.min(6,128-own.count,Math.floor(prior.contributors/5));
+  own.count+=count;
+  own.reward+=count*prior.mean;
  }
  return {version:1,history};
 }
@@ -63,3 +73,14 @@ export function recordAcousticTrial(owner:number,value:unknown){
 }
 export function acousticTrialCount(owner:number):number{return trials(owner).length;}
 export function clearAcousticTrials(owner:number){localStorage.removeItem(prefix+owner);}
+
+export function collectiveEnabled(owner:number):boolean{
+ try{return localStorage.getItem(prefix+'share:'+owner)==='1';}catch{return false;}
+}
+export function setCollectiveEnabled(owner:number, enabled:boolean){
+ if(enabled)localStorage.setItem(prefix+'share:'+owner,'1');
+ else localStorage.removeItem(prefix+'share:'+owner);
+}
+export function contribution(ticket:string,value:unknown){
+ return isTrial(value)?{ticket,profile:value.profile,strategy:value.strategy,reward:value.reward}:null;
+}

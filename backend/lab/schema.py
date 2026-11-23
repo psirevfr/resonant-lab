@@ -59,15 +59,18 @@ class GenerateRequest(AnalyzeRequest):
     weights: Weights = Field(default_factory=Weights)
 
 class OptimizeRequest(RenderRequest):
-    method: Literal['Powell', 'L-BFGS-B', 'differential_evolution'] = 'Powell'
+    method: Literal['Powell', 'L-BFGS-B', 'differential_evolution', 'compare'] = 'Powell'
     max_iterations: int = Field(default=15, ge=1, le=60)
     parameter_ids: list[str] = Field(default_factory=list, max_length=24)
+    focus_ids: list[str] = Field(default_factory=list, max_length=128)
+    compensate: bool = False
 
 class CompactRequest(RenderRequest):
     tolerance: float = Field(default=.2, ge=0, le=1, allow_inf_nan=False)
     test_shaping: bool = True
     protect_texture: bool = False
     test_noise: bool = True
+    preserve_chain: bool = False
 
 class InstrumentRequest(BaseModel):
     patch: Patch

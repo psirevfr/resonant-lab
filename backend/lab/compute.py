@@ -5,7 +5,7 @@ from threading import Event
 import numpy as np
 from .schema import GenerateRequest,OptimizeRequest,CompactRequest,AnalyzeRequest
 
-ALGORITHM_VERSION='shared-python-v7-adaptive'
+ALGORITHM_VERSION='shared-python-v8-workbench'
 MODELS={'analyze':AnalyzeRequest,'generate':GenerateRequest,'optimize':OptimizeRequest,'compact':CompactRequest}
 
 
@@ -26,7 +26,7 @@ def validate_input(kind,request,x,fs):
         validate_request(r)
     if kind=='compact':
         from .compact import validate_simplification
-        validate_simplification(r.patch,r.tolerance)
+        validate_simplification(r.patch,r.tolerance,r.preserve_chain)
     return r,x
 
 
@@ -75,7 +75,7 @@ def compute(kind,request,x,fs,progress=lambda _:None,cancel=None,*,cache=None,le
         result=run_optimization(r,x,progress,cancel or Event())
     else:
         from .compact import simplify
-        result=simplify(r.patch,x,r.weights,r.tolerance,r.test_shaping,r.protect_texture,test_noise=r.test_noise)
+        result=simplify(r.patch,x,r.weights,r.tolerance,r.test_shaping,r.protect_texture,test_noise=r.test_noise,preserve_chain=r.preserve_chain)
     # Same JSON contract; additional performance metadata is independent of objective.
     result['compute_metrics']={'algorithm_version':ALGORITHM_VERSION,'validation_ms':(validated-begun)*1000,'algorithm_ms':(time.perf_counter()-validated)*1000,
                                'analysis_cache_hit':cache_hit}

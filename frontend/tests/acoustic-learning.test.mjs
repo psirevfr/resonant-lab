@@ -38,3 +38,11 @@ test('La réserve reste bornée et rejette les mesures non finies',()=>{
  assert.equal(acousticTrialCount(3),128);
  assert.deepEqual(acousticHint(3).history.sustained.adsr,{count:128,reward:32});
 });
+
+test('Le prior collectif est borné et une petite cohorte est ignorée',()=>{
+ storage.clear();
+ setAcousticEnabled(1,true);
+ recordAcousticTrial(1,trial(1));
+ const hint=acousticHint(1,{sustained:{adsr:{contributors:100,mean:.5},decay:{contributors:4,mean:1}}});
+ assert.deepEqual(hint.history,{sustained:{adsr:{count:7,reward:3.25}}});
+});

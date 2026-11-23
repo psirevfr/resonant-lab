@@ -155,3 +155,17 @@ def test_terminal_only_allows_diagnostic_commands(project):
     assert 'style.css' in project.terminal('git status')['output']
     with pytest.raises(server.EditorError, match='indisponible'):
         project.terminal('git status; git push')
+
+
+def test_editor_detects_disk_edits_and_rejects_stale_saves(project):
+    before=project.presentation()
+    project.save({**before['settings'],'brandName':'Nouveau nom'})
+    after=project.presentation()
+    assert before['presentationRevision']!=after['presentationRevision']
+    assert project.progress()['presentationRevision']==after['presentationRevision']
+    with pytest.raises(server.EditorError) as conflict:
+        project.save({**before['settings'],'radius':9},revision=before['presentationRevision'])
+    assert conflict.value.status==409
+    assert project.read_settings()['brandName']=='Nouveau nom'
+    updated=project.save({**after['settings'],'radius':9},revision=after['presentationRevision'])
+    assert updated['settings']['radius']==9

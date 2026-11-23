@@ -47,6 +47,7 @@ app=FastAPI(title='Résonant Lab',version=APP_VERSION)
 
 from . import job_store
 from . import audio_store
+from . import learning_store
 from .request_limits import RequestLimits
 from .security_headers import SecurityHeaders
 app.add_middleware(RequestLimits)
@@ -195,7 +196,7 @@ def submit(kind,req,request,user):
         if kind=='optimize':
             from .optimization import validate_request
             validate_request(req)
-        else:validate_simplification(req.patch,req.tolerance)
+        else:validate_simplification(req.patch,req.tolerance,req.preserve_chain)
     return job_store.enqueue(user['id'],kind,data,x,fs,idem)
 
 @api_router.post('/api/generate',status_code=202,dependencies=[Depends(require_server_compute)])
@@ -314,7 +315,34 @@ def local_compute_input(body:dict,user:dict=Depends(require_api_user)):
         fs=r.patch.sample_rate;x=target_audio(r,user['id'])
         if x is None:raise ValueError('Référence requise.')
     validate_input(kind,data,x,fs)
-    return Response(np.asarray(x,dtype='<f8').tobytes(),media_type='application/octet-stream',headers={'X-Sample-Rate':str(fs),'Cache-Control':'no-store'})
+    samples=np.asarray(x,dtype='<f8').tobytes()
+    headers={'X-Sample-Rate':str(fs),'Cache-Control':'no-store'}
+    manifest=runtime_manifest()
+    if manifest and isinstance(manifest.get('source_sha256'),str):
+        headers['X-Compute-Source']=manifest['source_sha256']
+    if kind=='generate' and body.get('contribute') is True:
+        headers['X-Acoustic-Ticket']=learning_store.make_ticket(user['id'],samples,fs)
+    return Response(samples, media_type='application/octet-stream', headers=headers)
+
+
+@api_router.get('/api/acoustic-learning')
+def collective_learning():
+    return JSONResponse({'history':learning_store.summary()},headers={'Cache-Control':'private, max-age=45'})
+
+
+@api_router.post('/api/acoustic-learning')
+def contribute_learning(report:learning_store.LearningReport,request:Request,user:dict=Depends(require_api_user)):
+    rate_limit(request,'acoustic-learning-ip',limit=80,window=3600)
+    rate_limit(request,'acoustic-learning-owner',subject=str(user['id']),limit=18,window=3600)
+    return {'recorded':learning_store.accept(user['id'],report)}
+
+
+@api_router.post('/api/acoustic-learning/reset')
+def reset_learning(request:Request,user:dict=Depends(require_api_user)):
+    rate_limit(request,'acoustic-learning-reset',subject=str(user['id']),limit=6,window=3600)
+    learning_store.reset(user['id'])
+    return {'ok':True}
+
 
 @api_router.get('/api/compute/config')
 def local_compute_config(user:dict=Depends(require_api_user)):
