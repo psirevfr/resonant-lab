@@ -30,11 +30,11 @@ export const moduleHelp:Record<string,string>={
 
 export function ModuleHelp({type}:{type:string}){return moduleHelp[type]?<details className="module-simple-help"><summary>En mots simples</summary><p>{moduleHelp[type]}</p></details>:null}
 
-export function LabGuide({userId,space,onNavigate,onArea,labels,welcome}:{labels:Record<LabSpace,string>;welcome:string;userId?:number;space:LabSpace;onNavigate:(space:LabSpace)=>void;onArea:(step:GuideStep)=>void}){
+export function LabGuide({userId,space,onNavigate,onArea,labels,welcome,autoOpen=true}:{labels:Record<LabSpace,string>;welcome:string;userId?:number;space:LabSpace;onNavigate:(space:LabSpace)=>void;onArea:(step:GuideStep)=>void;autoOpen?:boolean}){
  const dialog=useRef<HTMLDialogElement>(null),trigger=useRef<HTMLButtonElement>(null),origin=useRef(space);
  const [open,setOpen]=useState(false),[walking,setWalking]=useState(false);
  const key=`resonant-guide-v3:${userId}`;
- useEffect(()=>{setWalking(false);if(!userId){setOpen(false);return}try{setOpen(localStorage.getItem(key)!=='seen')}catch{setOpen(true)}},[userId,key]);
+ useEffect(()=>{setWalking(false);if(!autoOpen||!userId){setOpen(false);return}try{setOpen(localStorage.getItem(key)!=='seen')}catch{setOpen(true)}},[autoOpen,userId,key]);
  useEffect(()=>{if(open){if(!dialog.current?.open)dialog.current?.showModal()}else if(dialog.current?.open)dialog.current.close()},[open]);
  function remember(){try{localStorage.setItem(key,'seen')}catch{}}
  function close(){dialog.current?.close();setOpen(false);remember();trigger.current?.focus()}

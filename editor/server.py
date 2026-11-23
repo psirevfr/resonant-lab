@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Loopback-only site settings editor. No arbitrary path or command API.
+"""Loopback-only site editor with a restricted frontend file console.
 
 The native launcher supplies RESONANT_EDITOR_TOKEN and performs the first GET
 with X-Editor-Token. Preparing and publishing are separate explicit operations.
@@ -42,6 +42,8 @@ except ImportError:
 SETTINGS_FILE = 'frontend/src/siteSettings.json'
 ALLOWED_EXACT = {SETTINGS_FILE, LAYOUT_FILE, 'frontend/tsconfig.tsbuildinfo'}
 MAX_BODY = 65_536
+MAX_SOURCE = 262_144
+SOURCE_SUFFIXES = {'.css', '.html', '.js', '.json', '.svg', '.ts', '.tsx'}
 MAX_COMMAND_OUTPUT = 8_000_000
 DEFAULT_SETTINGS = {
     'version': 1, 'brandName': 'résonant',
@@ -139,6 +141,10 @@ def isolated_environment():
     keep = ('PATH', 'HOME', 'USER', 'LOGNAME', 'LANG', 'LC_ALL', 'TMPDIR',
             'SSH_AUTH_SOCK', 'SYSTEMROOT', 'TZ')
     env = {key: os.environ[key] for key in keep if key in os.environ}
+    # Apps opened from Finder or Spotlight do not inherit shell startup files.
+    if sys.platform == 'darwin':
+        paths = ['/opt/homebrew/bin', '/usr/local/bin', *env.get('PATH', os.defpath).split(os.pathsep)]
+        env['PATH'] = os.pathsep.join(dict.fromkeys(path for path in paths if os.path.isabs(path)))
     env.update({'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1',
                 'VECLIB_MAXIMUM_THREADS': '1', 'GIT_TERMINAL_PROMPT': '0'})
     return env
@@ -272,6 +278,7 @@ class SiteEditor:
         self.prepared_fingerprint = None
         self.preview_url = None
         self.preview_error = None
+        self.preview_starting = False
         self.preview_processes = []
         root = self.git('rev-parse', '--show-toplevel').strip()
         if Path(root).resolve() != self.repo:
@@ -285,9 +292,14 @@ class SiteEditor:
                                on_line=on_line, cancel=self.stop_event)
 
     def safe_path(self, relative):
-        path = self.repo / relative
         if not allowed_path(relative):
             raise EditorError('Ce fichier ne peut pas être modifié par l’éditeur.')
+        return self.project_path(relative)
+
+    def project_path(self, relative):
+        path = self.repo / relative
+        if not path.is_relative_to(self.repo) or '..' in path.parts:
+            raise EditorError('Chemin hors du projet refusé.')
         cursor = path
         while cursor != self.repo:
             if cursor.is_symlink():
@@ -296,6 +308,63 @@ class SiteEditor:
         if not path.resolve().is_relative_to(self.repo):
             raise EditorError('Chemin hors du projet refusé.')
         return path
+
+    def source_names(self):
+        names = self.git('ls-files', '-z', '--', 'frontend/index.html', 'frontend/src').split('\0')
+        return sorted({name for name in names if name and Path(name).suffix in SOURCE_SUFFIXES
+                       and all(not part.startswith('.') for part in Path(name).parts)
+                       and not re.search(r'secret|credential|token|password|api[-_]?key', Path(name).stem, re.I)})
+
+    def source_file(self, name):
+        if not isinstance(name, str) or name not in self.source_names():
+            raise EditorError('Fichier source indisponible.', 404)
+        path = self.project_path(name)
+        if not path.is_file() or path.stat().st_nlink != 1:
+            raise EditorError('Fichier source indisponible.', 404)
+        with path.open('rb') as source:
+            data = source.read(MAX_SOURCE + 1)
+        if len(data) > MAX_SOURCE or b'\0' in data or contains_secret(data, secret_values(self.repo)):
+            raise EditorError('Ce fichier est trop volumineux ou contient des données protégées.', 413)
+        return path, data
+
+    def open_source(self, name):
+        with self.lock:
+            _, data = self.source_file(name)
+            try:
+                return {'content': data.decode('utf-8'), 'revision': hashlib.sha256(data).hexdigest()}
+            except UnicodeError:
+                raise EditorError('Seuls les fichiers texte UTF-8 sont disponibles.', 415) from None
+
+    def save_source(self, name, content, revision):
+        if not isinstance(content, str) or '\0' in content:
+            raise EditorError('Texte invalide.')
+        try:
+            data = content.encode('utf-8')
+        except UnicodeError:
+            raise EditorError('Texte UTF-8 invalide.') from None
+        if len(data) > MAX_SOURCE or contains_secret(data, secret_values(self.repo)):
+            raise EditorError('Le texte est trop volumineux ou contient un secret potentiel.', 413)
+        with self.lock:
+            if self.job['status'] == 'running':
+                raise EditorError('Attendez la fin de l’opération en cours.', 409)
+            path, previous = self.source_file(name)
+            if revision != hashlib.sha256(previous).hexdigest():
+                raise EditorError('Le fichier a changé depuis son ouverture. Rechargez-le avant d’enregistrer.', 409)
+            if path.suffix == '.json':
+                try:
+                    parsed = json.loads(content)
+                    if name == SETTINGS_FILE:
+                        validate_settings(parsed)
+                    elif name == LAYOUT_FILE:
+                        validate_layout(parsed)
+                except ValueError:
+                    raise EditorError('Le fichier JSON est invalide.') from None
+                if name in (SETTINGS_FILE, LAYOUT_FILE) and len(data) > MAX_BODY:
+                    raise EditorError('Le document de présentation dépasse la taille autorisée.', 413)
+            self.write_document(path, data, mode=path.stat().st_mode & 0o777)
+            self.prepared_fingerprint = None
+            self.job['readyToPublish'] = False
+        return {'revision': hashlib.sha256(data).hexdigest()}
 
     def read_settings(self):
         path = self.safe_path(SETTINGS_FILE)
@@ -319,7 +388,7 @@ class SiteEditor:
             raise EditorError('Le fichier de mise en page est invalide.') from error
 
     @staticmethod
-    def write_document(path, data):
+    def write_document(path, data, mode=0o644):
         path.parent.mkdir(parents=True,exist_ok=True)
         fd, temporary=tempfile.mkstemp(prefix='.site-document-',dir=path.parent)
         try:
@@ -327,7 +396,7 @@ class SiteEditor:
                 stream.write(data)
                 stream.flush()
                 os.fsync(stream.fileno())
-            os.chmod(temporary,0o644)
+            os.chmod(temporary,mode)
             os.replace(temporary,path)
         finally:
             Path(temporary).unlink(missing_ok=True)
@@ -537,17 +606,20 @@ class SiteEditor:
             self.log(error)
 
     def state(self):
-        settings = self.read_settings()
         try:
             repo = self.repository_state()
         except Exception:
             repo = {'branch': '', 'ahead': None, 'behind': None, 'dirty': [],
                     'unauthorizedChanges': [], 'error': 'État Git indisponible.'}
         with self.lock:
-            job = json.loads(json.dumps(self.job))
+            settings = self.read_settings()
             return {'settings': settings, 'savedSettings': settings, 'repo': repo,
-                    'layout': self.read_layout(), 'previewUrl': self.preview_url, 'previewError': self.preview_error,
-                    'job': job}
+                    'layout': self.read_layout(), **self.progress()}
+
+    def progress(self):
+        with self.lock:
+            return {'previewUrl': self.preview_url, 'previewError': self.preview_error,
+                    'job': {**self.job, 'log': list(self.job['log'])}}
 
     @staticmethod
     def free_port():
@@ -556,13 +628,13 @@ class SiteEditor:
             return sock.getsockname()[1]
 
     @staticmethod
-    def wait_http(port, path, stop_event):
+    def wait_http(port, path, stop_event, process):
         for _ in range(100):
-            if stop_event.is_set():
+            if stop_event.is_set() or process.poll() is not None:
                 return False
             connection = http.client.HTTPConnection('127.0.0.1', port, timeout=.3)
             try:
-                connection.request('GET', path)
+                connection.request('GET', path, headers={'Accept': 'text/html' if path == '/analyse' else 'application/json'})
                 if connection.getresponse().status == 200:
                     return True
             except OSError:
@@ -573,17 +645,25 @@ class SiteEditor:
         return False
 
     def start_preview(self):
+        with self.lock:
+            if self.preview_starting or self.preview_url or self.stop_event.is_set():
+                return
+            self.preview_starting = True
+            self.preview_error = None
+
         def launch():
             try:
                 root = self.repo/'.local/site-editor'
-                root.mkdir(parents=True, exist_ok=True, mode=0o700)
-                if root.is_symlink():
+                if root.parent.is_symlink() or root.is_symlink():
                     raise EditorError('Répertoire de prévisualisation invalide.')
+                root.mkdir(parents=True, exist_ok=True, mode=0o700)
                 python = self.repo/'.venv/bin/python'
                 vite = self.repo/'frontend/node_modules/vite/bin/vite.js'
                 node = shutil.which('node', path=self.env.get('PATH'))
-                if not python.is_file() or not vite.is_file() or not node:
-                    raise EditorError('Installez les dépendances du projet pour voir l’aperçu.')
+                if not node:
+                    raise EditorError('Node.js est introuvable. Installez-le puis réessayez.')
+                if not python.is_file() or not vite.is_file():
+                    raise EditorError('Les dépendances de Résonant sont manquantes. Lancez setup.sh puis réessayez.')
                 backend_port, frontend_port = self.free_port(), self.free_port()
                 while frontend_port == backend_port:
                     frontend_port = self.free_port()
@@ -593,11 +673,12 @@ class SiteEditor:
                            RESONANT_PREVIEW_API_ORIGIN=f'http://127.0.0.1:{backend_port}')
                 commands = [([str(python), '-m', 'uvicorn', 'lab.app:app', '--host', '127.0.0.1', '--port', str(backend_port)], self.repo),
                             ([node, str(vite), '--host', '127.0.0.1', '--port', str(frontend_port), '--strictPort'], self.repo/'frontend')]
+                processes = []
                 for args, cwd in commands:
                     if self.stop_event.is_set():
                         return
                     log_path = root/'preview.log'
-                    fd = os.open(log_path, os.O_WRONLY|os.O_CREAT|os.O_APPEND, 0o600)
+                    fd = os.open(log_path, os.O_WRONLY|os.O_CREAT|os.O_APPEND|os.O_NOFOLLOW, 0o600)
                     with os.fdopen(fd, 'ab') as log:
                         process = subprocess.Popen(args, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
                                                    stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
@@ -606,7 +687,8 @@ class SiteEditor:
                             ProcessRunner.stop(process)
                             return
                         self.preview_processes.append(process)
-                if not self.wait_http(backend_port, '/api/health', self.stop_event) or not self.wait_http(frontend_port, '/', self.stop_event):
+                    processes.append(process)
+                if not self.wait_http(backend_port, '/api/health', self.stop_event, processes[0]) or not self.wait_http(frontend_port, '/analyse', self.stop_event, processes[1]):
                     raise EditorError('L’aperçu n’a pas pu démarrer. Vérifiez l’installation du projet.')
                 with self.lock:
                     self.preview_url = f'http://127.0.0.1:{frontend_port}/analyse?editor=1'
@@ -617,6 +699,9 @@ class SiteEditor:
                     self.preview_processes.clear()
                 for process in processes:
                     ProcessRunner.stop(process)
+            finally:
+                with self.lock:
+                    self.preview_starting = False
         threading.Thread(target=launch, daemon=True).start()
 
     def close(self):
@@ -697,11 +782,22 @@ class EditorHandler(BaseHTTPRequestHandler):
             path = self.route()
             if path == '/api/state':
                 return self.send(200, self.editor.state())
+            if path == '/api/progress':
+                return self.send(200, self.editor.progress())
             if path == '/api/job':
-                return self.send(200, self.editor.state()['job'])
+                return self.send(200, self.editor.progress()['job'])
+            if path == '/api/preview':
+                if not self.token_valid():
+                    raise EditorError('Accès local non autorisé.', 403)
+                return self.send(200, {'previewUrl': self.editor.preview_url})
+            if path == '/api/files':
+                if not self.token_valid():
+                    raise EditorError('Accès local non autorisé.', 403)
+                return self.send(200, {'files': self.editor.source_names()})
             files = {'/': ('index.html', 'text/html; charset=utf-8'),
                      '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
                      '/layout.js': ('layout.js', 'text/javascript; charset=utf-8'),
+                     '/console.js': ('console.js', 'text/javascript; charset=utf-8'),
                      '/style.css': ('style.css', 'text/css; charset=utf-8')}
             if path not in files:
                 raise EditorError('Ressource absente.', 404)
@@ -718,13 +814,13 @@ class EditorHandler(BaseHTTPRequestHandler):
         except Exception:
             self.send(500, {'error': 'L’éditeur n’a pas pu terminer cette action.'})
 
-    def read_json(self):
+    def read_json(self, max_body=MAX_BODY):
         if self.headers.get('Transfer-Encoding'):
             raise EditorError('Format de requête non pris en charge.')
         length = self.headers.get('Content-Length', '')
-        if not re.fullmatch(r'\d{1,6}', length):
+        if not re.fullmatch(r'\d{1,7}', length):
             raise EditorError('Taille de requête invalide.')
-        if int(length) > MAX_BODY:
+        if int(length) > max_body:
             raise EditorError('Requête trop volumineuse.', 413)
         if self.headers.get('Content-Type', '').split(';')[0].strip() != 'application/json':
             raise EditorError('Une requête JSON est requise.', 415)
@@ -748,9 +844,18 @@ class EditorHandler(BaseHTTPRequestHandler):
             if not self.host_valid() or not self.token_valid() or self.headers.get('Origin') != self.editor.origin:
                 raise EditorError('Action locale non autorisée.', 403)
             path = self.route()
-            if path not in ('/api/save', '/api/prepare', '/api/publish'):
+            if path not in ('/api/save', '/api/prepare', '/api/publish', '/api/files/open', '/api/files/save', '/api/preview/retry'):
                 raise EditorError('Action inconnue.', 404)
-            body = self.read_json()
+            body = self.read_json(MAX_SOURCE * 6 + 4096 if path == '/api/files/save' else MAX_BODY)
+            if path == '/api/files/open' and set(body) == {'name'}:
+                return self.send(200, self.editor.open_source(body['name']))
+            if path == '/api/files/save' and set(body) == {'name', 'content', 'revision'}:
+                return self.send(200, self.editor.save_source(body['name'], body['content'], body['revision']))
+            if path == '/api/preview/retry' and not body:
+                self.editor.start_preview()
+                return self.send(202, {'ok': True})
+            if path.startswith(('/api/files/', '/api/preview/')):
+                raise EditorError('Paramètres invalides.')
             if path == '/api/save':
                 if set(body) not in ({'settings'},{'settings','layout'}):
                     raise EditorError('Demande de sauvegarde invalide.')

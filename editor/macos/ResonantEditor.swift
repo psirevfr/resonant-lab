@@ -41,7 +41,7 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
         window.minSize = NSSize(width: 960, height: 700)
         window.delegate = self
         window.isReleasedWhenClosed = false
-        window.appearance = NSAppearance(named: .darkAqua)
+        window.appearance = NSAppearance(named: .aqua)
         window.center()
         window.setFrameAutosaveName("ResonantEditorWindow")
         let content = NSView(frame: window.contentView!.bounds)
@@ -244,9 +244,9 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
         return url.scheme == "http" && url.host == "127.0.0.1" && url.port == base.port && url.user == nil && url.password == nil
     }
 
-    private func fetchState(_ completion: @escaping @MainActor ([String: Any]?) -> Void) {
+    private func fetchEditorObject(_ endpoint: String, completion: @escaping @MainActor ([String: Any]?) -> Void) {
         guard let base = editorURL else { completion(nil); return }
-        var request = URLRequest(url: base.appendingPathComponent("api/state"))
+        var request = URLRequest(url: base.appendingPathComponent(endpoint))
         request.setValue(token, forHTTPHeaderField: "X-Editor-Token")
         request.timeoutInterval = 3
         let session = URLSession(configuration: .ephemeral, delegate: NoRedirects(), delegateQueue: nil)
@@ -270,7 +270,7 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
               action.request.value(forHTTPHeaderField: "X-Editor-Token") == nil else { decision(.cancel); return }
         // An iframe may reach only the preview port announced by our own
         // authenticated backend, never an arbitrary localhost application.
-        fetchState { state in
+        fetchEditorObject("api/preview") { state in
             var allowed = false
             if let state,
                let value = state["previewUrl"] as? String, let preview = URL(string: value) {
@@ -302,6 +302,19 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
     }
 
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? { nil }
+    func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
+        guard frame.isMainFrame, let url = frame.request.url, internalURL(url) else { completionHandler(false); return }
+        confirmDiscard(message, completion: completionHandler)
+    }
+
+    private func confirmDiscard(_ message: String, completion: @escaping (Bool) -> Void) {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = message
+        alert.addButton(withTitle: "Continuer à modifier")
+        alert.addButton(withTitle: "Abandonner")
+        alert.beginSheetModal(for: window) { response in completion(response == .alertSecondButtonReturn) }
+    }
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { overlay.isHidden = true }
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { navigationFailed(error) }
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { navigationFailed(error) }
@@ -333,12 +346,30 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
         let previousOverlay = overlay.isHidden
         showStatus("Vérification de l’activité en cours…")
         window.makeFirstResponder(nil)
-        fetchState { [weak self, weak process] state in
+        webView.evaluateJavaScript("Boolean(window.resonantEditorHasUnsavedChanges?.())") { [weak self, weak process] value, _ in
             guard let self, let process else { NSApp.reply(toApplicationShouldTerminate: true); return }
-            let job = state?["job"] as? [String: Any]
+            if value as? Bool == true {
+                self.confirmDiscard("Quitter avec des modifications non enregistrées ?") { abandon in
+                    if abandon { self.checkPublicationBeforeQuit(process, previousOverlay: previousOverlay) }
+                    else { self.cancelQuit(previousOverlay: previousOverlay) }
+                }
+            } else { self.checkPublicationBeforeQuit(process, previousOverlay: previousOverlay) }
+        }
+        return .terminateLater
+    }
+
+    private func cancelQuit(previousOverlay: Bool) {
+        checkingQuit = false
+        overlay.isHidden = previousOverlay
+        NSApp.reply(toApplicationShouldTerminate: false)
+    }
+
+    private func checkPublicationBeforeQuit(_ process: Process, previousOverlay: Bool) {
+        fetchEditorObject("api/job") { [weak self, weak process] job in
+            guard let self, let process else { NSApp.reply(toApplicationShouldTerminate: true); return }
             let jobStatus = (job?["status"] as? String ?? "").lowercased()
             let active = ["queued", "running", "preparing", "publishing", "préparation", "publication"].contains(jobStatus)
-            if state == nil || active {
+            if job == nil || active {
                 let alert = NSAlert()
                 alert.alertStyle = .warning
                 alert.messageText = active ? "Une opération est encore en cours" : "Impossible de vérifier l’activité du projet"
@@ -348,15 +379,12 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
                 alert.beginSheetModal(for: self.window) { [weak self, weak process] response in
                     guard let self else { NSApp.reply(toApplicationShouldTerminate: true); return }
                     if response == .alertFirstButtonReturn {
-                        self.checkingQuit = false
-                        self.overlay.isHidden = previousOverlay
-                        NSApp.reply(toApplicationShouldTerminate: false)
+                        self.cancelQuit(previousOverlay: previousOverlay)
                     } else if let process { self.finishQuit(process) }
                     else { NSApp.reply(toApplicationShouldTerminate: true) }
                 }
             } else { self.finishQuit(process) }
         }
-        return .terminateLater
     }
 
     private func finishQuit(_ process: Process) {
