@@ -1,3 +1,4 @@
+import type {AcousticTrial} from './acousticLearning';
 export type Parameters = Record<string, number>;
 export interface Block {id:string; type:string; label:string; parameters:Parameters; position:{x:number;y:number}; reason:string}
 export interface Edge {id:string;source:string;target:string}
@@ -14,7 +15,7 @@ export interface Analysis {f0:number|null;partials:{frequency:number;amplitude:n
 export interface Bode {frequency:number[];magnitude:number[];phase:number[];description:string}
 export interface Transfer extends Partial<Bode> {lti:boolean;equation:string;digital?:string;order?:number;stable?:boolean;stability_reason?:string;dc_gain?:number;poles?:{real:number;imag:number;multiplicity?:number}[]|null;zeros?:{real:number;imag:number}[]|null;impulse_time?:number[];impulse?:number[];description:string}
 export interface Candidate {patch:Patch;errors:Errors;complexity:number;score:number;generators?:number;parameter_count?:number;modules?:number;rejection_reasons?:string[];bands?:Record<string,number>;pareto?:boolean;within_tolerance?:boolean;reference?:boolean}
-export interface Generation {analysis:Analysis;patch:Patch;candidates:Candidate[];selection:string;penalty:number}
+export interface Generation {learning?:AcousticTrial;analysis:Analysis;patch:Patch;candidates:Candidate[];selection:string;penalty:number}
 export interface Optimization {patch:Patch;initial:number;final:number;history:number[];evaluations:number;converged:boolean;message:string;parameters:string[]}
 export interface Job {status:string;progress:{initial?:number;current?:number;best?:number;evaluations?:number;budget?:number;history?:number[];parameters?:string[]};result?:Optimization;error?:string}
 

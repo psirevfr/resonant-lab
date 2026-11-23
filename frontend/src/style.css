@@ -117,4 +117,3 @@
 .audio-panel-close,.icon-actions .audio-panel-close{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:40px;height:40px;padding:0;border:1px solid #536779;border-radius:6px;background:#202e3b;color:#edf4fa;cursor:pointer}
 .audio-panel-close:hover,.icon-actions .audio-panel-close:hover{background:#33485a;border-color:#a2b7c8}
 .audio-panel-close:focus-visible{outline:2px solid #c2ee94;outline-offset:2px}
-.generation-comparison{margin:0 20px 12px;border:1px solid var(--line);border-radius:8px}.generation-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}.generation-columns>div{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.workflow-buttons label{display:flex;align-items:center;gap:4px;font-size:11px}.workflow-buttons select{max-width:100%;font-size:11px}

@@ -53,7 +53,7 @@ def comb_candidates(x,fs,features,objective):
     return [q for _,q in best.values()]
 
 
-def select_compact_generation(patches,x,features,objective,weights,penalty):
+def select_compact_generation(patches,x,features,objective,weights,penalty,*,history=None,learning=None):
     from .compact import tidy
     from .shared_envelopes import share_envelopes
     from .nonlinear_fit import architecture,fit_architecture,refine_shared
@@ -109,5 +109,20 @@ def select_compact_generation(patches,x,features,objective,weights,penalty):
             rows.append(candidate);current=q
     eligible=[r for r in rows if r['within_tolerance']]
     chosen=min(eligible,key=lambda r:(r['modules'],r['errors']['total'],r['complexity']))
+    if learning is not None:
+        from .adaptive import LEARNING_VERSION, adaptive_reward, envelope_candidate, select_strategy, sound_profile
+        profile=sound_profile(features,len(x)/ref.sample_rate)
+        strategy=select_strategy(profile,history)
+        try:
+            patch=envelope_candidate(x,ref.sample_rate,features,objective,strategy,chosen['modules'])
+            candidate=check(row(patch)) if patch is not None else None
+            reward=adaptive_reward(chosen,candidate) if candidate and candidate['within_tolerance'] else 0.
+        except (ValueError, np.linalg.LinAlgError, FloatingPointError):
+            # The optional fit can be ill-conditioned on unusual excerpts.
+            reward=0.
+        if reward>0:
+            rows.append(candidate)
+            chosen=candidate
+        learning.update(version=LEARNING_VERSION,profile=profile,strategy=strategy,reward=reward,accepted=reward>0)
     rows.sort(key=lambda r:(r is not chosen,not r['within_tolerance'],r['score']))
     return rows,baseline

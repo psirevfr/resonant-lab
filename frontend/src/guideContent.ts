@@ -2,7 +2,7 @@ export type LabSpace='atelier'|'analyse';
 export type GuideStep={space:LabSpace;target:string;title:string;text:string};
 export const guideSteps:GuideStep[]=[
  {space:'analyse',target:'reference',title:'Partez d’un son',text:'Importez un fichier WAV, puis choisissez la note que vous voulez reproduire.'},
- {space:'analyse',target:'generate',title:'Recréez le son',text:'L’additive assemble des vibrations. La soustractive filtre une source riche en fréquences.'},
+ {space:'analyse',target:'generate',title:'Recréez le son',text:'Le logiciel assemble des vibrations, puis compare le résultat au son de départ.'},
  {space:'analyse',target:'graph',title:'Ajustez le modèle',text:'La bibliothèque Blocs ajoute des sources, filtres et enveloppes. Pour retirer un câble, sélectionnez-le puis appuyez sur Suppr.'},
  {space:'analyse',target:'player',title:'Écoutez et comparez',text:'Écoutez l’original puis le modèle pour comparer le résultat.'},
  {space:'analyse',target:'export',title:'Gardez votre résultat',text:'Exporter enregistre le son ou le modèle. Un compte est nécessaire pour télécharger.'},

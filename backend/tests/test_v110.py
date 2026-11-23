@@ -54,17 +54,17 @@ def test_ideal_filter_topology_has_the_documented_response(kind):
     assert process(kind,params,[x],44100,len(x))==pytest.approx(expected,abs=1e-12)
 
 
-def test_subtractive_compares_its_actual_render_and_respects_strict():
+def test_subtractive_generation_paused_but_previous_graphs_render():
     fs=44100
     t=np.arange(2205)/fs
-    x=.3*np.sin(2*np.pi*440*t)*np.exp(-t/.1)
-    result=compute('generate',{'audio_id':'synthetic','duration':.05,'max_partials':2,
-        'synthesis':'subtractive','source':'white_noise','refine_modes':False,'include_impact':False},x,fs)
-    a,b=result['comparison']['additive'],result['comparison']['subtractive']
-    p=Patch.model_validate(b['patch'])
-    assert p.nodes[0].type=='white_noise' and p.nodes[1].type=='gain'
-    assert np.isfinite(render(p)).all()
-    expected=all(b['errors'][k]<=v+1e-12 for k,v in a['errors'].items())
-    expected &= all(b['bands'][k]<=v+1e-12 for k,v in a['bands'].items())
-    assert b['within_tolerance']==expected
-    assert result['patch']==(b['patch'] if expected else a['patch'])
+    x=.3*np.sin(2*np.pi*440*t)
+    with pytest.raises(ValueError, match='additive'):
+        compute('generate',{'audio_id':'synthetic','duration':.05,'synthesis':'subtractive'},x,fs)
+    patch=Patch.model_validate({'duration':.05,'sample_rate':fs,'nodes':[
+        {'id':'noise','type':'white_noise','parameters':{'seed':42,'amplitude':.3}},
+        {'id':'gain','type':'gain','parameters':{'gain':1}},
+        {'id':'out','type':'output'}], 'edges':[
+        {'id':'n-g','source':'noise','target':'gain'},
+        {'id':'g-o','source':'gain','target':'out'}]})
+    assert render(patch).shape==x.shape
+    assert np.isfinite(render(patch)).all()

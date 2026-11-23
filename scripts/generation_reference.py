@@ -2,7 +2,7 @@
 import json,runpy,sys
 from pathlib import Path
 import numpy as np
-from lab.compute import compute
+from lab.compute import AnalysisCache,compute
 from lab.graph import render
 from lab.schema import Patch,Block
 from lab.identify import link
@@ -27,8 +27,14 @@ from test_harmonic_groups import fixture as harmonic_fixture
 ap,ax=harmonic_fixture();ao=Objective(ax,ap.sample_rate,Weights())
 aq=min(harmonic_candidates(ap,ax,Weights()),key=lambda q:ao(render(q)))
 reference['harmonic']={'patch':ap.model_dump(),'input':ax.tolist(),'output':render(aq).tolist(),'types':[n.type for n in aq.nodes],'error':ao(render(aq))}
-sub_request={**request,'synthesis':'subtractive','source':'pink_noise'}
-sub=compute('generate',sub_request,x,fs)['comparison']['subtractive']
-reference['subtractive']={'request':sub_request,'output':render(Patch.model_validate(sub['patch'])).tolist(),'error':sub['errors']['total'],'strict':sub['strict']}
+from lab.blocks import adsr_envelope
+t=np.arange(round(.4*fs))/fs
+sx=.3*adsr_envelope(t,.025,.05,.7,.31,.07,fs)*(np.sin(2*np.pi*330*t)+.2*np.sin(2*np.pi*660*t+.1))
+adaptive_request={**request,'duration':len(sx)/fs}
+cache=AnalysisCache()
+compute('analyze',adaptive_request,sx,fs,cache=cache)
+ar=compute('generate',adaptive_request,sx,fs,cache=cache,learning={'version':1})
+reference['adaptive']={'request':adaptive_request,'input':sx.tolist(),'output':render(Patch.model_validate(ar['patch'])).tolist(),
+                       'error':ar['candidates'][0]['errors']['total'],'learning':ar['learning']}
 path=root/'.local/generation-wasm-reference.json'
 path.parent.mkdir(exist_ok=True);path.write_text(json.dumps(reference,allow_nan=False))

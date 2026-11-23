@@ -1,10 +1,11 @@
+import type {AcousticHint} from './acousticLearning';
 import {request as apiRequest} from './api';
 import type {JobKind} from './hooks/useComputeJob';
 export interface LocalUpdate {id:string;phase:'initializing'|'computing'|'progress'|'result'|'error';progress?:Record<string,unknown>;result?:unknown;error?:string;metrics?:Record<string,unknown>}
 let worker:Worker|null=null,active:string|null=null;
 export function disposeCompute(){worker?.terminate();worker=null;active=null}
 if(typeof window!=='undefined')window.addEventListener('pagehide',disposeCompute);
-export async function computeLocally(kind:JobKind|'analyze',request:unknown,signal:AbortSignal,onUpdate:(value:LocalUpdate)=>void):Promise<unknown>{
+export async function computeLocally(kind:JobKind|'analyze',request:unknown,signal:AbortSignal,onUpdate:(value:LocalUpdate)=>void,learning?:AcousticHint):Promise<unknown>{
  if(active)throw Error('Un calcul local est déjà actif.');
  const id=crypto.randomUUID();active=id;const begun=performance.now();
  try{
@@ -26,7 +27,7 @@ export async function computeLocally(kind:JobKind|'analyze',request:unknown,sign
     if(message.phase==='error'){clear();disposeCompute();reject(Error(message.error))}
     if(message.phase==='result'){clear();console.info('resonant-compute',JSON.stringify({id,kind,location:'browser',input_ms,total_ms:performance.now()-begun,...message.metrics}));resolve(message.result)}
    };
-   current.postMessage({id,kind,request,sampleRate,samples:new Float64Array(buffer)},[buffer]);
+   current.postMessage({id,kind,request,learning,sampleRate,samples:new Float64Array(buffer)},[buffer]);
   });
  }finally{if(active===id)active=null}
 }

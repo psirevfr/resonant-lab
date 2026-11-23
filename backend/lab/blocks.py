@@ -147,6 +147,13 @@ def coefficients(kind: str, p: dict[str, float], fs: int):
 def exponential(t, attack, tau):
     return np.exp(-t/tau) * (-np.expm1(-t/attack) if attack > 0 else 1)
 
+def adsr_envelope(t, attack, decay, sustain, gate, release, fs):
+    def held(u):
+        return np.where(u < attack, u/max(attack, 1/fs),
+                        1-(1-sustain)*np.clip((u-attack)/decay, 0, 1))
+    return np.where(t < gate, held(t), held(gate)*np.clip(1-(t-gate)/release, 0, 1))
+
+
 def comb_filter(x,frequency,feedback,fs):
     # Vector blocks end before any dependency within that block. O(N), with
     # the same recurrence/order as the browser; no dense high-order lfilter.
@@ -207,10 +214,7 @@ def process(kind: str, p: dict, inputs: list[np.ndarray], fs: int, n: int) -> np
         u=np.maximum(0,t-p.get('onset',0))
         return inputs[0]*exponential(u,p['attack'],p['tau'])*(t>=p.get('onset',0))
     if kind == 'adsr':
-        def held(u):
-            return np.where(u < p['attack'], u/max(p['attack'],1/fs), 1-(1-p['sustain'])*np.clip((u-p['attack'])/p['decay'],0,1))
-        env = np.where(t < p['gate'], held(t), held(p['gate'])*np.clip(1-(t-p['gate'])/p['release'],0,1))
-        return inputs[0]*env
+        return inputs[0]*adsr_envelope(t, p['attack'], p['decay'], p['sustain'], p['gate'], p['release'], fs)
     if kind == 'asymmetric_saturation':
         up=signal.resample_poly(inputs[0],4,1)
         shaped=p['level']*((1-p['mix'])*up+p['mix']*(np.tanh(p['drive']*up+p['bias'])-np.tanh(p['bias'])))

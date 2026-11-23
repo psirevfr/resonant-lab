@@ -35,8 +35,9 @@ def noise_patch(x,fs,features):
 def complexity(patch):
     return len(patch.nodes)+.25*sum(len(n.parameters) for n in patch.nodes)
 
-def generate(x,fs,max_partials=24,penalty=.0001,weights=None,refine_modes=True,include_impact=True,detailed=True):
-    features=analyze(x,fs,max_partials); objective=Objective(x,fs,weights or Weights())
+def generate(x,fs,max_partials=24,penalty=.0001,weights=None,refine_modes=True,include_impact=True,detailed=True,*,features=None,history=None):
+    if features is None:features=analyze(x,fs,max_partials)
+    objective=Objective(x,fs,weights or Weights())
     counts=sorted(set([1,min(4,len(features['partials'])),len(features['partials'])]))
     patches=[modal_patch(features,fs,len(x)/fs,n) for n in counts]+[noise_patch(x,fs,features)]
     # A filter is retained only if a scored candidate justifies it.
@@ -74,5 +75,6 @@ def generate(x,fs,max_partials=24,penalty=.0001,weights=None,refine_modes=True,i
         impact=fit_impact(tonal,x,features,objective)
         if impact is not None:patches.append(impact)
     from .generation_search import select_compact_generation
-    results,reference=select_compact_generation(patches,x,features,objective,weights or Weights(),penalty)
-    return {'analysis':features,'candidates':results,'patch':results[0]['patch'],'reference_patch':reference['patch'],'selection':'Recherche systématique de montages compacts : enveloppes partagées, sinus + saturation + filtres, fondamentale + bruit amplifié + peigne, remplacement ciblé des aigus et retrait vérifié de modes inutiles. Minimum de blocs parmi les candidats sans hausse des erreurs temporelle, spectrale, d’enveloppe, d’attaque ou par bande par rapport à la référence (tolérance numérique 1e−12). Référence choisie selon erreur + λ × complexité. Aucun gain de prix ou de consommation mesuré.','penalty':penalty,'refinement':refinement,'impact_tested':include_impact}
+    learning = {} if history is not None else None
+    results,reference=select_compact_generation(patches,x,features,objective,weights or Weights(),penalty,history=history,learning=learning)
+    return {'analysis':features,'candidates':results,'patch':results[0]['patch'],'reference_patch':reference['patch'],'selection':'Recherche systématique de montages compacts : enveloppes partagées, sinus + saturation + filtres, fondamentale + bruit amplifié + peigne, remplacement ciblé des aigus et retrait vérifié de modes inutiles. Minimum de blocs parmi les candidats sans hausse des erreurs temporelle, spectrale, d’enveloppe, d’attaque ou par bande par rapport à la référence (tolérance numérique 1e−12). Référence choisie selon erreur + λ × complexité. Aucun gain de prix ou de consommation mesuré.','penalty':penalty,'refinement':refinement,'impact_tested':include_impact, **({'learning':learning} if learning is not None else {})}

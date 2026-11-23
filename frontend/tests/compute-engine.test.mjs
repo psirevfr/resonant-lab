@@ -61,3 +61,19 @@ test('deadline also interrupts a transport that ignores the signal',async()=>{
  await assert.rejects(withDeadline(controller.signal,async()=>{submitted=true}),e=>e.name==='AbortError');
  assert.equal(submitted,false);
 });
+
+test('Les statistiques d’apprentissage vont uniquement au worker du navigateur', async()=>{
+ disposeCompute();
+ const previous=globalThis.fetch, sent=[];
+ globalThis.fetch=async(path,options)=>{sent.push(options?.body??'');return previous(path,options);};
+ try{
+  const hint={version:1,history:{sustained:{adsr:{count:4,reward:2}}}};
+  const run=computeLocally('generate',{audio_id:'test'},new AbortController().signal,()=>{},hint);
+  await tick();
+  const worker=workers.at(-1);
+  assert.deepEqual(worker.last.learning,hint);
+  assert.ok(sent.every(body=>!String(body).includes('history')));
+  worker.emit('result',{result:{patch:'test'}});
+  await run;
+ }finally{globalThis.fetch=previous;disposeCompute();}
+});
