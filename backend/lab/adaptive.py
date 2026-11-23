@@ -31,17 +31,37 @@ def sound_profile(features, duration):
 
 def select_strategy(profile, history):
     order = STRATEGIES if profile == 'sustained' else STRATEGIES[::-1]
-    table = history.get(profile) if isinstance(history, dict) else None
+    if not isinstance(history, dict):
+        return order[0]
+    table = history.get(profile)
     scores = {}
     for arm in order:
         row = table.get(arm) if isinstance(table, dict) else None
         if not isinstance(row, dict):
-            return arm
+            continue
         count, reward = row.get('count'), row.get('reward')
-        if (type(count) is not int or not 1 <= count <= 128 or type(reward) not in (int, float)
-                or not 0 <= reward <= count):
-            return arm
-        scores[arm] = (count, reward)
+        if type(count) is int and 1 <= count <= 128 and type(reward) in (int,float) and 0 <= reward <= count:
+            scores[arm] = (count, reward)
+    if len(scores) < len(order):
+        unknown = [arm for arm in order if arm not in scores]
+        community = history.get('_community')
+        group = community.get(profile) if isinstance(community, dict) else None
+        prior = {}
+        for arm in order:
+            row = group.get(arm) if isinstance(group, dict) else None
+            if not isinstance(row, dict):
+                continue
+            count, mean = row.get('contributors'), row.get('mean')
+            if type(count) is int and count >= 5 and type(mean) in (int,float) and 0 < mean <= 1:
+                prior[arm] = mean
+        if prior:
+            preferred = max(prior, key=prior.get)
+            if history.get('_explore') is True:
+                return next((arm for arm in unknown if arm != preferred), unknown[0])
+            return preferred
+        if history.get('_explore') is True and len(unknown) == len(order):
+            return unknown[1]
+        return unknown[0]
     total = sum(count for count, _ in scores.values())
     return max(order, key=lambda arm: scores[arm][1]/scores[arm][0]+.25*math.sqrt(math.log(total)/scores[arm][0]))
 

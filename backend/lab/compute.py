@@ -66,8 +66,13 @@ def compute(kind,request,x,fs,progress=lambda _:None,cancel=None,*,cache=None,le
             from .identify import generate
 
             history = learning.get('history') if adaptive else None
+            if adaptive:
+                history = dict(history) if isinstance(history, dict) else {}
+                history['_community'] = learning.get('community')
+                # Repeatable exploration per excerpt without changing synthesis seeds.
+                history['_explore'] = (learning.get('explore') is True or isinstance(learning.get('community'),dict)) and int(digest[:8],16) % 4 == 0
             result=generate(x,fs,r.max_partials,r.complexity_penalty,r.weights,r.refine_modes,r.include_impact,r.detailed,
-                            features=features,history=history if isinstance(history, dict) else {} if adaptive else None)
+                            features=features,history=history)
             if adaptive:
                 result['learning']['clip']=f'{fs}:{digest}'
     elif kind=='optimize':

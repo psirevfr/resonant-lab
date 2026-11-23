@@ -13,6 +13,7 @@ from lab.schema import Block, Edge, OptimizeRequest, Patch, Weights
 
 def test_collective_memory_needs_several_independent_contributors_and_can_be_withdrawn():
     for owner in range(1, 6):
+        learning_store.set_consent(owner, 'accepted')
         ticket = learning_store.make_ticket(owner, b'fixture', 44100)
         report = learning_store.LearningReport(ticket=ticket, profile='sustained', strategy='adsr', reward=owner/5)
         assert learning_store.accept(owner, report)
@@ -20,7 +21,7 @@ def test_collective_memory_needs_several_independent_contributors_and_can_be_wit
     assert learning_store.summary() == {'sustained': {'adsr': {'contributors': 5, 'mean': .6}}}
     for i in range(1, 35):
         ticket = learning_store.make_ticket(1, b'new test clip'+bytes([i]), 44100)
-        learning_store.accept(1, report.model_copy(update={'ticket':ticket, 'reward':0.}))
+        learning_store.accept(1, report.model_copy(update={'ticket':ticket, 'reward':.001}))
     assert learning_store.summary()['sustained']['adsr']['contributors'] == 5
     learning_store.reset(1)
     assert learning_store.summary() == {}
@@ -28,18 +29,66 @@ def test_collective_memory_needs_several_independent_contributors_and_can_be_wit
 
 def test_collective_endpoint_accepts_only_an_opted_in_receipt_for_this_session():
     client = TestClient(app)
+    consent_path = '/api/acoustic-learning/consent'
+    version = learning_store.CONSENT_VERSION
     audio = client.post('/api/demo').json()
     body = {'kind':'generate','request':{'audio_id':audio['id'],'duration':.05}}
+    assert client.get(consent_path).json() == {'version':version,'decision':None}
+    assert 'x-acoustic-ticket' not in client.post('/api/compute/input',json={**body,'contribute':True}).headers
+    assert client.post(consent_path,json={'version':version+1,'decision':'accepted'}).status_code == 422
+    assert client.post(consent_path,json={'version':version,'decision':'refused'}).json()['decision'] == 'refused'
     assert 'x-acoustic-ticket' not in client.post('/api/compute/input',json=body).headers
-    ticket = client.post('/api/compute/input',json={**body,'contribute':True}).headers['x-acoustic-ticket']
+    assert client.post(consent_path,json={'version':version,'decision':'accepted'}).json()['decision'] == 'accepted'
+    assert 'x-acoustic-ticket' not in client.post('/api/compute/input',json={**body,'kind':'analyze'}).headers
+    ticket = client.post('/api/compute/input',json=body).headers['x-acoustic-ticket']
     report = {'ticket':ticket,'strategy':'adsr','profile':'sustained','reward':.35}
     assert client.post('/api/acoustic-learning',json=report).json() == {'recorded':True}
     assert client.post('/api/acoustic-learning',json=report).json() == {'recorded':False}
     assert client.post('/api/acoustic-learning',json={**report,'samples':[1]}).status_code == 422
+    for reward in (0, -.1, 1.01, True, '.35'):
+        assert client.post('/api/acoustic-learning',json={**report,'reward':reward}).status_code == 422
+    learning_store.set_consent(2, 'accepted')
     other = learning_store.make_ticket(2,b'no',44100)
     assert client.post('/api/acoustic-learning',json={**report,'ticket':other}).status_code == 403
     assert client.get('/api/acoustic-learning').json() == {'history':{}}
     assert client.post('/api/acoustic-learning/reset',json={}).json() == {'ok':True}
+    assert client.post('/api/acoustic-learning',json=report).status_code == 403
+    report['ticket'] = client.post('/api/compute/input',json=body).headers['x-acoustic-ticket']
+    assert client.post('/api/acoustic-learning',json=report).json() == {'recorded':True}
+    assert client.post(consent_path,json={'version':version,'decision':'refused'}).status_code == 200
+    assert client.post('/api/acoustic-learning',json=report).status_code == 403
+    assert client.post(consent_path,json={'version':version,'decision':'accepted'}).status_code == 200
+    assert client.post('/api/acoustic-learning',json=report).status_code == 403
+    report['ticket'] = client.post('/api/compute/input',json=body).headers['x-acoustic-ticket']
+    assert client.post('/api/acoustic-learning',json=report).json() == {'recorded':True}
+
+
+def test_consent_is_private_and_requires_visitor_csrf():
+    app.dependency_overrides.clear()
+    first, second = (TestClient(app,base_url='https://testserver') for _ in range(2))
+    path = '/api/acoustic-learning/consent'
+    for client in first, second:
+        assert client.get('/analyse').status_code == 200
+        assert client.get(path).json()['decision'] is None
+    choice = {'version':learning_store.CONSENT_VERSION,'decision':'accepted'}
+    assert first.post(path,json=choice).status_code == 403
+    csrf = first.get('/api/me').json()['csrf_token']
+    assert first.post(path,json=choice,headers={'X-CSRF-Token':csrf}).status_code == 200
+    assert first.get(path).json()['decision'] == 'accepted'
+    assert second.get(path).json()['decision'] is None
+
+
+def test_legacy_reports_do_not_enter_the_new_collective_summary():
+    from contextlib import closing
+    import time
+    with closing(learning_store.get_db()) as db, db:
+        for owner in range(1, 6):
+            db.execute('INSERT INTO acoustic_trials VALUES (?,?,?,?,?,?)',
+                       (owner, 'old', 'sustained', 'adsr', 800, int(time.time())))
+    assert learning_store.summary() == {}
+    for owner in range(1, 6):
+        learning_store.set_consent(owner, 'accepted')
+    assert learning_store.summary() == {}
 
 
 def make_patch(filters=True):

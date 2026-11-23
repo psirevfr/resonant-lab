@@ -31,6 +31,18 @@ def test_learning_never_accepts_more_modules_or_worse_attack_or_bands():
     assert adaptive_reward(baseline, {**candidate, 'bands': {'bass': .4}}) == 0
 
 
+def test_a_single_collective_prior_guides_new_excerpts_but_preserves_exploration():
+    community = {'sustained': {'decay': {'contributors': 5, 'mean': .8}}}
+    hint = {'_community': community}
+    assert select_strategy('sustained', hint) == 'decay'
+    assert select_strategy('sustained', {**hint, '_explore': True}) == 'adsr'
+    assert select_strategy('sustained', {'_explore':True}) == 'decay'
+    assert select_strategy('transient', hint) == 'decay'
+    assert select_strategy('sustained', {'_community': {'sustained': {'decay': {'contributors':4,'mean':1}}}}) == 'adsr'
+    measured = {'adsr': {'count': 6, 'reward': 4}, 'decay': {'count': 6, 'reward': 0}}
+    assert select_strategy('sustained', {**hint, 'sustained': measured}) == 'adsr'
+
+
 def test_analysis_cache_is_reused_only_for_the_exact_analysis(monkeypatch):
     from lab import analysis, identify
 

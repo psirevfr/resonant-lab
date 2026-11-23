@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {acousticEnabled,acousticHint,acousticTrialCount,clearAcousticTrials,recordAcousticTrial,setAcousticEnabled} from '../.test-build/acousticLearning.mjs';
+import {acousticEnabled,acousticHint,acousticTrialCount,clearAcousticTrials,contribution,recordAcousticTrial,sendContribution,setAcousticEnabled} from '../.test-build/acousticLearning.mjs';
 
 const storage=new Map();
 globalThis.localStorage={
@@ -39,10 +39,41 @@ test('La réserve reste bornée et rejette les mesures non finies',()=>{
  assert.deepEqual(acousticHint(3).history.sustained.adsr,{count:128,reward:32});
 });
 
-test('Le prior collectif est borné et une petite cohorte est ignorée',()=>{
+test('La mémoire collective reste distincte des observations du navigateur',()=>{
  storage.clear();
  setAcousticEnabled(1,true);
  recordAcousticTrial(1,trial(1));
- const hint=acousticHint(1,{sustained:{adsr:{contributors:100,mean:.5},decay:{contributors:4,mean:1}}});
- assert.deepEqual(hint.history,{sustained:{adsr:{count:7,reward:3.25}}});
+ const summary={sustained:{adsr:{contributors:100,mean:.5},decay:{contributors:4,mean:1}}};
+ const hint=acousticHint(1,summary);
+ assert.deepEqual(hint.history,{sustained:{adsr:{count:1,reward:.25}}});
+ assert.deepEqual(hint.community,{sustained:{adsr:{contributors:100,mean:.5}}});
+ setAcousticEnabled(1,false);
+ assert.deepEqual(acousticHint(1,summary).history,{});
+});
+
+test('Seul un essai positif fournit une contribution sans audio, empreinte client ni nom',()=>{
+ assert.equal(contribution('receipt',trial(1,0)),null);
+ assert.equal(contribution('receipt',{...trial(1),accepted:false}),null);
+ assert.deepEqual(contribution('receipt',{...trial(1),audio:'private'}),{
+  ticket:'receipt',profile:'sustained',strategy:'adsr',reward:.25,
+ });
+});
+
+test('Un retrait interrompt l’envoi et un refus du serveur ne déclenche aucune relance',async()=>{
+ const previous=globalThis.fetch;
+ let requests=0;
+ globalThis.fetch=async path=>{
+  if(path==='/api/me')return Response.json({csrf_token:'test'});
+  requests++;
+  return Response.json({detail:'Consentement retiré'},{status:403});
+ };
+ try{
+  const report=contribution('receipt',trial(1));
+  const aborted=new AbortController();
+  aborted.abort();
+  await sendContribution(report,aborted.signal);
+  assert.equal(requests,0);
+  await sendContribution(report,new AbortController().signal);
+  assert.equal(requests,1);
+ }finally{globalThis.fetch=previous;}
 });

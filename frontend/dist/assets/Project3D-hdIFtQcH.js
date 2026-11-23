@@ -1,4 +1,4 @@
-import{r as nn,j as We}from"./index-DD8XoLi5.js";import{i as xa,e as Rh,p as Qe,a as je,s as Ps,d as Ch,b as Ds,c as Ko,f as Ls,g as Zo,h as li,j as Ph,m as Dh}from"./ArduinoWorkshop-qgxGyFwE.js";import"./editorShortcuts-CxHMeDcP.js";/**
+import{r as nn,j as We}from"./index-vvxtqWXj.js";import{i as xa,e as Rh,p as Qe,a as je,s as Ps,d as Ch,b as Ds,c as Ko,f as Ls,g as Zo,h as li,j as Ph,m as Dh}from"./ArduinoWorkshop-X2Y8JHGv.js";import"./editorShortcuts-CxHMeDcP.js";/**
  * @license
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT

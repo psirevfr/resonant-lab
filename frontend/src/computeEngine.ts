@@ -9,7 +9,7 @@ export async function computeLocally(kind:JobKind|'analyze',request:unknown,sign
  if(active)throw Error('Un calcul local est déjà actif.');
  const id=crypto.randomUUID();active=id;const begun=performance.now();
  try{
-  const response=await apiRequest('/compute/input',{kind,request,...(onTicket&&kind==='generate'?{contribute:true}:{})},signal);
+  const response=await apiRequest('/compute/input',{kind,request},signal);
   const ticket=response.headers.get('X-Acoustic-Ticket');
   if(ticket&&ticket.length<=550)onTicket?.(ticket);
   const sampleRate=Number(response.headers.get('X-Sample-Rate')),buffer=await response.arrayBuffer();

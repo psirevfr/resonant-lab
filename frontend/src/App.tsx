@@ -2,7 +2,7 @@ import {Fragment,type ReactNode} from 'react';
 import type {LayoutPage,BlockKind} from './siteLayout';
 import {LayoutGrid} from './components/LayoutGrid';
 import {HardwarePlan} from './components/HardwarePlan';
-import {acousticEnabled,acousticHint,acousticTrialCount,clearAcousticTrials,collectiveEnabled,contribution,recordAcousticTrial,setAcousticEnabled,setCollectiveEnabled,type CollectiveHistory} from './acousticLearning';
+import {acousticEnabled,acousticHint,acousticTrialCount,clearAcousticTrials,contribution,recordAcousticTrial,sendContribution,setAcousticEnabled,type CollectiveHistory} from './acousticLearning';
 import {COMPUTE_VERSION} from './computeVersion';
 import type {AudioOrigin} from './circuitProject';
 import {computeLocally,disposeCompute} from './computeEngine';
@@ -28,7 +28,7 @@ import {exportReport} from './report';
 import {buildTeensySketch} from './firmware/teensySketch';
 import {APP_VERSION} from './version';
 
-export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=true,accountUser,resumeJob,onCreateCircuit,onAccountChange}:{layoutPage?:LayoutPage;extraBlocks?:Partial<Record<BlockKind,ReactNode>>;onNavigatePage?:(id:string)=>void;guideTarget?:string;active?:boolean;accountUser?:LabUser|null;resumeJob?:import('./hooks/useComputeJob').ComputeJob|null;onCreateCircuit?:(patch:Patch,origin?:AudioOrigin)=>void;onAccountChange?:(user:LabUser)=>void}){
+export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=true,accountUser,learningOwner,resumeJob,onCreateCircuit,onAccountChange}:{layoutPage?:LayoutPage;extraBlocks?:Partial<Record<BlockKind,ReactNode>>;onNavigatePage?:(id:string)=>void;guideTarget?:string;active?:boolean;accountUser?:LabUser|null;learningOwner?:number;resumeJob?:import('./hooks/useComputeJob').ComputeJob|null;onCreateCircuit?:(patch:Patch,origin?:AudioOrigin)=>void;onAccountChange?:(user:LabUser)=>void}){
  useEffect(()=>{if(guideTarget==='graph')setTab('graph')},[guideTarget]);
  const [audioPanel,setAudioPanel]=useState<'library'|'inspector'|null>(null);
  const libraryToggle=useRef<HTMLButtonElement>(null),inspectorToggle=useRef<HTMLButtonElement>(null);
@@ -46,10 +46,17 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  const [user,setUser]=useState<LabUser|null>(null);
  const [exportLogin,setExportLogin]=useState(false);
  const [learningEnabled,setLearningEnabled]=useState(false),[trialCount,setTrialCount]=useState(0);
- const [sharing,setSharing]=useState(false),[community,setCommunity]=useState<CollectiveHistory>({});
+ const sharing=!!user&&learningOwner===user.id;
+ const [community,setCommunity]=useState<CollectiveHistory>({});
+ const contributionControl=useRef<AbortController|null>(null);
+ useEffect(()=>{
+  if(!sharing)return;
+  const controller=new AbortController();
+  contributionControl.current=controller;
+  return()=>{controller.abort();contributionControl.current=null;};
+ },[sharing,user?.id]);
 
  useEffect(()=>{
-  setSharing(user?collectiveEnabled(user.id):false);
   setLearningEnabled(user?acousticEnabled(user.id):false);
   setTrialCount(user?acousticTrialCount(user.id):0);
  },[user?.id]);
@@ -58,18 +65,6 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
   try{setAcousticEnabled(user.id,enabled);setLearningEnabled(enabled);}
   catch{setError('La mémoire locale est indisponible dans ce navigateur.');}
  }
- function changeSharing(enabled:boolean){
-  if(!user)return;
-  try{setCollectiveEnabled(user.id,enabled);setSharing(enabled);}
-  catch{setError('Le choix de partage ne peut pas être enregistré dans ce navigateur.');}
- }
- async function resetSharedLearning(){
-  if(!user)return;
-  await task('Retrait des contributions',async()=>{
-   await api('/acoustic-learning/reset',{});
-   setNotice('Contributions retirées.');
-  });
- }
  function resetLearning(){
   if(!user)return;
   try{clearAcousticTrials(user.id);setTrialCount(0);}
@@ -77,20 +72,20 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  }
  function accountConnected(next:LabUser){resetSession();try{if(user){const oldKey=`resonant-job:${user.id}`,newKey=`resonant-job:${next.id}`,pending=localStorage.getItem(oldKey);if(pending&&!localStorage.getItem(newKey))localStorage.setItem(newKey,pending);if(oldKey!==newKey)localStorage.removeItem(oldKey)}if(user&&localStorage.getItem(`resonant-guide-v2:${user.id}`)==='seen')localStorage.setItem(`resonant-guide-v2:${next.id}`,'seen')}catch{}setUser(next);onAccountChange?.(next);setExportLogin(false);setShowExports(true)}
  function openExports(){if(!user||user.guest){setExportLogin(true);return}setShowExports(v=>!v)}
- useEffect(()=>{api<LabUser>('/me').then(setUser).catch(()=>{})},[]);
+ useEffect(()=>{if(accountUser===undefined)api<LabUser>('/me').then(setUser).catch(()=>{})},[accountUser]);
  const [localReady,setLocalReady]=useState(false),[localBusy,setLocalBusy]=useState(false),[localMessage,setLocalMessage]=useState('');
  const localControl=useRef<AbortController|null>(null);
  useEffect(()=>{
-  if(!learningEnabled||!user){setCommunity({});return;}
+  if((!learningEnabled&&!sharing)||!user){setCommunity({});return;}
   const controller=new AbortController();
   void api<{history:CollectiveHistory}>('/acoustic-learning',undefined,controller.signal)
    .then(value=>{if(!controller.signal.aborted)setCommunity(value.history);}).catch(()=>{});
   return()=>controller.abort();
- },[learningEnabled,user?.id,localBusy]);
+ },[learningEnabled,sharing,user?.id,localBusy]);
  useEffect(()=>{let current=true;setLocalReady(false);if(user)api<{available:boolean;algorithm_version?:string}>('/compute/config').then(v=>{if(current){setLocalReady(v.available&&v.algorithm_version===COMPUTE_VERSION);}}).catch(()=>{});return()=>{current=false}},[user?.id]);
  useEffect(()=>()=>{localControl.current?.abort();disposeCompute()},[user?.id]);
  const compute=useComputeJob(user?.id,consumeResult,true);
- useEffect(()=>{if(accountUser)setUser(accountUser)},[accountUser]);
+ useEffect(()=>{if(accountUser!==undefined)setUser(accountUser)},[accountUser]);
  useEffect(()=>{if(resumeJob)compute.resume(resumeJob)},[resumeJob]);
  useEffect(()=>{if(!active){localControl.current?.abort();if(compute.busy)void compute.cancel().catch(()=>{});document.querySelectorAll('audio').forEach(a=>a.pause())}},[active]);
  async function submitCompute(kind:JobKind,parameters:unknown){
@@ -98,23 +93,24 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
   if(localControl.current||compute.busy||!user)return;
   const controller=new AbortController();localControl.current=controller;setLocalBusy(true);setError('');setLocalMessage('Chargement de la référence en double précision…');
   try{
-   const hint=kind==='generate'&&acousticEnabled(user.id)?acousticHint(user.id,community):undefined;
+   const hint=kind==='generate'&&(sharing||acousticEnabled(user.id))?acousticHint(user.id,community,sharing):undefined;
    let ticket='';
-   const receiveTicket=hint&&collectiveEnabled(user.id)?(value:string)=>{ticket=value;}:undefined;
+   const shareSignal=contributionControl.current?.signal;
+   const receiveTicket=hint&&sharing?(value:string)=>{ticket=value;}:undefined;
    const value=await computeLocally(kind,parameters,controller.signal,update=>{
     if(update.phase==='initializing')setLocalMessage('Initialisation Python / SciPy sur cet appareil…');
     if(update.phase==='computing')setLocalMessage('Calcul en cours sur cet appareil ; aucun calcul serveur en file.');
     if(update.phase==='progress'&&kind==='optimize')setJob({status:'running',progress:update.progress??{}});
    },hint,receiveTicket);
    if(!controller.signal.aborted){
-    await consumeResult(kind,value,controller.signal);
-    if(!controller.signal.aborted&&hint){
+    if(hint){
      const trial=(value as Generation).learning;
      recordAcousticTrial(user.id,trial);
-     const report=ticket&&collectiveEnabled(user.id)?contribution(ticket,trial):null;
-     if(report)void api('/acoustic-learning',report,controller.signal).catch(()=>{});
+     const report=ticket?contribution(ticket,trial):null;
+     if(report&&shareSignal)void sendContribution(report,shareSignal);
      setTrialCount(acousticTrialCount(user.id));
     }
+    await consumeResult(kind,value,controller.signal);
     if(!controller.signal.aborted)setLocalMessage('Calcul local terminé. Le modèle est chargé.');
    }
   }catch(e){if(kind==='optimize')setJob(j=>j?{...j,status:controller.signal.aborted?'cancelled':'failed'}:null);if(controller.signal.aborted)setLocalMessage('Calcul local annulé.');else{setError(e instanceof Error?e.message:String(e));setLocalMessage('Aucun repli automatique. Vérifiez le runtime local puis relancez.')}}
@@ -173,7 +169,7 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  async function analyze(){if(!localReady){setError('Le runtime local est indisponible.');return}if(localControl.current||locked)return;const c=new AbortController();localControl.current=c;setLocalBusy(true);setError('');setLocalMessage('Préparation de l’analyse locale…');try{const result=await computeLocally('analyze',request,c.signal,u=>setLocalMessage(u.phase==='initializing'?'Initialisation Python / SciPy sur cet appareil…':'Analyse sur cet appareil…'));if(!c.signal.aborted){setAnalysis(result as Analysis);setTab('analysis');setNotice('Analyse locale terminée.');setLocalMessage('Analyse locale terminée.')}}catch(e){if(c.signal.aborted)setLocalMessage('Analyse locale annulée.');else setError(e instanceof Error?e.message:String(e))}finally{if(localControl.current===c){localControl.current=null;setLocalBusy(false)}}}
  async function consumeResult(kind:JobKind,value:unknown,signal?:AbortSignal){
   if(kind==='generate'){
-   const g=value as Generation;setFocusIds([]);setDuration(g.patch.duration);setCompact(null);setAnalysis(g.analysis);setCandidates(g.candidates);setPatch(await api<Patch>('/patch/expand',g.patch,signal));setParameterIds([]);setSelected(g.patch.nodes[0]?.id??'');setTab('graph');setNotice(g.learning?.accepted?'Un affinage guidé par la mémoire locale a été retenu.':'Modèle prêt. Vous pouvez l’écouter.');
+   const g=value as Generation;setFocusIds([]);setDuration(g.patch.duration);setCompact(null);setAnalysis(g.analysis);setCandidates(g.candidates);setPatch(await api<Patch>('/patch/expand',g.patch,signal));setParameterIds([]);setSelected(g.patch.nodes[0]?.id??'');setTab('graph');setNotice(g.learning?.accepted?'Un affinage a amélioré le modèle.':'Modèle prêt. Vous pouvez l’écouter.');
   }else if(kind==='compact'){
    const c=value as CompactResult;setDuration(c.patch.duration);setCompact(c);setCandidates(c.candidates);setPatch(await api<Patch>('/patch/expand',c.patch,signal));setParameterIds([]);setSelected(c.patch.nodes[0]?.id??'');setTab('graph');setNotice(`Simplification : ${c.original_blocks} → ${c.final_blocks} modules. Comparez les sons à l’écoute.`);
   }else{
@@ -224,9 +220,6 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  </>;
  const settingsBlock=<> {showSettings&&<div className="settings"><label>Partiels max.<input type="number" min="1" max="24" disabled={locked} value={maxPartials} onChange={e=>setMaxPartials(Math.max(1,Math.min(24,+e.target.value)))}/></label><label>Parcimonie λ<input type="number" min="0" max="1" step=".0001" disabled={locked} value={penalty} onChange={e=>setPenalty(Math.max(0,Math.min(1,+e.target.value)))}/></label><label>Échantillonnage<select value={patch.sample_rate} disabled={locked} onChange={e=>edit({...patch,sample_rate:+e.target.value})}>{[44100,48000,96000].map(v=><option key={v} value={v}>{v} Hz</option>)}</select></label>{!audio&&<label>Durée (s)<input type="number" min=".05" max="60" step=".1" value={patch.duration} disabled={locked} onChange={e=>edit({...patch,duration:+e.target.value})}/></label>}{Object.entries(weights).map(([k,v])=><label key={k}>Poids {({time:'temps',spectral:'spectre',spectrogram:'STFT',envelope:'enveloppe',attack:'attaque'} as Record<string,string>)[k]}<input type="number" min="0" max="100" step=".05" value={v} disabled={locked} onChange={e=>{setCompact(null);setWeights({...weights,[k]:Math.max(0,Math.min(100,+e.target.value))});setCandidates([])}}/></label>)}<label className="checkbox-setting"><input type="checkbox" checked={refineModes} disabled={locked} onChange={e=>setRefineModes(e.target.checked)}/> Affiner modes et battements</label><label className="checkbox-setting"><input type="checkbox" checked={detailed} disabled={locked||!refineModes} onChange={e=>setDetailed(e.target.checked)}/> Recherche détaillée (plus lente)</label><label className="checkbox-setting"><input type="checkbox" checked={includeImpact} disabled={locked} onChange={e=>setIncludeImpact(e.target.checked)}/> Identifier un bruit d’impact</label><label>Hausse d’erreur max. (%)<input aria-label="Hausse d’erreur maximale" type="number" min="0" max="100" step="5" disabled={locked} value={tolerance} onChange={e=>{if(Number.isFinite(e.target.valueAsNumber))setTolerance(Math.max(0,Math.min(100,e.target.valueAsNumber)))}}/></label><label className="checkbox-setting"><input type="checkbox" checked={testShaping} disabled={locked} onChange={e=>setTestShaping(e.target.checked)}/> Tester sinus + saturations + filtres + enveloppes (plus lent)</label><label className="checkbox-setting"><input type="checkbox" checked={testNoise} disabled={locked} onChange={e=>setTestNoise(e.target.checked)}/> Tester le bruit blanc filtré pour l’attaque et les aigus diffus</label><label className="checkbox-setting"><input type="checkbox" checked={protectTexture} disabled={locked} onChange={e=>setProtectTexture(e.target.checked)}/> Protéger l’attaque et chaque bande de fréquences</label><label>Algorithme<select value={method} disabled={locked} onChange={e=>setMethod(e.target.value)}><option value="compare">Comparer les trois</option><option value="Powell">JeanJacky</option><option value="L-BFGS-B">Jean Neymar</option><option value="differential_evolution">Évolution différentielle</option></select></label><AlgorithmHelp method={method}/><label className="checkbox-setting"><input type="checkbox" checked={compensate} disabled={locked||parameterIds.length>0} onChange={e=>setCompensate(e.target.checked)}/> Tester un égaliseur après saturation</label><label>Budget d’itérations<input type="number" min="1" max="60" disabled={locked} value={iterations} onChange={e=>setIterations(Math.max(1,Math.min(60,+e.target.value)))}/></label><details className="calculation-details"><summary>Mémoire d’apprentissage</summary>
  <label className="checkbox-setting"><input type="checkbox" checked={learningEnabled} disabled={locked} onChange={e=>changeLearning(e.target.checked)}/> Apprendre sur cet appareil</label>
- <p>Les essais sont réutilisés sur cet appareil et les tendances collectives orientent le prochain choix.</p>
- <label className="checkbox-setting"><input type="checkbox" checked={sharing} disabled={locked||!learningEnabled} onChange={e=>changeSharing(e.target.checked)}/> Partager mes scores avec Résonant</label>
- <button type="button" disabled={locked} onClick={()=>void resetSharedLearning()}>Retirer mes contributions</button>
  {trialCount>0&&<button disabled={locked} onClick={resetLearning}>Effacer les essais ({trialCount})</button>}</details>
  <details className="calculation-details"><summary>Détails du calcul</summary><p>Optimisation : {parameterIds.length?`${parameterIds.length} paramètres cochés`:'paramètres réglables sur le trajet vers la sortie, dans la limite du budget'}. Génération : la référence utilise erreur + λ × complexité ; la recherche retient ensuite le moins de blocs sans dégrader les critères mesurés. Bruit + peigne et saturations + filtres sont toujours comparés. Les options de bruit et de tolérance ci-dessus concernent la simplification. Les scores candidats sont ceux de leur génération. Simplification : choisir le moins de blocs sous la limite d’erreur, relativement à la version précise. +20 % de coût ne signifie pas 20 % de perte perceptive.</p></details></div>}
 </>;

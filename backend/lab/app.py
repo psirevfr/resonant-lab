@@ -320,14 +320,27 @@ def local_compute_input(body:dict,user:dict=Depends(require_api_user)):
     manifest=runtime_manifest()
     if manifest and isinstance(manifest.get('source_sha256'),str):
         headers['X-Compute-Source']=manifest['source_sha256']
-    if kind=='generate' and body.get('contribute') is True:
-        headers['X-Acoustic-Ticket']=learning_store.make_ticket(user['id'],samples,fs)
+    if kind=='generate':
+        ticket=learning_store.make_ticket(user['id'],samples,fs)
+        if ticket:headers['X-Acoustic-Ticket']=ticket
     return Response(samples, media_type='application/octet-stream', headers=headers)
+
+
+@api_router.get('/api/acoustic-learning/consent')
+def learning_consent(user:dict=Depends(require_api_user)):
+    return JSONResponse(learning_store.consent(user['id']),headers={'Cache-Control':'no-store'})
+
+
+@api_router.post('/api/acoustic-learning/consent')
+def change_learning_consent(choice:learning_store.LearningChoice,request:Request,user:dict=Depends(require_api_user)):
+    rate_limit(request,'acoustic-learning-consent-ip',limit=180,window=3600)
+    rate_limit(request,'acoustic-learning-consent',subject=str(user['id']),limit=20,window=3600)
+    return JSONResponse(learning_store.set_consent(user['id'],choice.decision),headers={'Cache-Control':'no-store'})
 
 
 @api_router.get('/api/acoustic-learning')
 def collective_learning():
-    return JSONResponse({'history':learning_store.summary()},headers={'Cache-Control':'private, max-age=45'})
+    return JSONResponse({'history':learning_store.summary()},headers={'Cache-Control':'no-store'})
 
 
 @api_router.post('/api/acoustic-learning')
