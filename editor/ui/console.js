@@ -90,3 +90,22 @@
   }
  });
 }
+
+$('#terminal-files').onclick=()=>$('#console-open').click();
+const terminalInput=$('#terminal-input'),terminalOutput=$('#terminal-output'),terminalRun=$('#terminal-run');
+async function runTerminal(){
+ const command=terminalInput.value.trim();
+ if(!command||terminalRun.disabled)return;
+ if(command==='clear'){terminalOutput.textContent='';terminalInput.value='';return;}
+ terminalRun.disabled=true;terminalInput.value='';
+ let output;
+ try{output=(await api('/api/terminal',{command})).output;}
+ catch(error){output=error.message;}
+ finally{terminalRun.disabled=false;}
+ terminalOutput.textContent=(terminalOutput.textContent+'\n\n$ '+command+'\n'+output).slice(-30_000);
+ terminalOutput.scrollTop=terminalOutput.scrollHeight;terminalInput.focus();
+}
+terminalRun.onclick=runTerminal;
+terminalInput.addEventListener('keydown',event=>{
+ if(event.key==='Enter'){event.preventDefault();runTerminal();}
+});

@@ -105,6 +105,22 @@ function modify(action){
  undo.push(before);if(undo.length>50)undo.shift();redo=[];lastChange=null;
  renderLayout();refresh();sendPreview();
 }
+function moveLiveBlock({id,anchor,after,column}){
+ const p=current();
+ if(!p||busy()||typeof id!=='string'||typeof anchor!=='string'||typeof after!=='boolean'
+    ||(column!==undefined&&(!Number.isInteger(column)||Math.abs(column)>20)))return;
+ if(!p.custom&&(id===anchor||!Object.hasOwn(library,id)||!Object.hasOwn(library,anchor)))return;
+ modify(()=>{
+  const custom=p.custom;
+  gridPage(p);
+  const field=custom?'id':'kind';
+  const block=p.blocks.find(item=>item[field]===id),target=p.blocks.find(item=>item[field]===anchor);
+  if(!block||!target)throw Error('Le bloc n’est plus disponible.');
+  relocateBlock(p.blocks,block,target,after,column);
+  selectedBlock=block.id;
+ });
+ showSection('layout');
+}
 function openPage(id){page=id;selectedBlock='';setPage(id);renderLayout();}
 function append(kind,existing=null,place=null){
  modify(()=>{

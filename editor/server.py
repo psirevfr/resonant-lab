@@ -206,7 +206,7 @@ class ProcessRunner:
         for process in processes:
             self.stop(process)
 
-    def run(self, args, *, cwd, env, timeout=20, on_line=None, cancel=None):
+    def run(self, args, *, cwd, env, timeout=20, on_line=None, cancel=None, raw=False):
         process = subprocess.Popen([str(a) for a in args], cwd=cwd, env=env,
                                    stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT, start_new_session=True)
@@ -245,7 +245,7 @@ class ProcessRunner:
                 on_line(pending.decode(errors='replace'))
             if code:
                 raise EditorError('La commande a échoué (code '+str(code)+'). '+output[-1200:].decode(errors='replace'), 409)
-            return output.decode(errors='replace')
+            return bytes(output) if raw else output.decode(errors='replace')
         finally:
             if process.poll() is None:
                 self.stop(process)
@@ -276,6 +276,7 @@ class SiteEditor:
         self.job = {'id': None, 'status': 'idle', 'stage': '', 'log': [],
                     'error': None, 'readyToPublish': False}
         self.prepared_fingerprint = None
+        self.prepared_review = None
         self.preview_url = None
         self.preview_error = None
         self.preview_starting = False
@@ -285,11 +286,11 @@ class SiteEditor:
             raise EditorError('Le dossier choisi doit être la racine du dépôt Git.')
         self.read_settings()
 
-    def git(self, *args, timeout=20, on_line=None):
+    def git(self, *args, timeout=20, on_line=None, raw=False):
         return self.runner.run(['git', '-c', 'core.hooksPath=/dev/null', '-c', 'core.fsmonitor=false',
                                 '-c', 'commit.gpgsign=false', *args],
                                cwd=self.repo, env=self.env, timeout=timeout,
-                               on_line=on_line, cancel=self.stop_event)
+                               on_line=on_line, cancel=self.stop_event, raw=raw)
 
     def safe_path(self, relative):
         if not allowed_path(relative):
@@ -438,6 +439,28 @@ class SiteEditor:
             raise EditorError('Les destinations de lecture et publication GitHub doivent être identiques.')
         return first
 
+    def terminal(self, command):
+        commands = {
+            'git status': ('status', '--short', '--branch'),
+            'git log': ('log', '-8', '--oneline'),
+            'git diff --stat': ('diff', '--stat'),
+            'git diff --cached --stat': ('diff', '--cached', '--stat'),
+        }
+        if not isinstance(command, str) or len(command) > 80:
+            raise EditorError('Commande invalide.')
+        if command == 'help':
+            return {'output': '\n'.join([*commands, 'python --version', 'node --version', 'clear'])}
+        if command in commands:
+            output = self.git(*commands[command], timeout=5)
+        elif command in ('python --version', 'node --version'):
+            tool = sys.executable if command.startswith('python') else shutil.which('node', path=self.env.get('PATH'))
+            if not tool:
+                raise EditorError('Node.js est introuvable.')
+            output = self.runner.run([tool, '--version'], cwd=self.repo, env=self.env, timeout=5, cancel=self.stop_event)
+        else:
+            raise EditorError('Commande indisponible ici. Saisissez help.')
+        return {'output': sanitize(output.strip(), self.secrets)[:12_000] or 'Aucun changement.'}
+
     def repository_state(self):
         branch = self.git('branch', '--show-current').strip()
         records = self.git('status', '--porcelain=v1', '-z', '--untracked-files=all').split('\0')
@@ -461,32 +484,79 @@ class SiteEditor:
                 'dirty': sorted(dirty),
                 'unauthorizedChanges': sorted(p for p in dirty if not allowed_path(p))}
 
-    def ensure_publishable(self):
+    def history(self):
+        base = self.git('rev-parse', '--verify', 'origin/main').strip()
+        head = self.git('rev-parse', '--verify', 'HEAD').strip()
+        pending = self.git('rev-list', base+'..'+head).splitlines()
+        if len(pending) > 50:
+            raise EditorError('Plus de 50 commits attendent une publication. Vérifiez-les dans Git.', 409)
+        changes = {}
+        for commit in pending:
+            records = self.git('diff-tree', '--root', '-m', '--no-commit-id', '--no-renames',
+                               '--full-index', '--raw', '-z', '-r', commit).split('\0')
+            for header, name in zip(records[::2], records[1::2]):
+                _, mode, _, blob, _ = header.lstrip(':').split()
+                changes.setdefault(name, set())
+                if mode != '000000':
+                    if mode not in ('100644', '100755'):
+                        raise EditorError('Un commit contient un lien ou un sous-module. Inspectez les commits dans Git.', 409)
+                    changes[name].add(blob)
+        return base, head, pending, changes
+
+    def publication_review(self):
+        state = self.repository_state()
+        if state['branch'] != 'main' or state['behind'] != 0:
+            raise EditorError('La branche main doit être à jour avant la vérification.', 409)
+        remote = self.remote()
+        base, head, pending, changes = self.history()
+        for name in changes:
+            if not self.reviewable_path(name):
+                raise EditorError('Un fichier privé ou hors projet figure dans les commits. Inspectez l’historique dans Git.', 409)
+        paths = sorted(name for name in changes if not allowed_path(name))
+        review = hashlib.sha256(f'{remote}\n{base}\n{head}'.encode()).hexdigest()
+        return {'review': review, 'count': len(pending), 'paths': paths}
+
+    @staticmethod
+    def reviewable_path(name):
+        path = Path(name)
+        if (not name or path.is_absolute() or path.as_posix() != name or '\\' in name
+                or '..' in path.parts or any(ord(c) < 32 or c == '\ufffd' for c in name)):
+            return False
+        if name == '.github/workflows/deploy.yml':
+            return True
+        if any(part.startswith('.') for part in path.parts):
+            return False
+        if (path.suffix.lower() in {'.db', '.sqlite', '.sqlite3', '.db-wal', '.sqlite-wal', '.pem', '.key', '.p12', '.pfx', '.wav'}
+                or any(part == 'node_modules' for part in path.parts)
+                or re.search(r'(?:client_secret|credentials|(?:^|_)token(?:_|$)|^id_(?:rsa|ed25519))', path.stem, re.I)):
+            return False
+        return (allowed_path(name) or path.parts[0] in {'frontend','backend','docs','editor','deploy','scripts'}
+                or name in {'README.md','requirements.txt','requirements.lock.txt','requirements copie.txt',
+                            'test.sh','setup.sh','run.sh','run-web.sh','worker.sh'})
+
+    def ensure_publishable(self, review=None):
         state = self.repository_state()
         if state['branch'] != 'main':
             raise EditorError('La publication nécessite la branche main.', 409)
         if state['unauthorizedChanges']:
-            raise EditorError('Des fichiers hors des réglages du site ont été modifiés. Conservez-les avec vos outils de développement avant de publier.', 409)
-        self.remote()
+            raise EditorError('Enregistrez les changements de code dans un commit local avant de les vérifier.', 409)
         if state['ahead'] is None or state['behind'] is None:
             raise EditorError('La référence origin/main est absente. Synchronisez le dépôt avant de publier.', 409)
         if state['behind']:
             raise EditorError('GitHub contient une version plus récente. Synchronisez le dépôt avant de publier.', 409)
+        details = self.publication_review()
+        if details['paths'] and not review:
+            raise EditorError('Des commits de code attendent. Ouvrez Vérification pour examiner la version complète.', 409)
+        if review is not None and review != details['review']:
+            raise EditorError('Les commits ou la destination ont changé. Rouvrez Vérification.', 409)
         for name in state['dirty']:
             self.safe_path(name)
-        pending = self.git('rev-list', 'origin/main..HEAD').splitlines()
-        if len(pending) > 20:
-            raise EditorError('Trop de commits locaux en attente : utilisez vos outils Git pour cette publication.', 409)
-        for commit in pending:
-            changed = self.git('diff-tree', '--root', '--no-commit-id', '--name-only', '-r', commit).splitlines()
-            if any(not allowed_path(p) for p in changed):
-                raise EditorError('Un commit local contient des changements hors du périmètre de cet éditeur.', 409)
-        return state, pending
+        return state
 
-    def fingerprint(self):
-        state, _ = self.ensure_publishable()
+    def fingerprint(self, review=None):
+        state = self.ensure_publishable(review)
         digest = hashlib.sha256()
-        for value in (self.git('rev-parse', 'HEAD'), self.git('ls-files', '-s', '-z'),
+        for value in (self.git('rev-parse', 'HEAD', 'origin/main'), self.git('ls-files', '-s', '-z'),
                       self.remote(), json.dumps(state, sort_keys=True)):
             digest.update(value.encode())
         files = set(state['dirty']) | {SETTINGS_FILE, LAYOUT_FILE}
@@ -501,8 +571,8 @@ class SiteEditor:
                         digest.update(chunk)
         return digest.hexdigest()
 
-    def scan_secrets(self):
-        state, pending = self.ensure_publishable()
+    def scan_secrets(self, review=None):
+        state = self.ensure_publishable(review)
         values = secret_values(self.repo)
         total = 0
         names = set(state['dirty'])
@@ -518,15 +588,14 @@ class SiteEditor:
                 raise EditorError('Un secret potentiel a été détecté dans un fichier à publier. Publication bloquée.', 409)
         # Also inspect older pending commits: deleting a key in the last commit
         # would otherwise still publish it through the preceding history.
-        for commit in pending:
-            names = self.git('diff-tree', '--root', '--no-commit-id', '--name-only', '--diff-filter=ACMRT', '-r', commit).splitlines()
-            for name in names:
-                data = self.git('show', commit+':'+name).encode()
-                total += len(data)
-                if total > 128_000_000:
-                    raise EditorError('L’historique local à contrôler est trop volumineux.', 409)
-                if contains_secret(data, values):
-                    raise EditorError('Un secret potentiel existe dans un commit local. Publication bloquée.', 409)
+        _, _, _, changes = self.history()
+        for blob in {blob for blobs in changes.values() for blob in blobs}:
+            data = self.git('cat-file', 'blob', blob, raw=True)
+            total += len(data)
+            if total > 128_000_000:
+                raise EditorError('L’historique local à contrôler est trop volumineux.', 409)
+            if contains_secret(data, values):
+                raise EditorError('Un secret potentiel existe dans un commit local. Publication bloquée.', 409)
 
     def log(self, line):
         line = sanitize(line, self.secrets)[:600]
@@ -534,34 +603,35 @@ class SiteEditor:
             self.job['log'].append(line)
             self.job['log'] = self.job['log'][-200:]
 
-    def start_job(self, action):
+    def start_job(self, action, review=None):
         with self.lock:
             if self.job['status'] == 'running':
                 raise EditorError('Une opération est déjà en cours.', 409)
             if action == 'publish':
-                if not self.prepared_fingerprint or self.fingerprint() != self.prepared_fingerprint:
+                review = self.prepared_review
+                if not self.prepared_fingerprint or self.fingerprint(review) != self.prepared_fingerprint:
                     self.prepared_fingerprint = None
                     self.job['readyToPublish'] = False
                     raise EditorError('Les fichiers ont changé. Préparez à nouveau la publication.', 409)
             else:
-                self.ensure_publishable()
+                self.ensure_publishable(review)
             self.job = {'id': secrets.token_hex(12), 'status': 'running',
                         'stage': 'Préparation' if action == 'prepare' else 'Publication',
                         'log': [], 'error': None, 'readyToPublish': False}
             prepared = self.prepared_fingerprint
             self.prepared_fingerprint = None
-            thread = threading.Thread(target=self.run_job, args=(action, prepared), daemon=True)
+            thread = threading.Thread(target=self.run_job, args=(action, prepared, review), daemon=True)
             thread.start()
             return dict(self.job)
 
-    def run_job(self, action, prepared):
+    def run_job(self, action, prepared, review):
         try:
             if action == 'prepare':
                 self.log('Vérification du dépôt et de la destination GitHub…')
-                self.ensure_publishable()
+                self.ensure_publishable(review)
                 self.git('fetch', '--no-tags', 'origin', 'main', timeout=120, on_line=self.log)
-                self.ensure_publishable()
-                self.scan_secrets()
+                self.ensure_publishable(review)
+                self.scan_secrets(review)
                 script = self.repo/'test.sh'
                 if not script.is_file() or script.is_symlink():
                     raise EditorError('Le script de vérification du projet est absent ou invalide.', 409)
@@ -569,35 +639,54 @@ class SiteEditor:
                     self.job['stage'] = 'Tests et construction'
                 self.runner.run([str(script)], cwd=self.repo, env=self.env,
                                 timeout=900, on_line=self.log, cancel=self.stop_event)
-                self.scan_secrets()
-                state, _ = self.ensure_publishable()
-                fingerprint = self.fingerprint()
+                self.scan_secrets(review)
+                state = self.ensure_publishable(review)
+                fingerprint = self.fingerprint(review)
                 available = bool(state['dirty'] or state['ahead'])
                 with self.lock:
                     self.prepared_fingerprint = fingerprint if available else None
+                    self.prepared_review = review if available else None
                     self.job['readyToPublish'] = available
                 self.log('Vérifications réussies. Cliquez sur Publier pour mettre en ligne.' if available else 'Vérifications réussies. Aucune modification à publier.')
             else:
-                if self.fingerprint() != prepared:
+                if self.fingerprint(review) != prepared:
                     raise EditorError('Les fichiers ont changé. Préparez à nouveau la publication.', 409)
-                state, _ = self.ensure_publishable()
-                self.scan_secrets()
+                destination = self.remote()
+                base, head, _, _ = self.history()
+                state = self.ensure_publishable(review)
+                self.scan_secrets(review)
                 if not state['dirty'] and not state['ahead']:
                     raise EditorError('Aucune modification à publier.', 409)
                 self.git('add', '--', *[name for name in sorted(ALLOWED_EXACT) if (self.repo/name).exists() or name in state['dirty']], 'frontend/dist')
                 staged = self.git('diff', '--cached', '--name-only', '-z').split('\0')
                 if any(p and not allowed_path(p) for p in staged):
                     raise EditorError('L’index contient un fichier hors du périmètre de publication.', 409)
+                self.scan_secrets(review)
+                values = secret_values(self.repo)
+                for name in filter(None, staged):
+                    entry = self.git('ls-files', '-s', '--', name).strip()
+                    if entry and (not entry.startswith(('100644 ', '100755 '))
+                                  or contains_secret(self.git('show', ':'+name, raw=True), values)):
+                        raise EditorError('Un fichier indexé présente un risque. Publication bloquée.', 409)
                 if any(staged):
                     self.git('commit', '-m', 'feat: mettre à jour la présentation du site', timeout=60, on_line=self.log)
-                self.remote()
-                self.scan_secrets()
+                    if self.git('rev-parse', 'HEAD^').strip() != head:
+                        raise EditorError('La branche locale a bougé pendant la publication.', 409)
+                    head = self.git('rev-parse', 'HEAD').strip()
+                    if any(not allowed_path(name) for name in self.git('diff', '--name-only', '-z', head+'^', head).split('\0') if name):
+                        raise EditorError('Le nouveau commit contient un fichier hors périmètre.', 409)
+                    new_base, new_head, _, _ = self.history()
+                    if (new_base, new_head) != (base, head) or self.remote() != destination:
+                        raise EditorError('La version ou la destination a changé depuis la vérification.', 409)
+                    self.scan_secrets(self.publication_review()['review'])
+                if self.remote() != destination:
+                    raise EditorError('La destination a changé depuis la vérification.', 409)
                 self.log('Envoi vers GitHub…')
-                self.git('push', 'origin', 'HEAD:refs/heads/main', timeout=180, on_line=self.log)
+                self.git('push', 'origin', head+':refs/heads/main', timeout=180, on_line=self.log)
                 self.log('Version envoyée sur GitHub. Le déploiement automatique peut maintenant être suivi sur GitHub Actions.')
             with self.lock:
                 self.job['status'] = 'succeeded'
-                self.job['stage'] = 'Prêt à publier' if self.job['readyToPublish'] else 'Terminé'
+                self.job['stage'] = 'Prêt à publier' if self.job['readyToPublish'] else ('Vérifié' if action == 'prepare' else 'Terminé')
         except Exception as exc:
             error = sanitize(str(exc), self.secrets)[:600]
             with self.lock:
@@ -794,9 +883,14 @@ class EditorHandler(BaseHTTPRequestHandler):
                 if not self.token_valid():
                     raise EditorError('Accès local non autorisé.', 403)
                 return self.send(200, {'files': self.editor.source_names()})
+            if path == '/api/publication-review':
+                if not self.token_valid():
+                    raise EditorError('Accès local non autorisé.', 403)
+                return self.send(200, self.editor.publication_review())
             files = {'/': ('index.html', 'text/html; charset=utf-8'),
                      '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
                      '/layout.js': ('layout.js', 'text/javascript; charset=utf-8'),
+                     '/placement.js': ('placement.js', 'text/javascript; charset=utf-8'),
                      '/console.js': ('console.js', 'text/javascript; charset=utf-8'),
                      '/style.css': ('style.css', 'text/css; charset=utf-8')}
             if path not in files:
@@ -844,7 +938,7 @@ class EditorHandler(BaseHTTPRequestHandler):
             if not self.host_valid() or not self.token_valid() or self.headers.get('Origin') != self.editor.origin:
                 raise EditorError('Action locale non autorisée.', 403)
             path = self.route()
-            if path not in ('/api/save', '/api/prepare', '/api/publish', '/api/files/open', '/api/files/save', '/api/preview/retry'):
+            if path not in ('/api/save', '/api/prepare', '/api/publish', '/api/files/open', '/api/files/save', '/api/preview/retry', '/api/terminal'):
                 raise EditorError('Action inconnue.', 404)
             body = self.read_json(MAX_SOURCE * 6 + 4096 if path == '/api/files/save' else MAX_BODY)
             if path == '/api/files/open' and set(body) == {'name'}:
@@ -860,6 +954,12 @@ class EditorHandler(BaseHTTPRequestHandler):
                 if set(body) not in ({'settings'},{'settings','layout'}):
                     raise EditorError('Demande de sauvegarde invalide.')
                 return self.send(200, self.editor.save(body['settings'],body.get('layout')))
+            if path == '/api/terminal':
+                if set(body) != {'command'}:
+                    raise EditorError('Une commande est requise.')
+                return self.send(200, self.editor.terminal(body['command']))
+            if path == '/api/prepare' and set(body) == {'review'} and isinstance(body['review'], str):
+                return self.send(202, {'job': self.editor.start_job('prepare', body['review'])})
             if body:
                 raise EditorError('Cette action ne prend pas de paramètres.')
             return self.send(202, {'job': self.editor.start_job('prepare' if path == '/api/prepare' else 'publish')})

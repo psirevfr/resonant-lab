@@ -146,3 +146,19 @@ dialog p { line-height: 1.55; }
   .editor-brand b { font-size: 12px; }
   .editor-brand small { font-size: 9px; }
 }
+
+.toolbar { padding-block: 7px; gap: 6px; }
+.preview-toolbar { padding-block: 5px; }
+.preview-stage { padding: 8px; }
+.panel-tabs, .panel-tools { padding: 5px; }
+.panel-tabs button { padding-inline: 5px; }
+.panel-body { padding: 9px; }
+.panel-body h2 { margin: 11px 0 6px; }
+.quick-insert button { min-height: 52px; }
+.templates button { min-height: 56px; }
+#insert-list button, #page-list button { min-height: 30px; }
+#review-files { padding-left: 20px; max-height: 34vh; overflow: auto; overflow-wrap: anywhere; font-size: 12px; }
+.terminal-tools, .terminal-command { display: flex; gap: 6px; align-items: center; }
+.terminal-tools { justify-content: space-between; }
+#terminal-output { min-height: 140px; max-height: 50vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #142322; color: #edf4ef; border-radius: 6px; padding: 8px; font: 12px/1.5 ui-monospace, monospace; }
+#terminal-input { margin: 0; min-width: 0; font-family: ui-monospace, monospace; }

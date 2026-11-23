@@ -282,6 +282,18 @@ final class EditorDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, W
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
+        if url.absoluteString == "resonant-editor:terminal" {
+            if navigationAction.navigationType == .linkActivated,
+               navigationAction.sourceFrame.isMainFrame,
+               let source = navigationAction.sourceFrame.request.url, internalURL(source),
+               let repo = Bundle.main.object(forInfoDictionaryKey: "ResonantRepositoryPath") as? String {
+                let terminal = URL(fileURLWithPath: "/System/Applications/Utilities/Terminal.app")
+                NSWorkspace.shared.open([URL(fileURLWithPath: repo, isDirectory: true)], withApplicationAt: terminal,
+                                        configuration: NSWorkspace.OpenConfiguration(), completionHandler: nil)
+            }
+            decisionHandler(.cancel)
+            return
+        }
         if internalURL(url) {
             if navigationAction.targetFrame == nil {
                 if navigationAction.navigationType == .linkActivated { webView.load(navigationAction.request) }

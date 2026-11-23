@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {isEditorKey,isLocalEditorOrigin,siteSettings,validateEditorMessage} from './siteSettings';
 import './sitePresentation.css';
 import {siteLayout,type SiteLayout} from './siteLayout';
+import {createEditorDrag} from './editorDrag';
 
 export function useSitePresentation(){
  const [settings,setSettings]=useState(siteSettings),[layout,setLayout]=useState(siteLayout);
@@ -36,6 +37,9 @@ export function useSitePresentation(){
     else{selecting=message.enabled;document.documentElement.toggleAttribute('data-editor-select-mode',selecting)}
    }catch{/* Reject malformed previews without altering the current site. */}
   };
+  const cleanupDrag=createEditorDrag(()=>selecting&&!!parentOrigin,move=>{
+   if(parentOrigin)window.parent.postMessage({type:'resonant-editor:move',...move},parentOrigin);
+  });
   const blockPointer=(event:PointerEvent)=>{if(selecting&&event.target instanceof Element&&event.target.closest('[data-editor-key]')){event.preventDefault();event.stopImmediatePropagation()}};
   const select=(event:MouseEvent)=>{
    if(!selecting||!parentOrigin||!(event.target instanceof Element))return;
@@ -46,7 +50,7 @@ export function useSitePresentation(){
    event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'resonant-editor:selected',key},parentOrigin);
   };
   window.addEventListener('message',receive);document.addEventListener('pointerdown',blockPointer,true);document.addEventListener('click',select,true);
-  return()=>{window.removeEventListener('message',receive);document.removeEventListener('pointerdown',blockPointer,true);document.removeEventListener('click',select,true);document.documentElement.removeAttribute('data-editor-select-mode')};
+  return()=>{cleanupDrag();window.removeEventListener('message',receive);document.removeEventListener('pointerdown',blockPointer,true);document.removeEventListener('click',select,true);document.documentElement.removeAttribute('data-editor-select-mode')};
   }
  },[]);
  return {settings,layout};

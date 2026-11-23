@@ -11,6 +11,7 @@ from editor import server
 
 @pytest.fixture
 def project(tmp_path):
+    tmp_path = tmp_path / 'checkout'
     source = tmp_path / 'frontend/src'
     source.mkdir(parents=True)
     (source / 'style.css').write_text('body { color: black; }\n')
@@ -90,3 +91,67 @@ def test_mac_preview_path_includes_standard_node_installations(monkeypatch):
     monkeypatch.setattr(server.sys, 'platform', 'darwin')
     monkeypatch.setenv('PATH', '/usr/bin')
     assert server.isolated_environment()['PATH'].split(':') == ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin']
+
+
+def prepare_history(project):
+    def git(*args):
+        return project.git('-c', 'user.name=Test', '-c', 'user.email=test@local.invalid', *args)
+    git('symbolic-ref', 'HEAD', 'refs/heads/main')
+    with (project.repo/'.git/info/exclude').open('a') as ignored:
+        ignored.write('\n/.env\n')
+    git('commit', '-m', 'Base')
+    git('remote', 'add', 'origin', 'https://github.com/example/resonant.git')
+    git('update-ref', 'refs/remotes/origin/main', 'HEAD')
+    return git
+
+
+def test_review_allows_explicitly_reviewed_code_history(project, monkeypatch):
+    git = prepare_history(project)
+    path = project.repo / 'frontend/src/style.css'
+    path.write_text('body { color: green; }')
+    git('commit', '-am', 'Style')
+    (project.repo/'test.sh').write_text('#!/bin/sh\nexit 0\n')
+    git('add', 'test.sh')
+    git('update-index', '--chmod=+x', 'test.sh')
+    git('commit', '-m', 'Test script')
+    (project.repo/'test.sh').chmod(0o755)
+
+    normal_git = project.git
+    network = []
+    monkeypatch.setattr(project, 'git', lambda *args, **kw:
+                        network.append(args) or '' if args[0] in ('fetch', 'push') else normal_git(*args, **kw))
+    with pytest.raises(server.EditorError, match='Vérification'):
+        project.ensure_publishable()
+    review = project.publication_review()
+    assert review['count'] == 2
+    assert review['paths'] == ['frontend/src/style.css', 'test.sh']
+
+    project.run_job('prepare', None, review['review'])
+    assert project.job['readyToPublish']
+    assert [args[0] for args in network] == ['fetch']
+    git('commit', '--allow-empty', '-m', 'Unexpected new HEAD')
+    with pytest.raises(server.EditorError, match='changé'):
+        project.ensure_publishable(review['review'])
+
+
+def test_review_blocks_private_history_and_deleted_secrets(project):
+    git = prepare_history(project)
+    path = project.repo / 'frontend/src/style.css'
+    path.write_text('/* local-test-value-1234 */')
+    git('commit', '-am', 'Historical secret')
+    path.write_text('body {}')
+    git('commit', '-am', 'Removed secret')
+    with pytest.raises(server.EditorError, match='secret'):
+        project.scan_secrets(project.publication_review()['review'])
+    (project.repo/'frontend/src/user.sqlite').write_bytes(b'PRIVATE')
+    git('add', 'frontend/src/user.sqlite')
+    git('commit', '-m', 'Private file')
+    with pytest.raises(server.EditorError, match='privé'):
+        project.publication_review()
+
+
+def test_terminal_only_allows_diagnostic_commands(project):
+    assert 'git status' in project.terminal('help')['output']
+    assert 'style.css' in project.terminal('git status')['output']
+    with pytest.raises(server.EditorError, match='indisponible'):
+        project.terminal('git status; git push')

@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import {Fragment,type ReactNode} from 'react';
 import type {LayoutPage,BlockKind} from './siteLayout';
 import {LayoutGrid} from './components/LayoutGrid';
 import {GenerationComparison,HardwarePlan,type Comparison} from './components/GenerationComparison';
@@ -160,6 +160,13 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  const metricsBlock=<div className="error-metrics"><span>PRÉCISION</span>{result?.errors?Object.entries(result.errors).map(([k,v])=><div key={k} className={k==='total'?'total':''}><span>{({time:'Temps',spectral:'Spectre',spectrogram:'STFT',envelope:'Enveloppe',attack:'Attaque',total:'Pondérée'} as Record<string,string>)[k]}</span><b>{v.toFixed(4)}</b></div>):<small>{audio?'Rendu local. Les coûts du modèle sont disponibles dans Analyse & modèles.':'Importez une référence pour comparer les signaux.'}</small>}</div>;
  const transferBlock=<details className="global-section"><summary><Activity size={14}/> Fonction de transfert du réseau</summary><div className="global-controls"><select aria-label="Source pour le Bode global" value={globalSource} onChange={e=>setGlobalSource(e.target.value)}><option value="">Choisir le point d’injection</option>{patch.nodes.filter(n=>catalog[n.type]?.inputs===0).map(n=><option key={n.id} value={n.id}>{n.label||n.type}</option>)}</select><button disabled={!globalSource||locked} onClick={()=>void task('Calcul du transfert global',async()=>setGlobalBode(await api<Bode>('/transfer/global',{patch,source_id:globalSource})))}>Calculer H(z) global</button></div><p>Le transfert est défini d’une source vers la sortie, autres sources à zéro. Enveloppes et non-linéarités excluent une représentation LTI globale.</p>{globalBode&&<><p>{globalBode.description}</p><Plot plotId="global" height={210} data={[{x:globalBode.frequency,y:globalBode.magnitude,type:'scatter',mode:'lines',name:'Gain dB'},{x:globalBode.frequency,y:globalBode.phase,type:'scatter',mode:'lines',name:'Phase °',yaxis:'y2'}]} layout={{showlegend:true,xaxis:{type:'log',title:{text:'Fréquence (Hz)'}},yaxis:{title:{text:'Gain (dB)'}},yaxis2:{title:{text:'Phase (°)'},overlaying:'y',side:'right'},margin:{l:60,r:60,t:20,b:40}}}/></>}</details>;
  const layoutBlocks={inventory:inventoryBlock,compact:compactBlock,status:statusBlock,metrics:metricsBlock,transfer:transferBlock,knobs:knobsBlock,reference:referenceBlock,settings:settingsBlock,graph:graphBlock,keyboard:keyboardBlock,signals:signalsBlock,player:playerBlock,hardware:<HardwarePlan patch={patch}/>,...extraBlocks};
+ const nativeBlocks = [
+  ['reference', referenceBlock], ['settings', settingsBlock], ['inventory', inventoryBlock],
+  ['compact', compactBlock], ['graph', graphBlock], ['hardware', tab==='graph'&&<HardwarePlan patch={patch}/>],
+  ['status', statusBlock], ['keyboard', keyboardBlock], ['signals', signalsBlock],
+  ['metrics', metricsBlock], ['player', playerBlock], ['transfer', transferBlock],
+ ] as const;
+ const editablePreview=import.meta.env.DEV&&window.parent!==window&&new URLSearchParams(location.search).get('editor')==='1';
  return <ExportPermission.Provider value={!!user&&!user.guest}><div className={"app-shell "+(audioPanel?"audio-"+audioPanel+"-open":"")}>
  {exportLogin&&<ExportLogin onClose={()=>setExportLogin(false)} onConnected={accountConnected}/>}
  <header className="app-header"><a className="brand" href="#" onClick={e=>e.preventDefault()}><div className="brand-mark"><Activity size={24}/></div><div>résonant<span>LAB</span></div></a><div className="project-label"><span className="project-dot"/><input aria-label="Nom du modèle" value={patch.name} disabled={locked} onChange={e=>setPatch({...patch,name:e.target.value})}/><span className="version">v{APP_VERSION}</span></div><div className="header-actions"><Account onLogin={()=>setExportLogin(true)} onUserChange={setUser} user={user} onResume={compute.resume} busy={compute.busy}/><button disabled={locked} onClick={()=>uploadRef.current?.click()}><Upload size={15}/> Importer WAV</button><div className="export-holder"><button data-guide="export" className="export-button" disabled={locked} onClick={openExports}><Download size={15}/> Exporter</button>{showExports&&<div className="export-menu">{[['json','Modèle · JSON / .monpatch'],['wav','Audio synthétisé · WAV float'],['svg','Schéma vectoriel · SVG'],['png','Schéma image · PNG'],['csv','Paramètres · CSV'],['report','Rapport autonome · HTML / impression PDF']].map(([id,label])=><button key={id} onClick={()=>void doExport(id)}>{label}</button>)}</div>}</div></div></header>
@@ -169,18 +176,11 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  {exportFile&&<div className="message info" role="status"><Download size={16}/><span>Export prêt : <a href={exportFile.url} download={exportFile.name}>Télécharger {exportFile.name}</a></span><button aria-label="Fermer l’export" onClick={()=>setExportFile(null)}><X size={15}/></button></div>}
  {user?.guest&&<div className="visitor-notice" role="status">Mode visiteur : analysez, générez et écoutez librement. Un compte est nécessaire pour exporter. Session temporaire de 24 heures. WAV visiteur : 32 Mo et 4 millions d’échantillons maximum.</div>}
  <div className="workbench"><aside className="library" id="audio-library"><div className="library-heading"><div className="panel-label">COMPOSANTS</div><span>{Object.keys(catalog).length}</span><button className="audio-panel-close" type="button" aria-label="Fermer la bibliothèque de composants" title="Fermer la bibliothèque" onClick={()=>closeAudioPanel('library')}><X size={18}/></button></div><label className="search"><Search size={14}/><input placeholder="Rechercher un bloc…" aria-label="Rechercher un composant" value={search} onChange={e=>setSearch(e.target.value)}/></label><div className="library-items">{categories.map(category=><section key={category}><h4>{category}</h4>{Object.entries(catalog).filter(([_,d])=>d.category===category&&d.label.toLowerCase().includes(search.toLowerCase())).map(([type,d])=><button className="library-block" key={type} draggable={!locked} disabled={locked} onDragStart={e=>e.dataTransfer.setData('application/resonant',type)} onClick={()=>addBlock(type)}><span className={`block-symbol ${d.inputs===0?'gen':''}`}>{d.inputs===0?'∿':type==='sum'?'Σ':type==='gain'?'×':type==='delay'?'τ':'ƒ'}</span><span>{d.label}</span><Plus size={12}/></button>)}</section>)}</div><div className="library-footer"><button disabled={locked} onClick={()=>patchRef.current?.click()}><Upload size={14}/> Ouvrir un modèle</button><button disabled={locked} onClick={()=>{setCompact(null);setPatch(initialPatch());setAudio(null);setAnalysis(null);setCandidates([]);setSelected('filter');setParameterIds([]);setNotice('Patch manuel de départ chargé.')}}><RotateCcw size={14}/> Patch de départ</button></div></aside>
- <main className="main-workspace">{layoutPage?<LayoutGrid page={layoutPage} blocks={layoutBlocks} onNavigate={onNavigatePage}/>:<>{referenceBlock}{settingsBlock}
- {inventoryBlock}
- {compactBlock}
- {graphBlock}
- {tab==='graph'&&<HardwarePlan patch={patch}/>}
- {statusBlock}
- {keyboardBlock}
- {signalsBlock}
- {metricsBlock}
- {playerBlock}
- {transferBlock}
- </>}
+ <main className="main-workspace">{layoutPage
+  ? <LayoutGrid page={layoutPage} blocks={layoutBlocks} onNavigate={onNavigatePage}/>
+  : nativeBlocks.map(([kind,block])=>editablePreview
+   ? <section className="editor-native-block" data-editor-kind={kind} key={kind}>{block}</section>
+   : <Fragment key={kind}>{block}</Fragment>)}
  </main>
  <Inspector onClose={()=>closeAudioPanel('inspector')} block={selectedBlock} catalog={catalog} fs={patch.sample_rate} locked={locked} selectedParameters={parameterIds} onToggleParameter={id=>setParameterIds(ids=>ids.includes(id)?ids.filter(i=>i!==id):[...ids,id])} onParameter={(key,value)=>edit({...patch,nodes:patch.nodes.map(n=>n.id===selected?{...n,parameters:{...n.parameters,[key]:value}}:n)})} onDelete={()=>{edit({...patch,nodes:patch.nodes.filter(n=>n.id!==selected),edges:patch.edges.filter(e=>e.source!==selected&&e.target!==selected)});setSelected('')}} onDuplicate={()=>{if(!selectedBlock)return;const id=crypto.randomUUID();edit({...patch,nodes:[...patch.nodes,{...structuredClone(selectedBlock),id,position:{x:selectedBlock.position.x+40,y:selectedBlock.position.y+120},label:selectedBlock.label+' · copie'}]});setSelected(id)}}/>
  </div>

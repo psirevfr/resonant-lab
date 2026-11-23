@@ -24,11 +24,11 @@
   </details>
   <div class="publish-actions">
     <button id="save" disabled>Enregistrer</button>
+    <button id="prepare" disabled>Vérification</button>
     <button id="publish" class="primary" disabled>Publier</button>
     <details class="toolbar-menu" id="options-menu">
       <summary aria-label="Plus d’options" title="Plus d’options">⋯</summary>
       <div class="menu">
-        <button id="prepare" disabled>Vérifier la publication</button>
         <button id="log-toggle" aria-expanded="false">Suivi de publication</button>
         <button id="console-open">Console de fichiers</button>
         <a href="https://resonant-lab.servepics.com/" target="_blank" rel="noreferrer">Ouvrir le site en ligne ↗</a>
@@ -59,6 +59,7 @@
       <button data-section="insert" aria-pressed="true">Insérer</button>
       <button data-section="navigation" aria-pressed="false">Pages</button>
       <button data-section="appearance" aria-pressed="false">Thèmes</button>
+      <button data-section="terminal" aria-pressed="false">Console</button>
     </nav>
     <div class="panel-body">
       <h1 id="panel-title" hidden></h1>
@@ -77,6 +78,11 @@
 </section>
 <section data-panel="bank" hidden><div id="bank-list"></div></section>
 <section data-panel="plots" hidden><div id="plot-controls"></div></section>
+<section data-panel="terminal" hidden>
+  <div class="terminal-tools"><button id="terminal-files">Fichiers</button><a href="resonant-editor:terminal">Terminal macOS ↗</a></div>
+  <pre id="terminal-output" tabindex="0" aria-label="Sortie de la console" aria-live="polite">Saisissez help pour afficher les commandes.</pre>
+  <div class="terminal-command"><input id="terminal-input" aria-label="Commande du terminal" autocomplete="off" spellcheck="false" placeholder="git status"><button id="terminal-run" aria-label="Exécuter la commande">↵</button></div>
+</section>
 
     </div>
     <nav class="panel-tools" aria-label="Outils complémentaires">
@@ -92,6 +98,12 @@
 </main>
 <section id="activity" class="activity" hidden><div><b>Suivi de publication</b><button id="close-activity" aria-label="Fermer le suivi">×</button></div><pre id="activity-log" tabindex="0" aria-label="Journal des vérifications"></pre></section>
 <dialog id="publish-dialog"><h2>Mettre cette version en ligne ?</h2><p>Les tests et la compilation ont été validés. La publication déclenchera le déploiement du site depuis GitHub.</p><p id="publish-summary"></p><div class="dialog-actions"><button id="cancel-publish">Revenir à l’aperçu</button><button id="confirm-publish" class="primary">Publier sur le site</button></div></dialog>
+<dialog id="review-dialog" aria-labelledby="review-title">
+  <h2 id="review-title">Vérification</h2>
+  <p id="review-summary"></p>
+  <details id="review-details" hidden><summary>Fichiers des commits à vérifier</summary><ul id="review-files"></ul></details>
+  <div class="dialog-actions"><button id="cancel-review">Fermer</button><button id="run-review" class="primary">Vérifier la version locale</button></div>
+</dialog>
 <dialog id="file-console" aria-labelledby="console-title">
   <header><h2 id="console-title">Console de fichiers</h2><button id="console-close" aria-label="Fermer la console">×</button></header>
   <div class="console-workspace">
@@ -107,6 +119,6 @@
     </div>
   </div>
 </dialog>
-<script src="/app.js" defer></script><script src="/layout.js" defer></script><script src="/console.js" defer></script>
+<script src="/app.js" defer></script><script src="/placement.js" defer></script><script src="/layout.js" defer></script><script src="/console.js" defer></script>
 </body>
 </html>

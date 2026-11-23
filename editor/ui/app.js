@@ -19,14 +19,14 @@ function restore(snapshot){
  draft=snapshot.draft;layout=snapshot.layout;page=snapshot.page;selectedBlock=snapshot.selectedBlock;
  renderLayout();if(previous!==page)setPage(page);
 }
-const panelNames={appearance:'Thèmes',identity:'Textes et identité',navigation:'Pages',welcome:'Aide de Rémi',layout:'Bloc sélectionné',insert:'Insérer',bank:'Banque',plots:'Graphiques'};
+const panelNames={appearance:'Thèmes',identity:'Textes et identité',navigation:'Pages',welcome:'Aide de Rémi',layout:'Bloc sélectionné',insert:'Insérer',bank:'Banque',plots:'Graphiques',terminal:'Console'};
 function showSection(key){
  if(!Object.hasOwn(panelNames,key))return;
  section=key;
  all('[data-section]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.section===key)));
  all('[data-panel]').forEach(panel=>panel.hidden=panel.dataset.panel!==key);
  $('#panel-title').textContent=panelNames[key];
- $('#panel-title').hidden=['insert','navigation','appearance'].includes(key);
+ $('#panel-title').hidden=['insert','navigation','appearance','terminal'].includes(key);
  $('#panel-menu').open=false;
  renderLayout();
 }
@@ -38,8 +38,8 @@ function showGrid(enabled){
 }
 function resizePreview(){
  const stage=$('.preview-stage'),frame=$('.preview-frame'),shell=$('.preview-viewport');
- const available=Math.max(180,stage.clientWidth-24),width={desktop:Math.max(1024,available),tablet:768,mobile:390}[device];
- const scale=Math.min(1,available/width),height=Math.max(220,stage.clientHeight-24);
+ const available=Math.max(180,stage.clientWidth-16),width={desktop:Math.max(1024,available),tablet:768,mobile:390}[device];
+ const scale=Math.min(1,available/width),height=Math.max(220,stage.clientHeight-16);
  frame.style.width=width+'px';frame.style.height=(height/scale)+'px';frame.style.transform='scale('+scale+')';
  shell.style.width=(width*scale)+'px';shell.style.height=height+'px';
 }
@@ -91,8 +91,45 @@ all('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const colors={or
 $('#undo').onclick=()=>{if(!undo.length||busy())return;redo.push(snapshot());restore(undo.pop());lastChange=null;refresh();sendPreview();};
 $('#redo').onclick=()=>{if(!redo.length||busy())return;undo.push(snapshot());restore(redo.pop());lastChange=null;refresh();sendPreview();};
 $('#save').onclick=async()=>{try{requesting=true;refresh();await save();}catch(e){showMessage(e.message,true);}finally{requesting=false;refresh();}};
-$('#prepare').onclick=async()=>{if(!draft||busy())return;$('#options-menu').open=false;try{requesting=true;refresh();if(dirty)await save();showActivity(true);showMessage('Vérification des tests, des fichiers et de la compilation…');await api('/api/prepare',{});state=await api('/api/state');updateJob(state.job);}catch(e){showMessage(e.message,true);}finally{requesting=false;refresh();}};
-$('#publish').onclick=()=>{if(!draft||busy())return;if(dirty||!state?.job?.readyToPublish){$('#prepare').click();return;}$('#publish-summary').textContent='Branche '+(state.repo?.branch||'main')+' · présentation et ressources compilées.';$('#publish-dialog').showModal();};
+let publicationReview=null;
+async function openReview(){
+ if(!draft||busy())return;
+ const dialog=$('#review-dialog'),message=$('#review-summary');
+ publicationReview=null;$('#run-review').disabled=true;$('#review-details').hidden=true;
+ message.textContent='Lecture des commits locaux…';dialog.showModal();
+ try{
+  const details=await api('/api/publication-review');
+  publicationReview=details;
+  message.textContent=details.paths.length
+   ? details.count+' commits locaux seront vérifiés. Consultez les fichiers inclus avant de continuer.'
+   : 'Les réglages, les tests et la compilation seront vérifiés.';
+  const list=details.paths.map(path=>{const item=document.createElement('li');item.textContent=path;return item;});
+  $('#review-files').replaceChildren(...list);
+  $('#review-details').hidden=!list.length;
+  $('#review-details').open=details.paths.includes('.github/workflows/deploy.yml');
+  $('#run-review').disabled=false;
+ }catch(error){message.textContent=error.message;}
+}
+$('#prepare').onclick=openReview;
+$('#cancel-review').onclick=()=>$('#review-dialog').close();
+$('#run-review').onclick=async()=>{
+ if(!publicationReview||busy())return;
+ const review=publicationReview.review;
+ $('#review-dialog').close();
+ try{
+  requesting=true;refresh();
+  if(dirty)await save();
+  showActivity(true);showMessage('Vérification des fichiers, des tests et de la compilation…');
+  state.job=(await api('/api/prepare',{review})).job;updateJob(state.job);
+ }catch(error){showMessage(error.message,true);}
+ finally{requesting=false;refresh();}
+};
+$('#publish').onclick=()=>{
+ if(!draft||busy())return;
+ if(dirty||!state?.job?.readyToPublish){openReview();return;}
+ $('#publish-summary').textContent='Branche '+(state.repo?.branch||'main')+' · '+(publicationReview?.count??0)+' commits vérifiés et réglages locaux.';
+ $('#publish-dialog').showModal();
+};
 $('#cancel-publish').onclick=()=>$('#publish-dialog').close();
 $('#confirm-publish').onclick=async()=>{if(requesting)return;$('#publish-dialog').close();try{requesting=true;refresh();showActivity(true);showMessage('Envoi de la version sur GitHub…');await api('/api/publish',{});state=await api('/api/state');updateJob(state.job);}catch(e){showMessage(e.message,true);}finally{requesting=false;refresh();}};
 function changeMode(enabled){
@@ -119,6 +156,7 @@ window.addEventListener('message',event=>{
   previewReady=true;clearTimeout(previewDeadline);setPreviewStatus('');sendPreview();
  }
  if(event.data.type==='resonant-editor:selected')showSection(event.data.key);
+ if(event.data.type==='resonant-editor:move'&&selectMode&&!gridMode)moveLiveBlock(event.data);
  if(event.data.type==='resonant-editor:block'&&current()?.blocks.some(block=>block.id===event.data.id)){
   selectedBlock=event.data.id;
   showSection('layout');
