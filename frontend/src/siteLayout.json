@@ -1,8 +1,116 @@
 {
   "version": 1,
   "pages": [
-    {"id":"analyse","name":"","parent":null,"blocks":[]},
-    {"id":"atelier","name":"","parent":null,"blocks":[]}
+    {
+      "id": "analyse",
+      "name": "",
+      "parent": null,
+      "blocks": [
+        {
+          "id": "bloc-a207d5c8-a21",
+          "kind": "reference",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 4
+        },
+        {
+          "id": "bloc-6d4190ea-f60",
+          "kind": "settings",
+          "x": 0,
+          "y": 4,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-e8ae1b41-d5a",
+          "kind": "inventory",
+          "x": 0,
+          "y": 6,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-f66510bf-e8c",
+          "kind": "compact",
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-d76dbdf6-28a",
+          "kind": "graph",
+          "x": 0,
+          "y": 10,
+          "w": 12,
+          "h": 8
+        },
+        {
+          "id": "bloc-2bbed6d8-b00",
+          "kind": "hardware",
+          "x": 0,
+          "y": 18,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-168893a6-ebe",
+          "kind": "status",
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-1eea8227-e5d",
+          "kind": "keyboard",
+          "x": 0,
+          "y": 22,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-596712a0-130",
+          "kind": "signals",
+          "x": 0,
+          "y": 24,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-2472c131-4b3",
+          "kind": "metrics",
+          "x": 0,
+          "y": 26,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-0b9832a1-8de",
+          "kind": "player",
+          "x": 0,
+          "y": 28,
+          "w": 12,
+          "h": 2
+        },
+        {
+          "id": "bloc-42eaeaa0-28b",
+          "kind": "transfer",
+          "x": 0,
+          "y": 30,
+          "w": 12,
+          "h": 2
+        }
+      ],
+      "custom": true
+    },
+    {
+      "id": "atelier",
+      "name": "",
+      "parent": null,
+      "blocks": []
+    }
   ],
   "bank": [],
   "plots": {}
