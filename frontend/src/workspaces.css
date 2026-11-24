@@ -46,3 +46,8 @@ html,body,#root{height:100%;margin:0}body:has(.lab-shell){overflow:hidden}.lab-s
 .graph-wrap:focus-visible{outline:2px solid #b4ed79;outline-offset:-2px}
 @media(max-width:640px){.guide-spaces{grid-template-columns:1fr}.site-footer{font-size:9px;padding:5px 10px}.lab-topbar{gap:8px;padding:0 8px}.lab-topbar .lab-help-button{padding:7px}.lab-topbar .active-space{max-width:108px;overflow:hidden;text-overflow:ellipsis}.lab-topbar .account-holder>button{max-width:92px;overflow:hidden;text-overflow:ellipsis}}
 .space-menu{overflow:auto}.layout-subpage{margin-left:14px}
+.synthesis-tools{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--site-surface,#18201f)}
+.synthesis-tools button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px}
+.synthesis-tools button[aria-expanded="true"]{border-color:var(--site-accent,#b4ed79);color:var(--site-accent,#b4ed79)}
+@media(max-width:640px){.synthesis-tools{padding-inline:10px}.synthesis-tools button{min-height:44px}}
+@media print{.synthesis-tools{display:none}}
