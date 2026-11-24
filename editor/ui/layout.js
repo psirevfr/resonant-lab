@@ -97,12 +97,16 @@ function gridPage(p){
  }
  return p;
 }
-function modify(action){
+function modify(action,historyKey=null){
  if(busy()||!layout)return;
  const before=snapshot();
  try{action()}catch(e){restore(before);showMessage(e.message,true);return;}
  if(same(before.layout,layout))return;
- undo.push(before);if(undo.length>50)undo.shift();redo=[];lastChange=null;
+ const now=Date.now();
+ if(!historyKey||lastChange?.path!==historyKey||now-lastChange.time>750){
+  undo.push(before);if(undo.length>50)undo.shift();
+ }
+ redo=[];lastChange=historyKey?{path:historyKey,time:now}:null;
  renderLayout();refresh();sendPreview();
 }
 function moveLiveBlock({id,anchor,after,column}){
@@ -199,6 +203,12 @@ function renderLayout(){
    controls.append(field(label,block[k],val=>modify(()=>{if(Number.isInteger(val)&&val>=min&&val<=max)block[k]=val;}),{type:'number',min,max}));
   }
   if(['text','link','image'].includes(block.kind))controls.append(field(block.kind==='image'?'Description':'Texte',block.text,v=>modify(()=>{block.text=v}),{length:400}));
+  if(['text','link'].includes(block.kind)){
+   for(const [property,label,fallback] of [['color','Couleur du texte',draft.colors.text],['background','Couleur du fond',draft.colors.surface]]){
+    controls.append(field(label,block[property]??fallback,v=>modify(()=>{block[property]=v}),{type:'color'}));
+   }
+   if(block.color||block.background)controls.append(button('Réinitialiser les couleurs',()=>modify(()=>{delete block.color;delete block.background;})));
+  }
   if(block.kind==='image')controls.append(field('Image (/assets/…)',block.target,v=>modify(()=>{block.target=v}),{length:240}));
   if(block.kind==='link')controls.append(field('Destination',block.target,v=>modify(()=>{block.target=v}),{values:[...layout.pages.map(p=>[p.id,displayName(p)]),...p.blocks.filter(b=>b.id!==block.id).map(b=>['#'+b.id,b.text||library[b.kind]])]}));
   controls.append(button('Dupliquer',()=>{append(block.kind,{...block,id:createId('bloc')});}));

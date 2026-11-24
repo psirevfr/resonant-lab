@@ -23,7 +23,7 @@ export function createEditorDrag(canEdit:()=>boolean,send:(move:{id:string;ancho
  const guide=document.createElement('div');
  guide.className='editor-drop-guide';
  guide.setAttribute('aria-hidden','true');
- let active:{element:HTMLElement;origin:DOMRect;container:HTMLElement;pointer:number;x:number;y:number;drop:Drop|null;moved:boolean}|null=null;
+ let active:{element:HTMLElement;capture:Element;origin:DOMRect;container:HTMLElement;pointer:number;x:number;y:number;drop:Drop|null;moved:boolean}|null=null;
  let suppressClick=false;
  let clickTimer=0;
 
@@ -34,8 +34,8 @@ export function createEditorDrag(canEdit:()=>boolean,send:(move:{id:string;ancho
   if(!element||!container||active)return;
   const origin=targets(container).find(target=>target.element===element)?.rect;
   if(!origin)return;
-  active={element,origin,container,pointer:event.pointerId,x:event.clientX,y:event.clientY,drop:null,moved:false};
-  element.setPointerCapture(event.pointerId);
+  active={element,capture:event.target,origin,container,pointer:event.pointerId,x:event.clientX,y:event.clientY,drop:null,moved:false};
+  event.target.setPointerCapture(event.pointerId);
   event.preventDefault();
   event.stopImmediatePropagation();
  }
@@ -68,7 +68,7 @@ export function createEditorDrag(canEdit:()=>boolean,send:(move:{id:string;ancho
   event.stopImmediatePropagation();
  }
  function cancel(){
-  if(active?.element.hasPointerCapture(active.pointer))active.element.releasePointerCapture(active.pointer);
+  if(active?.capture.hasPointerCapture(active.pointer))active.capture.releasePointerCapture(active.pointer);
   active?.element.removeAttribute('data-editor-dragging');
   guide.remove();
   active=null;

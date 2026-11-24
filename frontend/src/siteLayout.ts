@@ -8,10 +8,11 @@ export const blockLibrary={
  text:'Texte',image:'Image',link:'Bouton de direction',
 };
 export type BlockKind=keyof typeof blockLibrary;
-export type LayoutBlock={id:string;kind:BlockKind;x:number;y:number;w:number;h:number;text?:string;target?:string};
+export type ElementStyle={text?:string;color?:string;background?:string};
+export type LayoutBlock=ElementStyle&{id:string;kind:BlockKind;x:number;y:number;w:number;h:number;target?:string};
 export type LayoutPage={id:string;name:string;parent:string|null;custom?:boolean;blocks:LayoutBlock[]};
 export type PlotStyle={title?:string;x?:string;xUnit?:string;y?:string;yUnit?:string;y2?:string;y2Unit?:string;legend?:boolean;color?:string;traces?:{name?:string;color?:string}[]};
-export type SiteLayout={version:1;pages:LayoutPage[];bank:LayoutBlock[];plots:Record<string,PlotStyle>};
+export type SiteLayout={version:1;pages:LayoutPage[];bank:LayoutBlock[];plots:Record<string,PlotStyle>;elements?:Record<string,ElementStyle>};
 export const siteLayout=source as SiteLayout;
 export const LayoutContext=createContext<SiteLayout>(siteLayout);
 export const useSiteLayout=()=>useContext(LayoutContext);

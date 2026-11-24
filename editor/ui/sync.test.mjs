@@ -22,3 +22,11 @@ test('Merge independently changed presentation fields and block rows',()=>{
 test('A draft value for an edited field stays pending when the disk changes the same field',()=>{
  assert.equal(mergePresentation('past','draft','disk'),'draft');
 });
+
+test('Two first-time element edits merge without losing either property',()=>{
+ assert.deepEqual(normalize(mergePresentation({},{
+  elements:{'element-a':{text:'Nouvelle commande'}},
+ },{
+  elements:{'element-a':{color:'#123456'},'element-b':{background:'#765432'}},
+ })),{elements:{'element-a':{text:'Nouvelle commande',color:'#123456'},'element-b':{background:'#765432'}}});
+});

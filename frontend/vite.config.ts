@@ -1,6 +1,6 @@
 import { defineConfig,loadEnv,type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import {editorSource} from './editorSource.mjs';
+import {editorSource,readElementStyles} from './editorSource.mjs';
 export default defineConfig(({mode,command})=>{
  const previewApi=loadEnv(mode,'.','RESONANT_PREVIEW_API_ORIGIN').RESONANT_PREVIEW_API_ORIGIN;
  if(previewApi&&!/^http:\/\/(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(previewApi))throw Error('Adresse API locale invalide.');
@@ -23,6 +23,8 @@ export default defineConfig(({mode,command})=>{
    }catch{res.statusCode=503;res.end('Le backend de prévisualisation n’est pas disponible.');}
   });
  }};
+ const elements=command==='build'?readElementStyles():{};
+ const presentation=visualOrigin||Object.keys(elements).length?[ [editorSource,{preview:!!visualOrigin,elements}] as const ]:[];
  return {define:{__RESONANT_VISUAL_EDITOR_ORIGIN__:JSON.stringify(visualOrigin||'')},
-  plugins:[react({babel:{plugins:visualOrigin?[editorSource]:[]}}),previewSession],server:{proxy:{'/api':{target:apiOrigin,changeOrigin:false},'/compute-runtime':{target:apiOrigin,changeOrigin:false}}},build:{chunkSizeWarningLimit:5500}};
+  plugins:[react({babel:{plugins:presentation.map(([plugin,options])=>[plugin,options])}}),previewSession],server:{proxy:{'/api':{target:apiOrigin,changeOrigin:false},'/compute-runtime':{target:apiOrigin,changeOrigin:false}}},build:{chunkSizeWarningLimit:5500}};
 });

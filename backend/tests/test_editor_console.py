@@ -87,6 +87,21 @@ def test_console_preserves_presentation_schema(project):
     assert project.read_settings()['brandName'] == 'Essai'
 
 
+def test_selected_element_styles_are_versioned_and_restricted(project):
+    element = 'e-' + 'a'*24
+    presentation = project.presentation()
+    layout = presentation['layout']
+    layout['elements'] = {element:{'text':'<b>Texte & couleur</b>', 'color':'#123456', 'background':'#fedcba'}}
+    layout['pages'][0]['blocks'] = [{'id':'titre', 'kind':'text', 'x':0, 'y':0, 'w':12, 'h':1,
+                                     'text':'Titre', 'color':'#ffffff'}]
+    project.save(presentation['settings'], layout, revision=presentation['presentationRevision'])
+    assert project.read_layout() == layout
+    for invalid in ({'color':'red; background:url(https://example.invalid)'}, {'html':'<script>'}, {'background':False}):
+        layout['elements'][element] = invalid
+        with pytest.raises(ValueError, match='Mise en page'):
+            server.validate_layout(layout)
+
+
 def test_mac_preview_path_includes_standard_node_installations(monkeypatch):
     monkeypatch.setattr(server.sys, 'platform', 'darwin')
     monkeypatch.setenv('PATH', '/usr/bin')

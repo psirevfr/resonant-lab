@@ -4,11 +4,13 @@ function mergePresentation(base, local, disk){
  if(same(local,base))return disk;
  if(same(disk,base)||same(local,disk))return local;
 
- const objects=[base,local,disk].every(value=>value&&typeof value==='object'&&!Array.isArray(value));
+ const isObject=value=>value&&typeof value==='object'&&!Array.isArray(value);
+ const objects=[local,disk].every(isObject)&&(base===undefined||isObject(base));
  if(objects){
-  const keys=new Set([...Object.keys(base),...Object.keys(local),...Object.keys(disk)]);
+  const original=base??{};
+  const keys=new Set([...Object.keys(original),...Object.keys(local),...Object.keys(disk)]);
   return Object.fromEntries([...keys].flatMap(key=>{
-   const value=mergePresentation(base[key],local[key],disk[key]);
+   const value=mergePresentation(original[key],local[key],disk[key]);
    return value===undefined?[]:[[key,value]];
   }));
  }

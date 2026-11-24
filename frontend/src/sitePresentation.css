@@ -27,7 +27,8 @@
 :root[data-editor-select-mode] [data-editor-grip]{display:block;position:absolute;right:4px;top:4px;z-index:4;background:#17312b;color:#e5f2e9;border-radius:4px;padding:4px 7px;touch-action:none;cursor:grab}
 [data-editor-dragging]{opacity:.55}
 .editor-drop-guide{height:3px;background:var(--site-accent,#b4ed79);position:fixed;z-index:9999;pointer-events:none;border-radius:2px;box-shadow:0 0 0 1px #22322b}
-[data-editor-source-mode] .lab-shell [data-editor-source]:hover:not(:has([data-editor-source]:hover)) {
+[data-editor-select-mode] .lab-shell [data-editor-source]:hover:not(:has([data-editor-source]:hover)),
+[data-editor-select-mode] .lab-shell [data-editor-selection] {
  outline: 2px dashed var(--site-accent);
  outline-offset: 2px;
  cursor: text;

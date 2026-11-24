@@ -6,6 +6,7 @@ KINDS = {'inventory','compact','status','metrics','transfer','knobs','reference'
 PLOTS = {'wave','env','fft','auto','spectrogram','measured-envelope','optimization','global','bode-gain','bode-phase','impulse'}
 IDENTIFIER = re.compile(r'[a-z][a-z0-9-]{0,47}')
 HEX = re.compile(r'#[0-9a-fA-F]{6}')
+ELEMENT = re.compile(r'e-[a-f0-9]{24}')
 
 
 def validate_layout(layout):
@@ -16,8 +17,17 @@ def validate_layout(layout):
         return isinstance(value,str) and len(value)<=limit and not any(ord(c)<32 and c!='\n' for c in value)
     def ident(value):
         return isinstance(value,str) and IDENTIFIER.fullmatch(value)
-    require(type(layout) is dict and set(layout)=={'version','pages','bank','plots'}
+    required={'version','pages','bank','plots'}
+    require(type(layout) is dict and required<=set(layout)<=required|{'elements'}
             and type(layout['version']) is int and layout['version']==1)
+    elements=layout.get('elements',{})
+    require(type(elements) is dict)
+    for key, style in elements.items():
+        require(isinstance(key,str) and ELEMENT.fullmatch(key) and type(style) is dict
+                and set(style)<={'text','color','background'})
+        require('text' not in style or text(style['text'],240))
+        require(all(isinstance(style[k],str) and HEX.fullmatch(style[k])
+                    for k in ('color','background') if k in style))
     pages,bank,plots = (layout[key] for key in ('pages','bank','plots'))
     require(type(pages) is list and 2<=len(pages)<=24 and type(bank) is list and len(bank)<=100
             and type(plots) is dict and set(plots)<=PLOTS)
@@ -39,12 +49,14 @@ def validate_layout(layout):
     unique=set()
     for block in [*bank,*(b for page in pages for b in page['blocks'])]:
         require(type(block) is dict and {'id','kind','x','y','w','h'}<=set(block)
-                and set(block)<={'id','kind','x','y','w','h','text','target'})
+                and set(block)<={'id','kind','x','y','w','h','text','target','color','background'})
         require(ident(block['id']) and block['id'] not in unique and isinstance(block['kind'],str) and block['kind'] in KINDS)
         unique.add(block['id'])
         x,y,w,h=(block[k] for k in ('x','y','w','h'))
         require(all(type(v) is int for v in (x,y,w,h)) and 0<=x<=11 and 0<=y<=239 and 1<=w<=12-x and 1<=h<=12)
         require(text(block.get('text',''),400) and text(block.get('target',''),240))
+        require(all(block['kind'] in ('text','link') and isinstance(block[k],str) and HEX.fullmatch(block[k])
+                    for k in ('color','background') if k in block))
         target=block.get('target','')
         if target and block['kind']=='image':
             require(bool(re.fullmatch(r'/(?:favicon\.svg|assets/[a-zA-Z0-9_.-]+\.(?:png|jpg|jpeg|svg|webp))',target)))

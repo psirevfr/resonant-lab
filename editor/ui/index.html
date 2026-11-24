@@ -43,7 +43,6 @@
       <strong id="preview-page">Analyse du son</strong>
       <div aria-label="Mode de travail">
         <button id="select-mode" aria-pressed="true">Modifier</button>
-        <button id="source-mode" aria-pressed="false">Textes et boutons</button>
         <button id="browse-mode" aria-pressed="false">Naviguer</button>
         <button id="grid-mode" aria-pressed="false" title="Déplacer et redimensionner les blocs">Disposition</button>
         <button id="reload-preview" class="icon" aria-label="Recharger l’aperçu" title="Recharger l’aperçu">↻</button>
@@ -69,6 +68,18 @@
 <section data-panel="navigation" hidden><div id="page-list"></div><button id="new-page">＋ Nouvelle page</button><div id="page-controls"></div><details><summary>Réglages de navigation</summary><label>Page d’arrivée<select data-setting="home"><option value="analyse">Analyse du son</option><option value="atelier">Atelier Arduino</option></select></label><label>Nom de la partie audio<input data-setting="labels.analyse" type="text" maxlength="32" autocomplete="off"></label><label>Nom de l’atelier<input data-setting="labels.atelier" type="text" maxlength="32" autocomplete="off"></label></details></section>
 <section data-panel="welcome" hidden><label>Message d’accueil<textarea data-setting="welcome" maxlength="240" rows="5"></textarea></label></section>
 <section data-panel="layout" hidden><div id="block-controls"></div></section>
+<section data-panel="element" id="element-controls" hidden>
+  <p id="element-kind"></p>
+  <p id="element-shared" class="field-note" hidden>Ce composant est réutilisé. Les réglages s’appliquent à toutes ses occurrences.</p>
+  <label id="element-text-label">Texte<textarea id="element-text" maxlength="240" rows="3"></textarea></label>
+  <label class="element-color">Couleur du texte <input id="element-color" type="color"></label>
+  <label class="element-color" id="element-bg-label">Couleur du fond <input id="element-background" type="color"></label>
+  <div class="element-actions">
+    <button id="element-reset" type="button">Réinitialiser</button>
+    <button id="element-layout" type="button" hidden>Disposition du bloc</button>
+    <button id="element-source" type="button">Ouvrir le code</button>
+  </div>
+</section>
 <section data-panel="insert"><div id="insert-quick" class="quick-insert"></div>
 <h2>Mises en page</h2>
 <div class="templates">
