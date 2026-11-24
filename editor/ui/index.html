@@ -43,6 +43,7 @@
       <strong id="preview-page">Analyse du son</strong>
       <div aria-label="Mode de travail">
         <button id="select-mode" aria-pressed="true">Modifier</button>
+        <button id="source-mode" aria-pressed="false">Textes et boutons</button>
         <button id="browse-mode" aria-pressed="false">Naviguer</button>
         <button id="grid-mode" aria-pressed="false" title="Déplacer et redimensionner les blocs">Disposition</button>
         <button id="reload-preview" class="icon" aria-label="Recharger l’aperçu" title="Recharger l’aperçu">↻</button>
@@ -113,6 +114,11 @@
     </div>
     <div class="console-source">
       <label id="file-name" for="file-content">Choisir un fichier</label>
+      <div id="source-tools" class="source-tools" hidden>
+        <button id="source-earlier">Déplacer avant</button><button id="source-later">Déplacer après</button>
+        <label id="source-label-tools">Libellé <input id="source-label" maxlength="240"></label>
+        <button id="source-rename">Appliquer le libellé</button>
+      </div>
       <textarea id="file-content" rows="16" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" disabled></textarea>
       <footer><span id="file-status" role="status"></span><button id="file-save" class="primary" disabled>Enregistrer le fichier</button></footer>
     </div>

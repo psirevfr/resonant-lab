@@ -322,8 +322,9 @@ class SiteEditor:
         return path
 
     def source_names(self):
-        names = self.git('ls-files', '-z', '--', 'frontend/index.html', 'frontend/src').split('\0')
-        return sorted({name for name in names if name and Path(name).suffix in SOURCE_SUFFIXES
+        server_pages = {'backend/lab/pages.py', 'backend/static/auth.js', 'backend/static/auth.css'}
+        names = self.git('ls-files', '-z', '--', 'frontend/index.html', 'frontend/src', *sorted(server_pages)).split('\0')
+        return sorted({name for name in names if name and (name in server_pages or Path(name).suffix in SOURCE_SUFFIXES)
                        and all(not part.startswith('.') for part in Path(name).parts)
                        and not re.search(r'secret|credential|token|password|api[-_]?key', Path(name).stem, re.I)})
 
@@ -835,6 +836,8 @@ class SiteEditor:
                 env = dict(self.env, PYTHONPATH=str(self.repo/'backend'),
                            RESONANT_DB_PATH=str(root/'preview.sqlite'),
                            RESONANT_SESSION_SECRET=self.preview_secret,
+                           RESONANT_LEARNING_SYNC_DIR=str(root),
+                           RESONANT_VISUAL_EDITOR_ORIGIN=self.origin,
                            RESONANT_PREVIEW_API_ORIGIN=f'http://127.0.0.1:{backend_port}')
                 runtime_script=self.repo/'scripts/prepare_local_runtime.py'
                 sources=lambda:self.source_revision([runtime_script,*(self.repo/'backend/lab').glob('*.py')])

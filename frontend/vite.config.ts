@@ -1,8 +1,11 @@
 import { defineConfig,loadEnv,type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-export default defineConfig(({mode})=>{
+import {editorSource} from './editorSource.mjs';
+export default defineConfig(({mode,command})=>{
  const previewApi=loadEnv(mode,'.','RESONANT_PREVIEW_API_ORIGIN').RESONANT_PREVIEW_API_ORIGIN;
  if(previewApi&&!/^http:\/\/(127\.0\.0\.1|localhost):[0-9]{1,5}$/.test(previewApi))throw Error('Adresse API locale invalide.');
+ const visualOrigin=command==='serve'&&previewApi?loadEnv(mode,'.','RESONANT_VISUAL_EDITOR_ORIGIN').RESONANT_VISUAL_EDITOR_ORIGIN:'';
+ if(visualOrigin&&!/^http:\/\/127\.0\.0\.1:[0-9]{1,5}$/.test(visualOrigin))throw Error('Adresse de l’éditeur local invalide.');
  const apiOrigin=previewApi||'http://127.0.0.1:8000';
  // A Vite page normally bypasses the backend HTML route which issues the
  // visitor cookie. Keep real session/CSRF checks in the isolated editor preview.
@@ -20,5 +23,6 @@ export default defineConfig(({mode})=>{
    }catch{res.statusCode=503;res.end('Le backend de prévisualisation n’est pas disponible.');}
   });
  }};
- return {plugins:[react(),previewSession],server:{proxy:{'/api':{target:apiOrigin,changeOrigin:false},'/compute-runtime':{target:apiOrigin,changeOrigin:false}}},build:{chunkSizeWarningLimit:5500}};
+ return {define:{__RESONANT_VISUAL_EDITOR_ORIGIN__:JSON.stringify(visualOrigin||'')},
+  plugins:[react({babel:{plugins:visualOrigin?[editorSource]:[]}}),previewSession],server:{proxy:{'/api':{target:apiOrigin,changeOrigin:false},'/compute-runtime':{target:apiOrigin,changeOrigin:false}}},build:{chunkSizeWarningLimit:5500}};
 });

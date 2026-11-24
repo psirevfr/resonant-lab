@@ -1,9 +1,9 @@
 """Private API with bounded caches and temporary, owner-scoped WAV references."""
 from collections import OrderedDict
-from contextlib import contextmanager
+from contextlib import asynccontextmanager, contextmanager
 from io import StringIO
 from pathlib import Path
-from threading import RLock,BoundedSemaphore
+from threading import RLock,BoundedSemaphore,Event,Thread
 from uuid import uuid4
 import math
 import os
@@ -43,11 +43,26 @@ from .auth import (
 )
 
 APP_VERSION='1.1.0'
-app=FastAPI(title='Résonant Lab',version=APP_VERSION)
+
+@asynccontextmanager
+async def lifespan(app):
+    init_db();job_store.init_jobs();job_store.maintain()
+    path = learning_sync.snapshot_path()
+    stop = Event()
+    if path is not None:
+        Thread(target=learning_sync.synchronize, args=(path,stop), daemon=True).start()
+    try:
+        yield
+    finally:
+        stop.set()
+
+
+app=FastAPI(title='Résonant Lab',version=APP_VERSION,lifespan=lifespan)
 
 from . import job_store
 from . import audio_store
 from . import learning_store
+from . import learning_sync
 from .request_limits import RequestLimits
 from .security_headers import SecurityHeaders
 app.add_middleware(RequestLimits)
@@ -340,7 +355,15 @@ def change_learning_consent(choice:learning_store.LearningChoice,request:Request
 
 @api_router.get('/api/acoustic-learning')
 def collective_learning():
-    return JSONResponse({'history':learning_store.summary()},headers={'Cache-Control':'no-store'})
+    remote = learning_sync.read_snapshot(learning_sync.snapshot_path())
+    if remote is not None:
+        return {'history':remote,'source':'production'}
+    return {'history':learning_store.summary()}
+
+
+@app.get('/api/acoustic-learning/public-summary')
+def public_learning_summary():
+    return {'version':learning_sync.SUMMARY_VERSION,'history':learning_store.summary()}
 
 
 @api_router.post('/api/acoustic-learning')
@@ -444,10 +467,6 @@ if DIST.exists():
 # ===================================================================
 # GESTION DES PAGES ET AUTHENTIFICATION
 # ===================================================================
-
-@app.on_event("startup")
-def startup_event():
-    init_db();job_store.init_jobs();job_store.maintain()
 
 from .pages import auth_form,signed_out
 import hmac

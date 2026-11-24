@@ -112,6 +112,8 @@ button.icon { min-width: 34px; padding: 3px 6px; font-size: 18px; }
 .activity { z-index: 4; position: fixed; inset: auto 278px 0 0; height: min(220px, 40vh); display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line); box-shadow: 0 -6px 24px #19383024; }
 .activity > div { display: flex; align-items: center; justify-content: space-between; padding: 5px 12px; border-bottom: 1px solid var(--line); }
 #deployment-actions { margin-left: auto; margin-right: 12px; color: var(--teal); }
+.source-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.source-tools input { max-width: min(100%, 240px); }
 .activity pre { flex: 1; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: 10px; }
 
 dialog { width: min(480px, calc(100% - 24px)); border: 1px solid #aec6ba; border-radius: 13px; padding: 20px; background: var(--paper); color: var(--ink); box-shadow: 0 16px 44px #12382f55; }

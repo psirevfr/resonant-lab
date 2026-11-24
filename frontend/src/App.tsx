@@ -4,6 +4,7 @@ import {LayoutGrid} from './components/LayoutGrid';
 import {HardwarePlan} from './components/HardwarePlan';
 import {acousticEnabled,acousticHint,acousticTrialCount,clearAcousticTrials,contribution,recordAcousticTrial,sendContribution,setAcousticEnabled,type CollectiveHistory} from './acousticLearning';
 import {COMPUTE_VERSION} from './computeVersion';
+import {visualEditorOrigin} from './siteSettings';
 import type {AudioOrigin} from './circuitProject';
 import {computeLocally,disposeCompute} from './computeEngine';
 import { renderPatchClientSide } from './audioEngine';
@@ -48,6 +49,7 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  const [learningEnabled,setLearningEnabled]=useState(false),[trialCount,setTrialCount]=useState(0);
  const sharing=!!user&&learningOwner===user.id;
  const [community,setCommunity]=useState<CollectiveHistory>({});
+ const [remoteLearning,setRemoteLearning]=useState(false);
  const contributionControl=useRef<AbortController|null>(null);
  useEffect(()=>{
   if(!sharing)return;
@@ -76,12 +78,31 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  const [localReady,setLocalReady]=useState(false),[localBusy,setLocalBusy]=useState(false),[localMessage,setLocalMessage]=useState('');
  const localControl=useRef<AbortController|null>(null);
  useEffect(()=>{
-  if((!learningEnabled&&!sharing)||!user){setCommunity({});return;}
+  setCommunity({});setRemoteLearning(false);
+  if(!user)return;
   const controller=new AbortController();
-  void api<{history:CollectiveHistory}>('/acoustic-learning',undefined,controller.signal)
-   .then(value=>{if(!controller.signal.aborted)setCommunity(value.history);}).catch(()=>{});
-  return()=>controller.abort();
- },[learningEnabled,sharing,user?.id,localBusy]);
+  let fetching=false;
+  const refreshLearning=async()=>{
+   if(fetching||document.hidden)return;
+   fetching=true;
+   try{
+    const value=await api<{history:CollectiveHistory;source?:'production'}>('/acoustic-learning',undefined,controller.signal);
+    if(!controller.signal.aborted){
+     const useRemote=value.source==='production';
+     setRemoteLearning(useRemote&&Object.keys(value.history).length>0);
+     setCommunity(useRemote||sharing||learningEnabled?value.history:{});
+    }
+   }catch{/* Continue with the last available observations. */}
+   finally{fetching=false;}
+  };
+  void refreshLearning();
+  const timer=setInterval(refreshLearning,300_000);
+  document.addEventListener('visibilitychange',refreshLearning);
+  return()=>{
+   controller.abort();clearInterval(timer);
+   document.removeEventListener('visibilitychange',refreshLearning);
+  };
+ },[learningEnabled,sharing,user?.id]);
  useEffect(()=>{let current=true;setLocalReady(false);if(user)api<{available:boolean;algorithm_version?:string}>('/compute/config').then(v=>{if(current){setLocalReady(v.available&&v.algorithm_version===COMPUTE_VERSION);}}).catch(()=>{});return()=>{current=false}},[user?.id]);
  useEffect(()=>()=>{localControl.current?.abort();disposeCompute()},[user?.id]);
  const compute=useComputeJob(user?.id,consumeResult,true);
@@ -93,7 +114,7 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
   if(localControl.current||compute.busy||!user)return;
   const controller=new AbortController();localControl.current=controller;setLocalBusy(true);setError('');setLocalMessage('Chargement de la référence en double précision…');
   try{
-   const hint=kind==='generate'&&(sharing||acousticEnabled(user.id))?acousticHint(user.id,community,sharing):undefined;
+   const hint=kind==='generate'&&(sharing||remoteLearning||acousticEnabled(user.id))?acousticHint(user.id,community,sharing):undefined;
    let ticket='';
    const shareSignal=contributionControl.current?.signal;
    const receiveTicket=hint&&sharing?(value:string)=>{ticket=value;}:undefined;
@@ -123,8 +144,8 @@ export function App({layoutPage,extraBlocks,onNavigatePage,guideTarget,active=tr
  const jobId=compute.busy&&compute.job?.kind==='optimize'?compute.job.id:'';
  const locked=!!busy||compute.busy||localBusy||!user;
  useEffect(()=>{
-  if(import.meta.env.DEV&&window.parent!==window&&new URLSearchParams(location.search).get('editor')==='1')
-   window.parent.postMessage({type:'resonant-editor:activity',busy:!!busy||localBusy||compute.busy},'*');
+  if(import.meta.env.DEV&&visualEditorOrigin&&window.parent!==window&&new URLSearchParams(location.search).get('editor')==='1')
+   window.parent.postMessage({type:'resonant-editor:activity',busy:!!busy||localBusy||compute.busy},visualEditorOrigin);
  },[busy,localBusy,compute.busy]);
  useEffect(()=>{if(compute.job?.kind==='optimize')setJob({...compute.job,progress:compute.job.progress} as Job)},[compute.job]);
  const signature=useMemo(()=>JSON.stringify({nodes:patch.nodes.map(({id,type,parameters})=>({id,type,parameters})),edges:patch.edges,fs:patch.sample_rate,duration:patch.duration}),[patch]);

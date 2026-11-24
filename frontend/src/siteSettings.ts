@@ -40,3 +40,5 @@ export function validateEditorMessage(value:unknown):EditorMessage{
  throw Error('Message éditeur inconnu.');
 }
 export function isEditorKey(value:unknown):value is EditorKey{return typeof value==='string'&&['identity','navigation','appearance','welcome'].includes(value)}
+declare const __RESONANT_VISUAL_EDITOR_ORIGIN__:string;
+export const visualEditorOrigin=typeof __RESONANT_VISUAL_EDITOR_ORIGIN__==='string'?__RESONANT_VISUAL_EDITOR_ORIGIN__:'';

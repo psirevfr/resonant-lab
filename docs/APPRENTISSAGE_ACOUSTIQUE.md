@@ -63,6 +63,10 @@ Sources méthodologiques. [Sélection de modèles pour les bandits contextuels](
 
 ## Synchronisation de l’éditeur
 
+L’aperçu dans Résonant Editor et le lanceur local `./run.sh` récupèrent les statistiques agrégées toutes les cinq minutes. Chaque groupe comprend au moins cinq identités. Le cache séparé reste utilisable pendant 24 heures si le site ne répond plus. Les statistiques de production guident les nouveaux essais locaux compatibles. Les observations locales, les réglages, les brouillons, les projets et les commits résident dans leurs propres fichiers.
+
+Le mode **Textes et boutons** ouvre la console sur l’élément sélectionné dans l’aperçu. Un libellé littéral peut être modifié directement. Les boutons qui ont un élément voisin dans le même groupe JSX peuvent être déplacés avant ou après lui. La console donne accès au code pour les libellés dynamiques et les déplacements entre groupes. Les marqueurs de sélection servent uniquement à l’aperçu de l’éditeur et le canal de messages est limité au port de cet éditeur.
+
 L’aperçu local suit les sources du site et reconstruit l’archive de calcul WebAssembly lorsque les sources numériques changent. Les changements de présentation sur disque sont fusionnés avec les modifications en cours. Lorsqu’un même réglage est modifié de part et d’autre, la saisie en cours reste dans le brouillon et la version externe reste enregistrée jusqu’à la sauvegarde suivante. Un changement de l’éditeur lui-même entraîne sa relance lorsque le brouillon et les calculs sont au repos.
 
 Dans Résonant Editor, **Publier** affiche les changements locaux et les commits à envoyer. La confirmation lance le contrôle des fichiers, les tests et la compilation, puis crée un commit local si nécessaire et envoie la version complète sur `origin/main`. **Vérification** permet aussi d’exécuter les contrôles séparément sans accès réseau. Si `main` a avancé sur GitHub et contient des changements absents du dépôt local, la publication s’arrête. Les fichiers ignorés restent sur le Mac et l’éditeur bloque les données privées détectées dans les changements ou les commits en attente.

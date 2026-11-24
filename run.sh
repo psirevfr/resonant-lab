@@ -17,6 +17,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM HUP
 ./worker.sh &
 worker_pid=$!
+export RESONANT_LEARNING_SYNC_DIR="$PWD/.local"
 ./run-web.sh &
 web_pid=$!
 printf 'Résonant : http://%s:%s — serveur et worker actifs ; Ctrl+C pour arrêter.\n' "${RESONANT_HOST:-127.0.0.1}" "${RESONANT_PORT:-8000}"
