@@ -61,6 +61,13 @@ class EditorError(Exception):
         self.status = status
 
 
+class PublishCredentialError(EditorError):
+    def __init__(self, message, fingerprint, head):
+        super().__init__(message, 409)
+        self.fingerprint = fingerprint
+        self.head = head
+
+
 def validate_settings(value):
     if type(value) is not dict or set(value) != set(DEFAULT_SETTINGS):
         raise EditorError('Format de réglages invalide.')
@@ -617,25 +624,28 @@ class SiteEditor:
             self.job['log'].append(line)
             self.job['log'] = self.job['log'][-200:]
 
-    def start_job(self, action, review=None):
+    def start_job(self, action, review=None, new_credential=False):
         with self.lock:
             if self.job['status'] == 'running':
                 raise EditorError('Une opération est déjà en cours.', 409)
             state = self.ensure_publishable()
             prepared = self.prepared_fingerprint
+            prepared_matches = (action == 'publish' and prepared
+                                and self.git('rev-parse', 'HEAD').strip() == self.prepared_head
+                                and self.fingerprint(state, include_remote=False) == prepared)
             if action == 'publish' and review is None:
-                if not prepared or self.fingerprint(state, include_remote=False) != prepared:
+                if not prepared_matches:
                     raise EditorError('La version a changé. Ouvrez la publication pour la vérifier.', 409)
             elif review is None or self.fingerprint(state) != review:
                 raise EditorError('La version a changé. Rouvrez la revue avant de continuer.', 409)
-            if action == 'publish' and prepared and self.fingerprint(state, include_remote=False) == prepared:
+            if prepared_matches:
                 review = None
             self.job = {'id': secrets.token_hex(12), 'status': 'running',
                         'stage': 'Préparation', 'log': [], 'error': None,
                         'readyToPublish': False}
             self.prepared_fingerprint = None
             job = dict(self.job)
-            thread = threading.Thread(target=self.run_job, args=(action, prepared, review), daemon=True)
+            thread = threading.Thread(target=self.run_job, args=(action, prepared, review, new_credential), daemon=True)
             thread.start()
             return job
 
@@ -660,7 +670,7 @@ class SiteEditor:
         self.scan_secrets(state)
         return state, self.fingerprint(state, include_remote=False)
 
-    def push_release(self, prepared):
+    def push_release(self, prepared, new_credential=False):
         destination = self.remote()
         with self.lock:
             self.job['stage'] = 'Envoi vers GitHub'
@@ -703,9 +713,16 @@ class SiteEditor:
                 head = self.git('rev-parse', 'HEAD').strip()
         if self.remote() != destination or self.git('rev-parse', 'origin/main').strip() != base:
             raise EditorError('La destination ou la branche distante a changé.', 409)
+        final_state = self.ensure_publishable()
+        if final_state['dirty'] or self.git('rev-parse', 'HEAD').strip() != head:
+            raise EditorError('Le projet a changé après la vérification. Relancez la publication.', 409)
+        retry_fingerprint = self.fingerprint(final_state, include_remote=False)
+        # An explicit retry bypasses stored HTTPS credentials for this command only.
+        # An empty helper list also prevents Git from storing an unverified token.
+        credential_options = ('-c', 'credential.helper=') if new_credential else ()
         self.log('Envoi de '+head[:12]+' vers GitHub sur main…')
         try:
-            self.git('push', '--no-follow-tags', '--recurse-submodules=no', 'origin',
+            self.git(*credential_options, 'push', '--no-follow-tags', '--recurse-submodules=no', 'origin',
                      head+':refs/heads/main', timeout=180, on_line=self.log, authenticate=True)
         except EditorError as error:
             # Reconcile a lost reply without retrying a write blindly.
@@ -714,14 +731,20 @@ class SiteEditor:
             except EditorError:
                 found = []
             if not found or found[0] != head:
+                if 'workflow' in str(error).lower() and re.search(r'refusing to allow|without .*scope|workflows.*permission', str(error), re.I):
+                    raise PublishCredentialError(
+                        'GitHub refuse la modification du workflow. Dans Publier, choisissez un autre jeton avec le droit d’écriture sur Workflows.',
+                        retry_fingerprint, head) from None
                 if re.search(r'could not read (?:Username|Password)|Authentication failed|Invalid username or token',
                              str(error), re.I):
-                    raise EditorError('GitHub demande une identification. Relancez Publier et complétez la fenêtre GitHub du Mac avec un jeton autorisé.', 409) from None
+                    raise PublishCredentialError(
+                        'GitHub demande une identification. Dans Publier, choisissez un autre jeton et saisissez-le dans la fenêtre du Mac.',
+                        retry_fingerprint, head) from None
                 raise error
         self.log('GitHub a reçu '+head[:12]+'. Suivez la mise en ligne dans GitHub Actions.')
         return {'commit': head[:12], 'actionsUrl': f'https://github.com/{destination}/actions'}
 
-    def run_job(self, action, prepared, review):
+    def run_job(self, action, prepared, review, new_credential=False):
         try:
             if action == 'prepare' or review is not None:
                 state, prepared = self.verify_release(review)
@@ -734,9 +757,16 @@ class SiteEditor:
                                         readyToPublish=available)
                     self.log('Vérifications réussies.' if available else 'Vérifications réussies. Aucune modification à publier.')
                     return
-            result = self.push_release(prepared)
+            result = self.push_release(prepared, new_credential)
             with self.lock:
                 self.job.update(status='succeeded', stage='Envoyé sur GitHub' if result else 'Déjà à jour', publication=result)
+        except PublishCredentialError as exc:
+            with self.lock:
+                self.prepared_fingerprint = exc.fingerprint
+                self.prepared_head = exc.head
+                self.job.update(status='failed', stage='Identification GitHub', error=str(exc),
+                                readyToPublish=False, needsCredential=True)
+            self.log(str(exc))
         except Exception as exc:
             error = sanitize(str(exc), self.secrets)[:600]
             with self.lock:
@@ -1070,6 +1100,8 @@ class EditorHandler(BaseHTTPRequestHandler):
             if path in ('/api/prepare', '/api/publish') and set(body) == {'review'} and isinstance(body['review'], str):
                 action = 'prepare' if path == '/api/prepare' else 'publish'
                 return self.send(202, {'job': self.editor.start_job(action, body['review'])})
+            if path == '/api/publish' and set(body) == {'review','newCredential'} and isinstance(body['review'], str) and body['newCredential'] is True:
+                return self.send(202, {'job': self.editor.start_job('publish', body['review'], new_credential=True)})
             if body:
                 raise EditorError('Cette action ne prend pas de paramètres.')
             return self.send(202, {'job': self.editor.start_job('prepare' if path == '/api/prepare' else 'publish')})

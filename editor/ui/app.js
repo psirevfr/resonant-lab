@@ -234,6 +234,8 @@ async function openReview(action){
  const dialog=$('#review-dialog'),message=$('#review-summary');
  const publishing=action==='publish';
  publicationReview=null;$('#run-review').disabled=true;$('#review-details').hidden=true;
+ $('#publish-credential').hidden=!publishing;
+ $('#new-publish-credential').checked=publishing&&state?.job?.needsCredential===true;
  $('#review-title').textContent=publishing?'Publier la version complète':'Vérification';
  $('#run-review').textContent=publishing?'Publier sur GitHub':'Vérifier la version locale';
  message.textContent=dirty?'Enregistrement des réglages…':'Lecture des changements locaux…';
@@ -260,11 +262,12 @@ $('#cancel-review').onclick=()=>$('#review-dialog').close();
 $('#run-review').onclick=async()=>{
  if(!publicationReview||busy())return;
  const {review,action}=publicationReview;
+ const newCredential=action==='publish'&&$('#new-publish-credential').checked;
  $('#review-dialog').close();
  try{
   requesting=true;refresh();showActivity(true);
   showMessage(action==='publish'?'Préparation de la publication complète…':'Vérification des fichiers, des tests et de la compilation…');
-  state.job=(await api('/api/'+action,{review})).job;
+  state.job=(await api('/api/'+action,newCredential?{review,newCredential}:{review})).job;
   updateJob(state.job);
  }catch(error){showMessage(error.message,true);}
  finally{requesting=false;refresh();}

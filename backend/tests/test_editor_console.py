@@ -223,6 +223,59 @@ def test_publish_checks_build_and_pushes_all_reviewed_changes(project, monkeypat
     assert not git('status', '--porcelain')
 
 
+def test_workflow_refusal_can_retry_the_same_commit_with_a_fresh_token(project, monkeypatch):
+    from threading import Event
+
+    git, remote = local_origin(project, monkeypatch)
+    base = git('rev-parse', 'HEAD').strip()
+    script = project.repo/'test.sh'
+    script.write_text('#!/bin/sh\nprintf run >> .git/test-runs\n')
+    script.chmod(0o755)
+    workflow = project.repo/'.github/workflows/deploy.yml'
+    workflow.parent.mkdir(parents=True)
+    workflow.write_text('name: example\n')
+    original_git = project.git
+    attempts = []
+    completed = Event()
+
+    def fake_git(*args, **kwargs):
+        if 'push' in args:
+            attempts.append(args)
+            if 'credential.helper=' not in args:
+                raise server.EditorError('remote rejected: refusing to allow a Personal Access Token '
+                                         'to update workflow without workflow scope', 409)
+        return original_git(*args, **kwargs)
+
+    monkeypatch.setattr(project, 'git', fake_git)
+    project.run_job('publish', None, project.publication_review()['review'])
+    assert project.job['needsCredential'] and 'Workflows' in project.job['error']
+    head = git('rev-parse', 'HEAD').strip()
+    assert head != base
+    assert git('--git-dir', str(remote), 'rev-parse', 'main').strip() == base
+    assert (project.repo/'.git/test-runs').read_text() == 'run'
+    future_edit = project.repo/'README.md'
+    future_edit.write_text('A change after the failed push')
+    with pytest.raises(server.EditorError, match='changé'):
+        project.start_job('publish', new_credential=True)
+    future_edit.unlink()
+
+    run_job = project.run_job
+    def notify_completion(*args):
+        try:
+            run_job(*args)
+        finally:
+            completed.set()
+    monkeypatch.setattr(project, 'run_job', notify_completion)
+    project.start_job('publish', project.publication_review()['review'], new_credential=True)
+    assert completed.wait(5)
+    assert project.job['status'] == 'succeeded', project.job
+    assert len(attempts) == 2
+    assert 'credential.helper=' in attempts[-1]
+    assert head+':refs/heads/main' in attempts[-1]
+    assert git('--git-dir', str(remote), 'rev-parse', 'main').strip() == head
+    assert (project.repo/'.git/test-runs').read_text() == 'run'
+
+
 def test_publish_rejects_changes_after_review_and_during_tests(project, monkeypatch):
     git, remote = local_origin(project, monkeypatch)
     base = git('rev-parse', 'HEAD').strip()

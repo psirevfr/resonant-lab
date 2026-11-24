@@ -74,3 +74,5 @@ Dans Résonant Editor, **Publier** affiche les changements locaux et les commits
 Après la réception par GitHub, le lien **GitHub Actions** donne l’état du déploiement. Le workflow déploie les fichiers compilés dans `frontend/dist` et reconstruit l’archive WebAssembly. Le serveur initialise les tables de mémoire collective et de consentement au démarrage par migration additive.
 
 Si le Trousseau ne possède pas encore d’identifiant GitHub utilisable, la publication peut ouvrir une fenêtre macOS qui demande le nom d’utilisateur et un jeton GitHub disposant du droit d’écriture. Git reçoit le jeton par son mécanisme d’identification et le Trousseau peut le conserver pour les prochaines publications. Si le lot inclut le workflow de déploiement, le jeton doit aussi avoir le droit de modifier ce workflow.
+
+Si le jeton enregistré est refusé, **Publier → Utiliser un autre jeton pour cet envoi** ouvre la fenêtre macOS et utilise le nouveau jeton pour cette seule tentative. Après un refus d’autorisation, l’éditeur peut réessayer la version déjà vérifiée tant que les fichiers et la branche locale restent identiques. Le Trousseau garde ses identifiants existants.
