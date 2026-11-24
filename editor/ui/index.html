@@ -96,12 +96,11 @@
     </nav>
   </aside>
 </main>
-<section id="activity" class="activity" hidden><div><b>Suivi de publication</b><button id="close-activity" aria-label="Fermer le suivi">×</button></div><pre id="activity-log" tabindex="0" aria-label="Journal des vérifications"></pre></section>
-<dialog id="publish-dialog"><h2>Mettre cette version en ligne ?</h2><p>Les tests et la compilation ont été validés. La publication déclenchera le déploiement du site depuis GitHub.</p><p id="publish-summary"></p><div class="dialog-actions"><button id="cancel-publish">Revenir à l’aperçu</button><button id="confirm-publish" class="primary">Publier sur le site</button></div></dialog>
+<section id="activity" class="activity" hidden><div><b>Suivi de publication</b><a id="deployment-actions" hidden>GitHub Actions ↗</a><button id="close-activity" aria-label="Fermer le suivi">×</button></div><pre id="activity-log" tabindex="0" aria-label="Journal des vérifications"></pre></section>
 <dialog id="review-dialog" aria-labelledby="review-title">
   <h2 id="review-title">Vérification</h2>
   <p id="review-summary"></p>
-  <details id="review-details" hidden><summary>Fichiers des commits à vérifier</summary><ul id="review-files"></ul></details>
+  <details id="review-details" hidden><summary>Fichiers inclus dans la version</summary><ul id="review-files"></ul></details>
   <div class="dialog-actions"><button id="cancel-review">Fermer</button><button id="run-review" class="primary">Vérifier la version locale</button></div>
 </dialog>
 <dialog id="file-console" aria-labelledby="console-title">

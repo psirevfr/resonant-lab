@@ -63,7 +63,22 @@ function setPage(next){
  $('#preview').src=url.href;
 }
 function showActivity(value){$('#activity').hidden=!value;$('#log-toggle').setAttribute('aria-expanded',String(value));}
-function updateJob(job){if(!job)return;if(previousReady&&!job.readyToPublish&&job.status!=='running')showMessage('Le projet a été actualisé. La vérification peut être relancée.');previousReady=job.readyToPublish;const log=Array.isArray(job.log)?job.log.join('\n'):job.log||'';if($('#activity-log').textContent!==log){$('#activity-log').textContent=log;$('#activity-log').scrollTop=$('#activity-log').scrollHeight;}if(job.id!==lastJobId||job.status!==lastStatus){if(job.status==='failed')showMessage(job.error||'La vérification a échoué. Consultez le suivi.',true);if(job.readyToPublish)showMessage('Version vérifiée. Vous pouvez maintenant la publier.');if(job.status==='succeeded'&&job.stage==='Terminé')showMessage('Version envoyée sur GitHub. Le déploiement est lancé.');lastJobId=job.id;lastStatus=job.status;}}
+function updateJob(job){
+ if(!job)return;
+ if(previousReady&&!job.readyToPublish&&job.status!=='running'&&!job.publication)showMessage('Le projet a été actualisé. La vérification peut être relancée.');
+ previousReady=job.readyToPublish;
+ const log=Array.isArray(job.log)?job.log.join('\n'):job.log||'';
+ if($('#activity-log').textContent!==log){$('#activity-log').textContent=log;$('#activity-log').scrollTop=$('#activity-log').scrollHeight;}
+ const actions=$('#deployment-actions');
+ actions.hidden=!job.publication;
+ if(job.publication)actions.href=job.publication.actionsUrl;
+ if(job.id===lastJobId&&job.status===lastStatus)return;
+ if(job.status==='failed')showMessage(job.error||'L’opération a échoué. Consultez le suivi.',true);
+ if(job.readyToPublish)showMessage('Version vérifiée. Vous pouvez la publier.');
+ if(job.publication)showMessage('Version '+job.publication.commit+' reçue par GitHub. Suivez la mise en ligne dans GitHub Actions.');
+ if(job.stage==='Déjà à jour')showMessage('GitHub possède déjà cette version.');
+ lastJobId=job.id;lastStatus=job.status;
+}
 function synchronizePresentation(next){
  if(!next.presentationRevision||diskRevision===next.presentationRevision)return;
  const before=page;
@@ -132,46 +147,46 @@ $('#undo').onclick=()=>{if(!undo.length||busy())return;redo.push(snapshot());res
 $('#redo').onclick=()=>{if(!redo.length||busy())return;undo.push(snapshot());restore(redo.pop());lastChange=null;refresh();sendPreview();};
 $('#save').onclick=async()=>{try{requesting=true;refresh();await save();}catch(e){showMessage(e.message,true);}finally{requesting=false;refresh();}};
 let publicationReview=null;
-async function openReview(){
+async function openReview(action){
  if(!draft||busy())return;
  const dialog=$('#review-dialog'),message=$('#review-summary');
+ const publishing=action==='publish';
  publicationReview=null;$('#run-review').disabled=true;$('#review-details').hidden=true;
- message.textContent='Lecture des commits locaux…';dialog.showModal();
- try{
-  const details=await api('/api/publication-review');
-  publicationReview=details;
-  message.textContent=details.paths.length
-   ? details.count+' commits locaux seront vérifiés. Consultez les fichiers inclus avant de continuer.'
-   : 'Les réglages, les tests et la compilation seront vérifiés.';
-  const list=details.paths.map(path=>{const item=document.createElement('li');item.textContent=path;return item;});
-  $('#review-files').replaceChildren(...list);
-  $('#review-details').hidden=!list.length;
-  $('#review-details').open=details.paths.includes('.github/workflows/deploy.yml');
-  $('#run-review').disabled=false;
- }catch(error){message.textContent=error.message;}
-}
-$('#prepare').onclick=openReview;
-$('#cancel-review').onclick=()=>$('#review-dialog').close();
-$('#run-review').onclick=async()=>{
- if(!publicationReview||busy())return;
- const review=publicationReview.review;
- $('#review-dialog').close();
+ $('#review-title').textContent=publishing?'Publier la version complète':'Vérification';
+ $('#run-review').textContent=publishing?'Publier sur GitHub':'Vérifier la version locale';
+ message.textContent=dirty?'Enregistrement des réglages…':'Lecture des changements locaux…';
+ dialog.showModal();
  try{
   requesting=true;refresh();
   if(dirty)await save();
-  showActivity(true);showMessage('Vérification des fichiers, des tests et de la compilation…');
-  state.job=(await api('/api/prepare',{review})).job;updateJob(state.job);
+  const details=await api('/api/publication-review');
+  if(!dialog.open)return;
+  publicationReview={review:details.review,action};
+  const scope=details.count+' commits locaux · '+details.localCount+' fichiers modifiés.';
+  message.textContent=scope+(publishing?' Après les contrôles, la version complète sera envoyée sur main et déclenchera le déploiement du site.':' Les tests et la compilation seront vérifiés sur ce Mac.');
+  const list=details.paths.map(path=>{const item=document.createElement('li');item.textContent=path;return item;});
+  $('#review-files').replaceChildren(...list);
+  $('#review-details').hidden=!list.length;
+  $('#review-details').open=details.paths.some(path=>path.startsWith('.github/workflows/'));
+  $('#run-review').disabled=false;
+ }catch(error){message.textContent=error.message;}
+ finally{requesting=false;refresh();}
+}
+$('#prepare').onclick=()=>openReview('prepare');
+$('#publish').onclick=()=>openReview('publish');
+$('#cancel-review').onclick=()=>$('#review-dialog').close();
+$('#run-review').onclick=async()=>{
+ if(!publicationReview||busy())return;
+ const {review,action}=publicationReview;
+ $('#review-dialog').close();
+ try{
+  requesting=true;refresh();showActivity(true);
+  showMessage(action==='publish'?'Préparation de la publication complète…':'Vérification des fichiers, des tests et de la compilation…');
+  state.job=(await api('/api/'+action,{review})).job;
+  updateJob(state.job);
  }catch(error){showMessage(error.message,true);}
  finally{requesting=false;refresh();}
 };
-$('#publish').onclick=()=>{
- if(!draft||busy())return;
- if(dirty||!state?.job?.readyToPublish){openReview();return;}
- $('#publish-summary').textContent='Branche '+(state.repo?.branch||'main')+' · '+(publicationReview?.count??0)+' commits vérifiés et réglages locaux.';
- $('#publish-dialog').showModal();
-};
-$('#cancel-publish').onclick=()=>$('#publish-dialog').close();
-$('#confirm-publish').onclick=async()=>{if(requesting)return;$('#publish-dialog').close();try{requesting=true;refresh();showActivity(true);showMessage('Envoi de la version sur GitHub…');await api('/api/publish',{});state=await api('/api/state');updateJob(state.job);}catch(e){showMessage(e.message,true);if(e.status===409){requesting=false;await openReview();}}finally{requesting=false;refresh();}};
 function changeMode(enabled){
  selectMode=enabled;
  $('#select-mode').setAttribute('aria-pressed',String(enabled));

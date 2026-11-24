@@ -6,7 +6,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from editor import server
+from editor import git_askpass, server
 
 
 @pytest.fixture
@@ -93,6 +93,23 @@ def test_mac_preview_path_includes_standard_node_installations(monkeypatch):
     assert server.isolated_environment()['PATH'].split(':') == ['/opt/homebrew/bin', '/usr/local/bin', '/usr/bin']
 
 
+def test_native_credential_prompt_only_answers_github_https(monkeypatch, capsys):
+    assert git_askpass.credential_kind("Username for 'https://github.com': ") == 'Username'
+    prompt = "Password for 'https://tester@github.com/example/repo.git': "
+    assert git_askpass.credential_kind(prompt) == 'Password'
+    for host in ('http://github.com', 'https://github.com.example.invalid',
+                 'https://github.com:444', 'https://user:value@github.com'):
+        assert git_askpass.credential_kind(f"Password for '{host}': ") is None
+    monkeypatch.setattr(git_askpass.sys, 'argv', ['git_askpass', prompt])
+    def native_dialog(args, **kwargs):
+        assert args == ['/usr/bin/osascript', '-', 'Password']
+        assert 'with hidden answer' in kwargs['input']
+        return subprocess.CompletedProcess(args, 0, stdout='synthetic-answer\n', stderr='')
+    monkeypatch.setattr(git_askpass.subprocess, 'run', native_dialog)
+    assert git_askpass.main() == 0
+    assert capsys.readouterr().out == 'synthetic-answer\n'
+
+
 def prepare_history(project):
     def git(*args):
         return project.git('-c', 'user.name=Test', '-c', 'user.email=test@local.invalid', *args)
@@ -120,8 +137,6 @@ def test_review_allows_explicitly_reviewed_code_history(project, monkeypatch):
     network = []
     monkeypatch.setattr(project, 'git', lambda *args, **kw:
                         network.append(args) or '' if args[0] in ('fetch', 'push') else normal_git(*args, **kw))
-    with pytest.raises(server.EditorError, match='Vérification'):
-        project.ensure_publishable()
     review = project.publication_review()
     assert review['count'] == 2
     assert review['paths'] == ['frontend/src/style.css', 'test.sh']
@@ -131,7 +146,7 @@ def test_review_allows_explicitly_reviewed_code_history(project, monkeypatch):
     assert network == []
     git('commit', '--allow-empty', '-m', 'Unexpected new HEAD')
     with pytest.raises(server.EditorError, match='changé'):
-        project.ensure_publishable(review['review'])
+        project.start_job('publish', review['review'])
 
 
 def test_review_blocks_private_history_and_deleted_secrets(project):
@@ -142,12 +157,102 @@ def test_review_blocks_private_history_and_deleted_secrets(project):
     path.write_text('body {}')
     git('commit', '-am', 'Removed secret')
     with pytest.raises(server.EditorError, match='secret'):
-        project.scan_secrets(project.publication_review()['review'])
+        project.verify_release(project.publication_review()['review'])
     (project.repo/'frontend/src/user.sqlite').write_bytes(b'PRIVATE')
     git('add', 'frontend/src/user.sqlite')
     git('commit', '-m', 'Private file')
     with pytest.raises(server.EditorError, match='privé'):
         project.publication_review()
+
+
+def local_origin(project, monkeypatch):
+    git = prepare_history(project)
+    remote = project.repo.parent/'remote.git'
+    git('clone', '--bare', '.', str(remote))
+    git('remote', 'set-url', 'origin', str(remote))
+    git('config', 'user.name', 'Test')
+    git('config', 'user.email', 'test@local.invalid')
+    monkeypatch.setattr(project, 'remote', lambda: 'example/resonant')
+    return git, remote
+
+
+def test_publish_checks_build_and_pushes_all_reviewed_changes(project, monkeypatch):
+    git, remote = local_origin(project, monkeypatch)
+    base = git('rev-parse', 'HEAD').strip()
+    style = project.repo/'frontend/src/style.css'
+    style.write_text('body { color: green; }')
+    git('commit', '-am', 'Styles already committed')
+    (project.repo/'docs').mkdir()
+    (project.repo/'docs/usage.md').write_text('Reviewed documentation')
+    style.write_text('body { color: orange; }')
+    git('add', 'frontend/src/style.css')
+    style.write_text('body { color: yellow; }')
+    script = project.repo/'test.sh'
+    script.write_text('#!/bin/sh\nset -eu\nmkdir -p frontend/dist\ncp frontend/src/style.css frontend/dist/style.css\n')
+    script.chmod(0o755)
+    git('tag', '-a', 'local-tag', '-m', 'Local')
+    git('config', 'push.followTags', 'true')
+
+    review = project.publication_review()
+    assert review['count'] == 1
+    assert review['paths'] == ['docs/usage.md', 'frontend/src/style.css', 'test.sh']
+    project.run_job('publish', None, review['review'])
+    assert project.job['status'] == 'succeeded', project.job
+    head = git('rev-parse', 'HEAD').strip()
+    assert head == git('--git-dir', str(remote), 'rev-parse', 'main').strip()
+    assert git('rev-list', '--count', base+'..'+head).strip() == '2'
+    assert project.job['publication']['commit'] == head[:12]
+    assert git('--git-dir', str(remote), 'show', 'main:frontend/dist/style.css') == 'body { color: yellow; }'
+    assert git('--git-dir', str(remote), 'show', 'main:docs/usage.md') == 'Reviewed documentation'
+    assert git('--git-dir', str(remote), 'tag') == ''
+    assert not git('status', '--porcelain')
+
+
+def test_publish_rejects_changes_after_review_and_during_tests(project, monkeypatch):
+    git, remote = local_origin(project, monkeypatch)
+    base = git('rev-parse', 'HEAD').strip()
+    (project.repo/'README.md').write_text('Reviewed')
+    review = project.publication_review()
+    (project.repo/'README.md').write_text('Changed after review')
+    with pytest.raises(server.EditorError, match='changé'):
+        project.start_job('publish', review['review'])
+
+    script = project.repo/'test.sh'
+    script.write_text('#!/bin/sh\nprintf unexpected > README.md\n')
+    script.chmod(0o755)
+    project.run_job('publish', None, project.publication_review()['review'])
+    assert project.job['status'] == 'failed'
+    assert 'pendant les tests' in project.job['error']
+    assert git('--git-dir', str(remote), 'rev-parse', 'main').strip() == base
+
+
+def test_publish_keeps_remote_changes_and_does_not_send_private_files(project, monkeypatch):
+    git, remote = local_origin(project, monkeypatch)
+    script = project.repo/'test.sh'
+    script.write_text('#!/bin/sh\nexit 0\n')
+    script.chmod(0o755)
+    (project.repo/'docs').mkdir()
+    private = project.repo/'docs/private.sqlite3-shm'
+    private.write_text('private data')
+    with pytest.raises(server.EditorError, match='privé'):
+        project.publication_review()
+    private.unlink()
+    (project.repo/'README.md').write_text('local-test-value-1234')
+    project.run_job('publish', None, project.publication_review()['review'])
+    assert project.job['status'] == 'failed'
+    assert 'secret' in project.job['error']
+
+    git('add', 'test.sh')
+    git('commit', '-m', 'Local change')
+    (project.repo/'README.md').unlink()
+    base = git('rev-parse', 'origin/main').strip()
+    external = git('commit-tree', base+'^{tree}', '-p', base, '-m', 'Remote change').strip()
+    git('push', str(remote), external+':refs/heads/main')
+    git('update-ref', 'refs/remotes/origin/main', base)
+    project.run_job('publish', None, project.publication_review()['review'])
+    assert project.job['status'] == 'failed'
+    assert 'plus récente' in project.job['error']
+    assert git('--git-dir', str(remote), 'rev-parse', 'main').strip() == external
 
 
 def test_terminal_only_allows_diagnostic_commands(project):
